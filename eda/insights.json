@@ -1,0 +1,969 @@
+{
+  "phylum_stats": {
+    "Perception & Sensing": {
+      "total": 554,
+      "first_year": 1988,
+      "peak_year": 2025,
+      "peak_count": 74,
+      "recent_5y_2021_2025": 205,
+      "prior_5y_2016_2020": 96,
+      "growth_pct": 113.5
+    },
+    "SLAM & Localization": {
+      "total": 670,
+      "first_year": 1988,
+      "peak_year": 2025,
+      "peak_count": 64,
+      "recent_5y_2021_2025": 211,
+      "prior_5y_2016_2020": 131,
+      "growth_pct": 61.1
+    },
+    "Planning": {
+      "total": 835,
+      "first_year": 1988,
+      "peak_year": 2025,
+      "peak_count": 70,
+      "recent_5y_2021_2025": 257,
+      "prior_5y_2016_2020": 154,
+      "growth_pct": 66.9
+    },
+    "Control": {
+      "total": 441,
+      "first_year": 1988,
+      "peak_year": 2024,
+      "peak_count": 31,
+      "recent_5y_2021_2025": 100,
+      "prior_5y_2016_2020": 68,
+      "growth_pct": 47.1
+    },
+    "Manipulation": {
+      "total": 934,
+      "first_year": 1988,
+      "peak_year": 2023,
+      "peak_count": 69,
+      "recent_5y_2021_2025": 275,
+      "prior_5y_2016_2020": 156,
+      "growth_pct": 76.3
+    },
+    "Locomotion": {
+      "total": 842,
+      "first_year": 1989,
+      "peak_year": 2025,
+      "peak_count": 66,
+      "recent_5y_2021_2025": 214,
+      "prior_5y_2016_2020": 156,
+      "growth_pct": 37.2
+    },
+    "Robot Design & Hardware": {
+      "total": 623,
+      "first_year": 1988,
+      "peak_year": 2025,
+      "peak_count": 46,
+      "recent_5y_2021_2025": 191,
+      "prior_5y_2016_2020": 122,
+      "growth_pct": 56.6
+    },
+    "Human-Robot Interaction": {
+      "total": 395,
+      "first_year": 1991,
+      "peak_year": 2025,
+      "peak_count": 43,
+      "recent_5y_2021_2025": 123,
+      "prior_5y_2016_2020": 89,
+      "growth_pct": 38.2
+    },
+    "Multi-Robot Systems": {
+      "total": 408,
+      "first_year": 1988,
+      "peak_year": 2022,
+      "peak_count": 41,
+      "recent_5y_2021_2025": 148,
+      "prior_5y_2016_2020": 86,
+      "growth_pct": 72.1
+    },
+    "Learning for Robotics": {
+      "total": 354,
+      "first_year": 1999,
+      "peak_year": 2025,
+      "peak_count": 71,
+      "recent_5y_2021_2025": 200,
+      "prior_5y_2016_2020": 87,
+      "growth_pct": 129.9
+    },
+    "Application Domains": {
+      "total": 396,
+      "first_year": 1988,
+      "peak_year": 2009,
+      "peak_count": 30,
+      "recent_5y_2021_2025": 100,
+      "prior_5y_2016_2020": 67,
+      "growth_pct": 49.3
+    },
+    "Theoretical Foundations": {
+      "total": 491,
+      "first_year": 1988,
+      "peak_year": 2024,
+      "peak_count": 37,
+      "recent_5y_2021_2025": 134,
+      "prior_5y_2016_2020": 83,
+      "growth_pct": 61.4
+    },
+    "Robot Software & Architecture": {
+      "total": 30,
+      "first_year": 1989,
+      "peak_year": 1998,
+      "peak_count": 5,
+      "recent_5y_2021_2025": 6,
+      "prior_5y_2016_2020": 3,
+      "growth_pct": 100.0
+    }
+  },
+  "top_cited_per_phylum": {
+    "Perception & Sensing": [
+      {
+        "title": "3-D Mapping With an RGB-D Camera",
+        "year": 2014,
+        "venue": "T-RO",
+        "citations": 820,
+        "class": "Visual Perception",
+        "order": "General Perception"
+      },
+      {
+        "title": "TEASER: Fast and Certifiable Point Cloud Registration",
+        "year": 2021,
+        "venue": "T-RO",
+        "citations": 784,
+        "class": "LiDAR Perception",
+        "order": "Point Cloud Processing"
+      },
+      {
+        "title": "University of Michigan North Campus long-term vision and lidar dataset",
+        "year": 2016,
+        "venue": "IJRR",
+        "citations": 539,
+        "class": "LiDAR Perception",
+        "order": "Point Cloud Processing"
+      },
+      {
+        "title": "Vehicle Detection from 3D Lidar Using Fully Convolutional Network",
+        "year": 2016,
+        "venue": "RSS",
+        "citations": 485,
+        "class": "LiDAR Perception",
+        "order": "Object Detection"
+      },
+      {
+        "title": "The MOPED framework: Object recognition and pose estimation for manipulation",
+        "year": 2011,
+        "venue": "IJRR",
+        "citations": 440,
+        "class": "Visual Perception",
+        "order": "Pose Estimation"
+      }
+    ],
+    "SLAM & Localization": [
+      {
+        "title": "Square Root SAM: Simultaneous Localization and Mapping via Square Root Information Smoothing",
+        "year": 2006,
+        "venue": "IJRR",
+        "citations": 914,
+        "class": "SLAM",
+        "order": "General SLAM"
+      },
+      {
+        "title": "SVO: Semidirect Visual Odometry for Monocular and Multicamera Systems",
+        "year": 2017,
+        "venue": "T-RO",
+        "citations": 910,
+        "class": "SLAM",
+        "order": "Visual SLAM/Odometry"
+      },
+      {
+        "title": "ElasticFusion: Dense SLAM Without A Pose Graph",
+        "year": 2015,
+        "venue": "RSS",
+        "citations": 804,
+        "class": "SLAM",
+        "order": "Dense Mapping / Reconstruction"
+      },
+      {
+        "title": "High-precision, consistent EKF-based visual-inertial odometry",
+        "year": 2013,
+        "venue": "IJRR",
+        "citations": 790,
+        "class": "SLAM",
+        "order": "Visual-Inertial Odometry/SLAM (VIO)"
+      },
+      {
+        "title": "Mobile Robot Localization and Mapping with Uncertainty using Scale-Invariant Visual Landmarks",
+        "year": 2002,
+        "venue": "IJRR",
+        "citations": 779,
+        "class": "Localization",
+        "order": "Visual Localization"
+      }
+    ],
+    "Planning": [
+      {
+        "title": "Robot Motion Planning: A Distributed Representation Approach",
+        "year": 1991,
+        "venue": "IJRR",
+        "citations": 987,
+        "class": "Path/Motion Planning",
+        "order": "Motion / Path Planning"
+      },
+      {
+        "title": "Motion planning with sequential convex optimization and convex collision checking",
+        "year": 2014,
+        "venue": "IJRR",
+        "citations": 826,
+        "class": "Path/Motion Planning",
+        "order": "Trajectory Optimization"
+      },
+      {
+        "title": "Randomized Kinodynamic Motion Planning with Moving Obstacles",
+        "year": 2002,
+        "venue": "IJRR",
+        "citations": 767,
+        "class": "Path/Motion Planning",
+        "order": "Motion / Path Planning"
+      },
+      {
+        "title": "Temporal-Logic-Based Reactive Mission and Motion Planning",
+        "year": 2009,
+        "venue": "T-RO",
+        "citations": 749,
+        "class": "Path/Motion Planning",
+        "order": "Motion / Path Planning"
+      },
+      {
+        "title": "CHOMP: Covariant Hamiltonian optimization for motion planning",
+        "year": 2013,
+        "venue": "IJRR",
+        "citations": 731,
+        "class": "Path/Motion Planning",
+        "order": "Trajectory Optimization"
+      }
+    ],
+    "Control": [
+      {
+        "title": "A Unified Passivity-based Control Framework for Position, Torque and Impedance Control of Flexible Joint Robots",
+        "year": 2007,
+        "venue": "IJRR",
+        "citations": 802,
+        "class": "Force / Impedance Control",
+        "order": "Impedance / Admittance"
+      },
+      {
+        "title": "Adaptive synergies for the design and control of the Pisa/IIT SoftHand",
+        "year": 2014,
+        "venue": "IJRR",
+        "citations": 658,
+        "class": "General Control",
+        "order": "Robot Control"
+      },
+      {
+        "title": "Vector Field Path Following for Miniature Air Vehicles",
+        "year": 2007,
+        "venue": "T-RO",
+        "citations": 627,
+        "class": "General Control",
+        "order": "Path/Trajectory Tracking"
+      },
+      {
+        "title": "Cooperative Robot Control and Concurrent Synchronization of Lagrangian Systems",
+        "year": 2009,
+        "venue": "T-RO",
+        "citations": 549,
+        "class": "General Control",
+        "order": "Robot Control / Motion"
+      },
+      {
+        "title": "Stability and Robustness Analysis of a Class of Adaptive Controllers for Robotic Manipulators",
+        "year": 1990,
+        "venue": "IJRR",
+        "citations": 507,
+        "class": "Classical Control",
+        "order": "Adaptive Control"
+      }
+    ],
+    "Manipulation": [
+      {
+        "title": "Robotic Grasping of Novel Objects using Vision",
+        "year": 2008,
+        "venue": "IJRR",
+        "citations": 943,
+        "class": "Grasping",
+        "order": "Grasp Planning / Synthesis"
+      },
+      {
+        "title": "Constructing Force-Closure Grasps",
+        "year": 1988,
+        "venue": "IJRR",
+        "citations": 893,
+        "class": "Grasping",
+        "order": "Grasp Planning / Synthesis"
+      },
+      {
+        "title": "Data-Driven Grasp Synthesis - A Survey",
+        "year": 2014,
+        "venue": "T-RO",
+        "citations": 839,
+        "class": "Grasping",
+        "order": "Learning-based Grasping"
+      },
+      {
+        "title": "SARSOP: Efficient Point-Based POMDP Planning by Approximating Optimally Reachable Belief Spaces",
+        "year": 2008,
+        "venue": "RSS",
+        "citations": 782,
+        "class": "Contact-rich Manipulation",
+        "order": "Assembly / Insertion / Peg-in-hole"
+      },
+      {
+        "title": "A Positive Pressure Universal Gripper Based on the Jamming of Granular Material",
+        "year": 2012,
+        "venue": "T-RO",
+        "citations": 695,
+        "class": "Contact-rich Manipulation",
+        "order": "Liquid / Granular Manipulation"
+      }
+    ],
+    "Locomotion": [
+      {
+        "title": "The First Takeoff of a Biologically Inspired At-Scale Robotic Insect",
+        "year": 2008,
+        "venue": "T-RO",
+        "citations": 902,
+        "class": "Aerial Locomotion",
+        "order": "Insect-scale / Pico Aerial"
+      },
+      {
+        "title": "Trajectory generation and control for precise aggressive maneuvers with quadrotors",
+        "year": 2012,
+        "venue": "IJRR",
+        "citations": 865,
+        "class": "Aerial Locomotion",
+        "order": "Aggressive / Racing Flight"
+      },
+      {
+        "title": "A Three-Dimensional Passive-Dynamic Walking Robot with Two Legs and Knees",
+        "year": 2001,
+        "venue": "IJRR",
+        "citations": 781,
+        "class": "Legged Locomotion",
+        "order": "Bipedal / Humanoid"
+      },
+      {
+        "title": "Stabilization of Lateral Motion in Passive Dynamic Walking",
+        "year": 1999,
+        "venue": "IJRR",
+        "citations": 670,
+        "class": "Legged Locomotion",
+        "order": "Bipedal / Humanoid"
+      },
+      {
+        "title": "Sim-to-Real: Learning Agile Locomotion For Quadruped Robots",
+        "year": 2018,
+        "venue": "RSS",
+        "citations": 665,
+        "class": "Legged Locomotion",
+        "order": "Quadruped"
+      }
+    ],
+    "Robot Design & Hardware": [
+      {
+        "title": "Kinematics for multisection continuum robots",
+        "year": 2006,
+        "venue": "T-RO",
+        "citations": 934,
+        "class": "Continuum Robot",
+        "order": "Continuum Manipulator"
+      },
+      {
+        "title": "Modeling of Soft Fiber-Reinforced Bending Actuators",
+        "year": 2015,
+        "venue": "T-RO",
+        "citations": 875,
+        "class": "Soft Robotics",
+        "order": "Soft Actuator"
+      },
+      {
+        "title": "Design and Control of Concentric-Tube Robots",
+        "year": 2010,
+        "venue": "T-RO",
+        "citations": 729,
+        "class": "Continuum Robot",
+        "order": "Concentric Tube Robot"
+      },
+      {
+        "title": "How Should Microrobots Swim?",
+        "year": 2009,
+        "venue": "IJRR",
+        "citations": 665,
+        "class": "Microrobotics",
+        "order": "Microrobot / Microswimmer"
+      },
+      {
+        "title": "Mechanics Modeling of Tendon-Driven Continuum Manipulators",
+        "year": 2008,
+        "venue": "T-RO",
+        "citations": 628,
+        "class": "Continuum Robot",
+        "order": "Continuum Manipulator"
+      }
+    ],
+    "Human-Robot Interaction": [
+      {
+        "title": "Design and Control of a Powered Transfemoral Prosthesis",
+        "year": 2008,
+        "venue": "IJRR",
+        "citations": 588,
+        "class": "Assistive Robotics",
+        "order": "Prosthetics"
+      },
+      {
+        "title": "Living With Seal Robots - Its Sociopsychological and Physiological Influences on the Elderly at a Care House",
+        "year": 2007,
+        "venue": "T-RO",
+        "citations": 569,
+        "class": "Social Robotics",
+        "order": "Social Robot / HRI Study"
+      },
+      {
+        "title": "Passive Bilateral Teleoperation With Constant Time Delay",
+        "year": 2006,
+        "venue": "T-RO",
+        "citations": 563,
+        "class": "Teleoperation",
+        "order": "Bilateral Teleoperation"
+      },
+      {
+        "title": "Telemanipulation with Time Delays",
+        "year": 2004,
+        "venue": "IJRR",
+        "citations": 534,
+        "class": "Teleoperation",
+        "order": "Bilateral Teleoperation"
+      },
+      {
+        "title": "Powered Ankle--Foot Prosthesis Improves Walking Metabolic Economy",
+        "year": 2009,
+        "venue": "T-RO",
+        "citations": 473,
+        "class": "Assistive Robotics",
+        "order": "Prosthetics"
+      }
+    ],
+    "Multi-Robot Systems": [
+      {
+        "title": "Distributed Coordination Control of Multiagent Systems While Preserving Connectedness",
+        "year": 2007,
+        "venue": "T-RO",
+        "citations": 855,
+        "class": "Coordination",
+        "order": "Multi-Robot Control"
+      },
+      {
+        "title": "Safety Barrier Certificates for Collisions-Free Multirobot Systems",
+        "year": 2017,
+        "venue": "T-RO",
+        "citations": 736,
+        "class": "Coordination",
+        "order": "Multi-Robot Coordination"
+      },
+      {
+        "title": "A Survey on Aerial Swarm Robotics",
+        "year": 2018,
+        "venue": "T-RO",
+        "citations": 621,
+        "class": "Aerial Swarms / UAV Swarms",
+        "order": "Decentralized Aerial Swarm"
+      },
+      {
+        "title": "A comprehensive taxonomy for multi-robot task allocation",
+        "year": 2013,
+        "venue": "IJRR",
+        "citations": 594,
+        "class": "Coordination",
+        "order": "Task Allocation / Auction"
+      },
+      {
+        "title": "Formation Control and Collision Avoidance for Multi-agent Non-holonomic Systems: Theory and Experiments",
+        "year": 2008,
+        "venue": "IJRR",
+        "citations": 450,
+        "class": "Coordination",
+        "order": "Formation / Consensus / Flocking"
+      }
+    ],
+    "Learning for Robotics": [
+      {
+        "title": "Learning Stable Nonlinear Dynamical Systems With Gaussian Mixture Models",
+        "year": 2011,
+        "venue": "T-RO",
+        "citations": 759,
+        "class": "Deep Learning Application",
+        "order": "Generic Learning"
+      },
+      {
+        "title": "Learning human activities and object affordances from RGB-D videos",
+        "year": 2013,
+        "venue": "IJRR",
+        "citations": 695,
+        "class": "Deep Learning Application",
+        "order": "Generic Learning"
+      },
+      {
+        "title": "ChauffeurNet: Learning to Drive by Imitating the Best and Synthesizing the Worst",
+        "year": 2019,
+        "venue": "RSS",
+        "citations": 677,
+        "class": "Deep Learning Application",
+        "order": "Generic Learning"
+      },
+      {
+        "title": "How to train your robot with deep reinforcement learning: lessons we have learned",
+        "year": 2021,
+        "venue": "IJRR",
+        "citations": 527,
+        "class": "Reinforcement Learning",
+        "order": "RL"
+      },
+      {
+        "title": "RT-1: Robotics Transformer for Real-World Control at Scale",
+        "year": 2023,
+        "venue": "RSS",
+        "citations": 477,
+        "class": "Foundation Models",
+        "order": "Vision-Language-Action (VLA)"
+      }
+    ],
+    "Application Domains": [
+      {
+        "title": "Path Planning for Autonomous Vehicles in Unknown Semi-structured Environments",
+        "year": 2010,
+        "venue": "IJRR",
+        "citations": 926,
+        "class": "Autonomous Driving",
+        "order": "Self-driving Vehicle / Decision Making"
+      },
+      {
+        "title": "Nonholonomic Modeling of Needle Steering",
+        "year": 2006,
+        "venue": "IJRR",
+        "citations": 619,
+        "class": "Medical & Surgical Robotics",
+        "order": "Needle Steering / Insertion"
+      },
+      {
+        "title": "Probabilistic Algorithms and the Interactive Museum Tour-Guide Robot Minerva",
+        "year": 2000,
+        "venue": "IJRR",
+        "citations": 521,
+        "class": "Service Robotics",
+        "order": "Domestic / Service Robot"
+      },
+      {
+        "title": "A Steady-Hand Robotic System for Microsurgical Augmentation",
+        "year": 1999,
+        "venue": "IJRR",
+        "citations": 518,
+        "class": "Medical & Surgical Robotics",
+        "order": "Microsurgery / Neurosurgery"
+      },
+      {
+        "title": "Planning Long Dynamically Feasible Maneuvers for Autonomous Vehicles",
+        "year": 2009,
+        "venue": "IJRR",
+        "citations": 506,
+        "class": "Autonomous Driving",
+        "order": "Self-driving Vehicle / Decision Making"
+      }
+    ],
+    "Theoretical Foundations": [
+      {
+        "title": "Gaussian Processes for Signal Strength-Based Location Estimation",
+        "year": 2006,
+        "venue": "RSS",
+        "citations": 394,
+        "class": "Probabilistic Methods",
+        "order": "Gaussian Processes"
+      },
+      {
+        "title": "Kinematic Control of Redundant Manipulators: Generalizing the Task-Priority Framework to Inequality Task",
+        "year": 2011,
+        "venue": "T-RO",
+        "citations": 391,
+        "class": "Kinematics",
+        "order": "Redundancy Resolution"
+      },
+      {
+        "title": "Human-Like Adaptation of Force and Impedance in Stable and Unstable Interactions",
+        "year": 2011,
+        "venue": "T-RO",
+        "citations": 389,
+        "class": "Dynamics",
+        "order": "Robot Dynamics"
+      },
+      {
+        "title": "Rigid Body Collisions of Planar Kinematic Chains With Multiple Contact Points",
+        "year": 1994,
+        "venue": "IJRR",
+        "citations": 378,
+        "class": "Kinematics",
+        "order": "Kinematic Analysis"
+      },
+      {
+        "title": "A Lie Group Formulation of Robot Dynamics",
+        "year": 1995,
+        "venue": "IJRR",
+        "citations": 345,
+        "class": "Dynamics",
+        "order": "Robot Dynamics"
+      }
+    ],
+    "Robot Software & Architecture": [
+      {
+        "title": "An Architecture for Autonomy",
+        "year": 1998,
+        "venue": "IJRR",
+        "citations": 519,
+        "class": "Robot Architecture / Middleware",
+        "order": "Architecture / Software"
+      },
+      {
+        "title": "How Behavior Trees Modularize Hybrid Control Systems and Generalize Sequential Behavior Compositions, the Subsumption Architecture, and Decision Trees",
+        "year": 2017,
+        "venue": "T-RO",
+        "citations": 197,
+        "class": "Behavior Trees / Reactive Architectures",
+        "order": "Behavior Tree"
+      },
+      {
+        "title": "Toward a Robot Architecture Integrating Cooperation between Mobile Robots: Application to Indoor Environment",
+        "year": 1993,
+        "venue": "IJRR",
+        "citations": 170,
+        "class": "Robot Architecture / Middleware",
+        "order": "Robot Architecture"
+      },
+      {
+        "title": "The ORCCAD Architecture",
+        "year": 1998,
+        "venue": "IJRR",
+        "citations": 104,
+        "class": "Robot Architecture / Middleware",
+        "order": "Robot Architecture"
+      },
+      {
+        "title": "Motion Generation in the MRROC++ Robot Programming Framework",
+        "year": 2010,
+        "venue": "IJRR",
+        "citations": 79,
+        "class": "Robot Architecture / Middleware",
+        "order": "Robot Architecture"
+      }
+    ]
+  },
+  "hot_classes_2020_2025": [
+    {
+      "phylum": "Planning",
+      "class": "Path/Motion Planning",
+      "count": 178
+    },
+    {
+      "phylum": "Multi-Robot Systems",
+      "class": "Coordination",
+      "count": 111
+    },
+    {
+      "phylum": "Manipulation",
+      "class": "Contact-rich Manipulation",
+      "count": 105
+    },
+    {
+      "phylum": "SLAM & Localization",
+      "class": "SLAM",
+      "count": 102
+    },
+    {
+      "phylum": "Locomotion",
+      "class": "Legged Locomotion",
+      "count": 95
+    },
+    {
+      "phylum": "Locomotion",
+      "class": "Aerial Locomotion",
+      "count": 87
+    },
+    {
+      "phylum": "Manipulation",
+      "class": "Grasping",
+      "count": 75
+    },
+    {
+      "phylum": "Robot Design & Hardware",
+      "class": "Soft Robotics",
+      "count": 73
+    },
+    {
+      "phylum": "Planning",
+      "class": "Navigation",
+      "count": 70
+    },
+    {
+      "phylum": "Learning for Robotics",
+      "class": "Foundation Models",
+      "count": 70
+    }
+  ],
+  "declined_classes": [
+    {
+      "phylum": "Control",
+      "class": "Visual Servoing",
+      "pre_2015_count": 50,
+      "post_2020_count": 4,
+      "decline_ratio": 0.08
+    },
+    {
+      "phylum": "Application Domains",
+      "class": "Computational Biology Robotics",
+      "pre_2015_count": 28,
+      "post_2020_count": 0,
+      "decline_ratio": 0.0
+    }
+  ],
+  "emerging_categories": {
+    "Vision-Language-Action (VLA)": {
+      "first_year": 2023,
+      "first_title": "RT-1: Robotics Transformer for Real-World Control at Scale",
+      "total_matched": 9,
+      "cum_2021_2025": 9
+    },
+    "Diffusion Policies": {
+      "first_year": 2023,
+      "first_title": "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion",
+      "total_matched": 15,
+      "cum_2021_2025": 15
+    },
+    "Foundation Models for Robotics": {
+      "first_year": 2023,
+      "first_title": "RT-1: Robotics Transformer for Real-World Control at Scale",
+      "total_matched": 7,
+      "cum_2021_2025": 7
+    },
+    "3D Gaussian Splatting SLAM": {
+      "first_year": 2024,
+      "first_title": "PIN-SLAM: LiDAR SLAM Using a Point-Based Implicit Neural Representation for Achieving Global Map Consistency",
+      "total_matched": 8,
+      "cum_2021_2025": 8
+    },
+    "Sim-to-Real Legged Locomotion": {
+      "first_year": 2018,
+      "first_title": "Sim-to-Real: Learning Agile Locomotion For Quadruped Robots",
+      "total_matched": 21,
+      "cum_2021_2025": 18
+    },
+    "LiDAR-Inertial Odometry (LIO)": {
+      "first_year": 2022,
+      "first_title": "FAST-LIO2: Fast Direct LiDAR-Inertial Odometry",
+      "total_matched": 6,
+      "cum_2021_2025": 6
+    },
+    "Visual-Inertial Odometry (VIO)": {
+      "first_year": 2013,
+      "first_title": "High-precision, consistent EKF-based visual-inertial odometry",
+      "total_matched": 15,
+      "cum_2021_2025": 5
+    },
+    "Soft Robotics": {
+      "first_year": 1996,
+      "first_title": "Soft Robotic Fingertips. Part I: A Comparison of Construction Materials, Part II: Modeling and Impedance Regulation",
+      "total_matched": 83,
+      "cum_2021_2025": 56
+    },
+    "Concentric Tube Robots": {
+      "first_year": 2010,
+      "first_title": "A Geometrically Exact Model for Externally Loaded Concentric-Tube Continuum Robots",
+      "total_matched": 20,
+      "cum_2021_2025": 6
+    },
+    "Humanoid Whole-Body Control": {
+      "first_year": 2025,
+      "first_title": "AMO: Adaptive Motion Optimization for Hyper-Dexterous Humanoid Whole-Body Control",
+      "total_matched": 4,
+      "cum_2021_2025": 4
+    }
+  },
+  "venue_phylum_pct": {
+    "T-RO": {
+      "Perception & Sensing": 6.9,
+      "SLAM & Localization": 9.9,
+      "Planning": 9.3,
+      "Control": 6.9,
+      "Manipulation": 11.6,
+      "Locomotion": 12.7,
+      "Robot Design & Hardware": 11.4,
+      "Human-Robot Interaction": 6.1,
+      "Multi-Robot Systems": 6.7,
+      "Learning for Robotics": 2.0,
+      "Application Domains": 4.8,
+      "Theoretical Foundations": 6.5,
+      "Robot Software & Architecture": 0.3
+    },
+    "RSS": {
+      "Perception & Sensing": 8.5,
+      "SLAM & Localization": 7.9,
+      "Planning": 14.1,
+      "Control": 4.2,
+      "Manipulation": 12.0,
+      "Locomotion": 7.7,
+      "Robot Design & Hardware": 3.5,
+      "Human-Robot Interaction": 4.8,
+      "Multi-Robot Systems": 5.7,
+      "Learning for Robotics": 13.1,
+      "Application Domains": 4.5,
+      "Theoretical Foundations": 6.8,
+      "Robot Software & Architecture": 0.1
+    },
+    "IJRR": {
+      "Perception & Sensing": 7.5,
+      "SLAM & Localization": 8.4,
+      "Planning": 11.9,
+      "Control": 5.6,
+      "Manipulation": 13.9,
+      "Locomotion": 11.5,
+      "Robot Design & Hardware": 7.1,
+      "Human-Robot Interaction": 4.5,
+      "Multi-Robot Systems": 3.8,
+      "Learning for Robotics": 3.5,
+      "Application Domains": 6.4,
+      "Theoretical Foundations": 6.6,
+      "Robot Software & Architecture": 0.7
+    }
+  },
+  "citation_stats": {
+    "overall_mean": 67.7,
+    "overall_median": 32,
+    "per_phylum": {
+      "Perception & Sensing": {
+        "n": 554,
+        "mean": 59.1,
+        "median": 26.5,
+        "mean_vs_overall": 0.87
+      },
+      "SLAM & Localization": {
+        "n": 670,
+        "mean": 85.6,
+        "median": 35.5,
+        "mean_vs_overall": 1.26
+      },
+      "Planning": {
+        "n": 835,
+        "mean": 64.7,
+        "median": 26,
+        "mean_vs_overall": 0.96
+      },
+      "Control": {
+        "n": 441,
+        "mean": 66.2,
+        "median": 31,
+        "mean_vs_overall": 0.98
+      },
+      "Manipulation": {
+        "n": 934,
+        "mean": 64.3,
+        "median": 32.5,
+        "mean_vs_overall": 0.95
+      },
+      "Locomotion": {
+        "n": 842,
+        "mean": 85.0,
+        "median": 49.0,
+        "mean_vs_overall": 1.26
+      },
+      "Robot Design & Hardware": {
+        "n": 623,
+        "mean": 83.3,
+        "median": 44,
+        "mean_vs_overall": 1.23
+      },
+      "Human-Robot Interaction": {
+        "n": 395,
+        "mean": 77.0,
+        "median": 38,
+        "mean_vs_overall": 1.14
+      },
+      "Multi-Robot Systems": {
+        "n": 408,
+        "mean": 63.8,
+        "median": 30.5,
+        "mean_vs_overall": 0.94
+      },
+      "Learning for Robotics": {
+        "n": 354,
+        "mean": 47.5,
+        "median": 18.0,
+        "mean_vs_overall": 0.7
+      },
+      "Application Domains": {
+        "n": 396,
+        "mean": 76.0,
+        "median": 38.5,
+        "mean_vs_overall": 1.12
+      },
+      "Theoretical Foundations": {
+        "n": 491,
+        "mean": 44.8,
+        "median": 23,
+        "mean_vs_overall": 0.66
+      },
+      "Robot Software & Architecture": {
+        "n": 30,
+        "mean": 58.3,
+        "median": 28.5,
+        "mean_vs_overall": 0.86
+      }
+    }
+  },
+  "year_totals": {
+    "1988": 33,
+    "1989": 36,
+    "1990": 42,
+    "1991": 55,
+    "1993": 43,
+    "1994": 41,
+    "1995": 41,
+    "1996": 35,
+    "1997": 50,
+    "1998": 86,
+    "1999": 84,
+    "2000": 75,
+    "2001": 58,
+    "2002": 62,
+    "2003": 58,
+    "2004": 183,
+    "2005": 242,
+    "2006": 232,
+    "2007": 236,
+    "2008": 251,
+    "2009": 279,
+    "2010": 238,
+    "2011": 256,
+    "2012": 284,
+    "2013": 267,
+    "2014": 290,
+    "2015": 265,
+    "2016": 253,
+    "2017": 274,
+    "2018": 281,
+    "2019": 276,
+    "2020": 312,
+    "2021": 319,
+    "2022": 359,
+    "2023": 457,
+    "2024": 499,
+    "2025": 625
+  }
+}
