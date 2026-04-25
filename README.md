@@ -1,5 +1,7 @@
 # Robotics Paper Phylogenetic Taxonomy
 
+🌐 **Live site**: <https://gisbi-kim.github.io/robotics-paper-phylogeny/>
+
 > 7,477편의 로봇공학 논문(T-RO / IJRR / RSS, 1988~2025)을 시맨틱하게 분류해서 생물 계통도(phylogenetic taxonomy)처럼 묶은 결과물.
 
 원 데이터는 **RoboPaper Atlas**에서 발췌. T-RO, IJRR, RSS 세 저널의 논문 제목/연도/저자/인용수를 받아서, **단순 TF-IDF가 아니라 시맨틱 동의어 클러스터** 기반으로 **4단계** (`Phylum > Class > Order > Genus`) 트리에 매핑.
