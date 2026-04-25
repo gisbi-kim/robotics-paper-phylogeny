@@ -28,7 +28,7 @@ wb.remove(wb.active)
 # ============================================================
 ws1 = wb.create_sheet('Papers')
 header = ['idx', 'venue', 'year', 'title', 'authors', 'citations',
-          'Phylum', 'Class', 'Order']
+          'Phylum', 'Class', 'Order', 'Genus']
 ws1.append(header)
 
 # Header styling
@@ -45,11 +45,11 @@ for col_idx, _ in enumerate(header, start=1):
 for p in papers:
     ws1.append([
         p['idx'], p['venue'], p['year'], p['title'], p['authors'],
-        p['citations'], p['phylum'], p['class'], p['order']
+        p['citations'], p['phylum'], p['class'], p['order'], p['genus']
     ])
 
 # Column widths
-widths = [6, 12, 6, 70, 35, 8, 30, 30, 35]
+widths = [6, 12, 6, 70, 35, 8, 30, 30, 35, 30]
 for i, w in enumerate(widths, start=1):
     ws1.column_dimensions[get_column_letter(i)].width = w
 
@@ -63,19 +63,19 @@ ws1.auto_filter.ref = ws1.dimensions
 # Sheet 2: Taxonomy_Tree
 # ============================================================
 ws2 = wb.create_sheet('Taxonomy_Tree')
-ws2.append(['Phylum', 'Class', 'Order', 'Paper Count', '% of Total'])
+ws2.append(['Phylum', 'Class', 'Order', 'Genus', 'Paper Count', '% of Total'])
 
 # Header style
-for col_idx, _ in enumerate(range(5), start=1):
+for col_idx, _ in enumerate(range(6), start=1):
     cell = ws2.cell(row=1, column=col_idx)
     cell.font = header_font
     cell.fill = header_fill
     cell.alignment = header_align
 
-# Group by Phylum > Class > Order
-tree = defaultdict(lambda: defaultdict(Counter))
+# Group by Phylum > Class > Order > Genus (4 levels)
+tree = defaultdict(lambda: defaultdict(lambda: defaultdict(Counter)))
 for p in papers:
-    tree[p['phylum']][p['class']][p['order']] += 1
+    tree[p['phylum']][p['class']][p['order']][p['genus']] += 1
 
 # Define Phylum order for output (matches TAXONOMY.md)
 phylum_order = [
@@ -103,39 +103,50 @@ phy_fill = PatternFill(start_color='D9E1F2', end_color='D9E1F2',
 cls_fill = PatternFill(start_color='F2F2F2', end_color='F2F2F2',
                        fill_type='solid')
 
-# Write Phylum > Class > Order rows
+# Write Phylum > Class > Order > Genus rows
 for phy in phylum_order:
     if phy not in tree:
         continue
-    phy_total = sum(sum(orders.values())
+    phy_total = sum(sum(sum(genera.values()) for genera in orders.values())
                     for orders in tree[phy].values())
     # Phylum-level summary row
-    row = [phy, '', '', phy_total, f'{phy_total / total * 100:.1f}%']
+    row = [phy, '', '', '', phy_total, f'{phy_total / total * 100:.1f}%']
     ws2.append(row)
     r = ws2.max_row
-    for c in range(1, 6):
+    for c in range(1, 7):
         ws2.cell(row=r, column=c).fill = phy_fill
         ws2.cell(row=r, column=c).font = Font(bold=True)
 
     # Sort classes by count desc
-    classes_sorted = sorted(tree[phy].items(),
-                            key=lambda x: -sum(x[1].values()))
+    classes_sorted = sorted(
+        tree[phy].items(),
+        key=lambda x: -sum(sum(g.values()) for g in x[1].values()))
     for cls, orders in classes_sorted:
-        cls_total = sum(orders.values())
-        row = ['', cls, '', cls_total, f'{cls_total / total * 100:.2f}%']
+        cls_total = sum(sum(g.values()) for g in orders.values())
+        row = ['', cls, '', '', cls_total,
+               f'{cls_total / total * 100:.2f}%']
         ws2.append(row)
         r = ws2.max_row
-        for c in range(1, 6):
+        for c in range(1, 7):
             ws2.cell(row=r, column=c).fill = cls_fill
             ws2.cell(row=r, column=c).font = Font(italic=True)
 
         # Sort orders by count desc
-        orders_sorted = sorted(orders.items(), key=lambda x: -x[1])
-        for ord_, cnt in orders_sorted:
-            ws2.append(['', '', ord_, cnt, f'{cnt / total * 100:.2f}%'])
+        orders_sorted = sorted(orders.items(),
+                               key=lambda x: -sum(x[1].values()))
+        for ord_, genera in orders_sorted:
+            ord_total = sum(genera.values())
+            ws2.append(['', '', ord_, '', ord_total,
+                        f'{ord_total / total * 100:.2f}%'])
+
+            # Sort genera by count desc
+            genera_sorted = sorted(genera.items(), key=lambda x: -x[1])
+            for gen, cnt in genera_sorted:
+                ws2.append(['', '', '', gen, cnt,
+                            f'{cnt / total * 100:.3f}%'])
 
 # Column widths
-for i, w in enumerate([34, 36, 42, 12, 12], start=1):
+for i, w in enumerate([32, 34, 38, 32, 12, 12], start=1):
     ws2.column_dimensions[get_column_letter(i)].width = w
 
 ws2.freeze_panes = 'A2'

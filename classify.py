@@ -12,6 +12,7 @@ The patterns encode SEMANTIC equivalence (synonym clusters), not TF-IDF.
 import json
 import re
 from collections import Counter
+from genus_rules import assign_genus
 
 # ---------- Helper ----------
 def t_low(s):
@@ -2448,7 +2449,10 @@ def main():
     results = []
     for p in papers:
         phy, cls, ord_ = classify(p['title'])
-        results.append({**p, 'phylum': phy, 'class': cls, 'order': ord_})
+        t = ' ' + p['title'].lower() + ' '
+        gen = assign_genus(phy, cls, ord_, t)
+        results.append({**p, 'phylum': phy, 'class': cls,
+                        'order': ord_, 'genus': gen})
 
     # Stats
     phy_counts = Counter(r['phylum'] for r in results)
@@ -2464,8 +2468,21 @@ def main():
     print(f"\n=== Unclassified samples ===")
     unc = [r for r in results if r['phylum'] == 'Other / Unclassified']
     print(f"Total unclassified: {len(unc)} ({len(unc)/len(results)*100:.1f}%)")
-    for r in unc[:30]:
-        print(f"  [{r['year']}] {r['title']}")
+
+    # Genus stats
+    print("\n=== Genus assignment stats ===")
+    genus_filled = sum(1 for r in results if r['genus'] != '(general)'
+                       and r['genus'] != 'Unclassified')
+    print(f"Papers with specific Genus (non-general): {genus_filled} "
+          f"({genus_filled/len(results)*100:.1f}%)")
+    print(f"Papers with '(general)' Genus: "
+          f"{sum(1 for r in results if r['genus'] == '(general)')}")
+
+    print("\n=== Top 30 Genus by count ===")
+    gen_counts = Counter(f"{r['order']} > {r['genus']}" for r in results
+                         if r['genus'] not in ('(general)', 'Unclassified'))
+    for k, v in sorted(gen_counts.items(), key=lambda x: -x[1])[:30]:
+        print(f"  {v:>4}  {k}")
 
     with open('/tmp/classified.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=1)

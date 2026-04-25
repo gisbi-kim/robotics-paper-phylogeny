@@ -5,7 +5,7 @@
 
 생물 분류처럼 4단계: **Phylum > Class > Order > Genus**
 
-> 표기: 들여쓰기로 깊이 표시. Genus는 sub-area가 풍부한 곳에만 부여.
+> 표기: 들여쓰기로 깊이 표시. 아래 트리 본문은 P/C/O 3단계 위주이고, **4단계 (Genus)는 별도 룰 파일** [`genus_rules.py`](genus_rules.py) 에 정의. 모든 논문은 4단계 라벨을 받음 (specific Genus 매칭 안 되면 `(general)`).
 
 ---
 
@@ -627,3 +627,37 @@
   - "RL for Cassie biped walking" → `Locomotion > Legged > Bipedal` (RL은 도구, locomotion이 핵심)
   - "Surgical robot for needle steering" → `Application > Medical & Surgical > Needle Steering`
 - 분류 후 카운트가 적은 Order는 합치고, 너무 많은 Order는 Genus로 더 쪼갠다.
+
+---
+
+## 부록: 4단계 (Genus) 분류 — `genus_rules.py`
+
+본 트리에서 sub-rule로 풀려나간 Genus 카테고리. Top 45개 Order에 대해 정의됨. 매칭 안 되면 `(general)`로 fallback.
+
+| Order | 정의된 Genus 수 | 예시 Genus |
+|---|---:|---|
+| Bipedal / Humanoid | 13 | Cassie / ATRIAS / HZD / SLIP / Sim-to-Real RL / Whole-body Humanoid / ZMP / Bipedal Jumping ... |
+| Quadruped | 7 | MIT Cheetah / ANYmal / Boston Dynamics Spot / Sim-to-Real RL / MPC-based / Loco-Manipulation |
+| Multirotor / Quadrotor | 7 | Quadrotor Swarm / Agile Racing / Aerial Manipulation / Cinematography / Learning-based / MPC / State Estimation |
+| Visual SLAM/Odometry | 7 | ORB-SLAM / SVO / DSO/LSD / Monocular / Stereo / RGB-D / VPR-augmented |
+| LiDAR SLAM/Odometry | 4 | LOAM / FAST-LIO / LIO-SAM / Continuous-time |
+| VIO | 5 | VINS / OKVIS / ROVIO / MSCKF / Preintegration |
+| Tactile Sensors | 7 | GelSight / Visuo-Tactile / Event-based / EIT / Slip Detection / Whisker / BioTac |
+| Grasp Planning | 6 | Force-Closure / Caging / Multi-finger / Underactuated / Tactile-based / Novel Object |
+| Deformable Object | 6 | Cloth/Garment / Rope/Cable/Wire / Liquid / Granular / Elasto-plastic / Soft Tissue |
+| Assembly / Insertion | 5 | Peg-in-Hole / Snap-fit / Screwing / RL-based / Cooperative |
+| Continuum Manipulator | 5 | Tendon-driven / Fluidic / Cosserat / Multi-section / Magnetic |
+| Parallel Mechanism | 5 | Stewart-Gough / Delta / Cable-driven / Singularity / Kinematics |
+| Visual Servoing | 8 | IBVS / PBVS / Direct/Photometric / Aerial / Mobile / Parallel / Tactile / Aural / Thermal |
+| Exoskeleton / Wearable | 4 | Lower-limb / Upper-limb / Back-Spine / Hand-Wrist |
+| RL | 6 | Safe RL / Multi-agent / Inverse RL / Hierarchical / Offline / Meta |
+| Sim-to-Real | 4 | Locomotion / Manipulation / Aerial / Domain Randomization |
+| VLA | 4 | RT-series / π₀-family / Octo/OpenVLA / VLN |
+| Diffusion Policies | 4 | 3D Diffusion / Consistency / Flow Matching / Hierarchical |
+| Pursuit-Evasion | 6 | Pursuit / Patrolling / Surveillance / Persistent Monitoring / Perimeter / Herding |
+| ... (총 45 Order) | | 자세한 룰은 [`genus_rules.py`](genus_rules.py) |
+
+**Genus 적용 결과**:
+- 전체 7,477편 중 약 **3,902편 (52.2%)** 가 specific Genus를 받았고,
+- 나머지는 `(general)` 또는 룰이 없는 Order에 속함.
+- 엑셀 `Papers` 시트에 4번째 컬럼(`Genus`)으로 표시됨.

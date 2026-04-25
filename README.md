@@ -2,7 +2,9 @@
 
 > 7,477편의 로봇공학 논문(T-RO / IJRR / RSS, 1988~2025)을 시맨틱하게 분류해서 생물 계통도(phylogenetic taxonomy)처럼 묶은 결과물.
 
-원 데이터는 **RoboPaper Atlas**에서 발췌. T-RO, IJRR, RSS 세 저널의 논문 제목/연도/저자/인용수를 받아서, **단순 TF-IDF가 아니라 시맨틱 동의어 클러스터** 기반으로 4단계 (`Phylum > Class > Order > Genus`) 트리에 매핑.
+원 데이터는 **RoboPaper Atlas**에서 발췌. T-RO, IJRR, RSS 세 저널의 논문 제목/연도/저자/인용수를 받아서, **단순 TF-IDF가 아니라 시맨틱 동의어 클러스터** 기반으로 **4단계** (`Phylum > Class > Order > Genus`) 트리에 매핑.
+
+- **모든 논문이 4-depth 라벨링**: Phylum / Class / Order는 100%, Genus는 specific rule이 매칭된 경우(약 52%) + 나머지는 `(general)`로 채워짐.
 
 ---
 
@@ -10,17 +12,19 @@
 
 | 파일 | 설명 |
 |---|---|
-| **[`robotics_taxonomy.xlsx`](robotics_taxonomy.xlsx)** | 메인 결과 — 3 시트 (Papers / Taxonomy_Tree / Stats) |
+| **[`robotics_taxonomy.xlsx`](robotics_taxonomy.xlsx)** | 메인 결과 — 3 시트 (Papers / Taxonomy_Tree / Stats), **4-depth (P/C/O/G)** |
 | [`TAXONOMY.md`](TAXONOMY.md) | 13 Phylum × ~95 Class × ~330 Order 전체 트리 |
 | [`TAXONOMY_CHANGES.md`](TAXONOMY_CHANGES.md) | 초안 vs 7,477편 통독 후 비교/업데이트 설명 |
 | [`PLAN.md`](PLAN.md) | 작업 플랜 |
-| [`classify.py`](classify.py) | 시맨틱 분류기 소스 |
+| [`classify.py`](classify.py) | 1~3 단계 분류기 (Phylum/Class/Order) |
+| [`genus_rules.py`](genus_rules.py) | 4단계 분류기 (Genus, top 45 Order에 sub-rule) |
+| [`make_excel.py`](make_excel.py) | 분류 결과 → 엑셀 변환 스크립트 |
 | [`data/raw/data.txt`](data/raw/data.txt) | 원본 (RoboPaper Atlas dump) |
 | [`data/raw/task.txt`](data/raw/task.txt) | 사용자 원본 task 지시 |
 | [`data/intermediate/papers_parsed.json`](data/intermediate/papers_parsed.json) | 1차 파싱 결과 (7,477편) |
 | [`data/intermediate/titles_chronological.txt`](data/intermediate/titles_chronological.txt) | 시간순 제목 리스트 (통독용) |
 | [`data/intermediate/reading_notes.md`](data/intermediate/reading_notes.md) | 통독 중 메모 |
-| [`data/intermediate/papers_classified.json`](data/intermediate/papers_classified.json) | 분류 라벨 부착 결과 |
+| [`data/intermediate/papers_classified.json`](data/intermediate/papers_classified.json) | 분류 라벨 부착 결과 (4-depth) |
 
 ---
 
@@ -86,20 +90,19 @@
 
 ```bash
 # 1. 데이터 파싱 (raw → JSON)
-#    classify.py 안에서 data/raw/data.txt를 읽어 7,477편 추출
-#    실제 작업 중에는 /tmp에 저장했고, 결과물을 data/intermediate/papers_parsed.json에 백업
+#    data/raw/data.txt를 읽어 7,477편 추출 → data/intermediate/papers_parsed.json
 
 # 2. 통독 → 노트 작성
 #    data/intermediate/titles_chronological.txt를 시간순으로 읽으며
 #    data/intermediate/reading_notes.md에 메모.
 #    이 결과를 TAXONOMY_CHANGES.md로 정리, TAXONOMY.md를 최종안으로 갱신.
 
-# 3. 분류기 실행
+# 3. 분류기 실행 (P/C/O 1차 분류 + Genus 4단계 분류)
 python3 classify.py
 # → /tmp/classified.json (백업본은 data/intermediate/papers_classified.json)
 
-# 4. 엑셀 생성
-#    /tmp/make_excel.py 실행 → robotics_taxonomy.xlsx
+# 4. 엑셀 생성 (4-depth 컬럼 포함)
+python3 make_excel.py → robotics_taxonomy.xlsx
 ```
 
 > 의존성: `python3` + `openpyxl`만 있으면 됨.
