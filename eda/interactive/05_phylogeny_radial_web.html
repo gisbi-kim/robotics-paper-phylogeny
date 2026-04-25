@@ -72,6 +72,10 @@
   .arc:hover { stroke: white; stroke-width: 1.5px; }
   .dimmed { opacity: 0.12; }
   .highlighted { opacity: 1; }
+  .focused {
+    stroke: #ffd24a !important;
+    stroke-width: 3px !important;
+  }
   .label {
     pointer-events: none;
     font-size: 9px;
@@ -160,9 +164,17 @@
 <div class="header">
   <h1>🌳 Robotics Paper Phylogenetic Tree — Interactive</h1>
   <div class="help">
-    <span><kbd>hover</kbd> 호버 = 강조</span>
+    <span><kbd>hover</kbd> 강조</span>
     &nbsp;·&nbsp;
-    <span><kbd>click</kbd> 클릭 = 계열 선택</span>
+    <span><kbd>click</kbd> 계열 선택</span>
+    &nbsp;·&nbsp;
+    <span><kbd>← →</kbd> 형제</span>
+    &nbsp;·&nbsp;
+    <span><kbd>↑</kbd> 부모</span>
+    &nbsp;·&nbsp;
+    <span><kbd>↓</kbd> 자식</span>
+    &nbsp;·&nbsp;
+    <span><kbd>Esc</kbd> 해제</span>
     &nbsp;·&nbsp;
     <button class="reset-btn" id="reset">Reset</button>
   </div>
@@ -310,16 +322,22 @@ d3.json('tree_data.json').then(data => {
     return `rotate(${deg}) translate(${r},0) rotate(${rotation - deg})`;
   }
 
+  // ----- Focus state (for keyboard nav) -----
+  let focusedNode = null;
+
   // Tooltip helpers
-  function showTooltip(event, d) {
-    const path = d.ancestors().reverse().map(n => n.data.name).join(' › ');
+  function buildTooltipHTML(d) {
+    const path = d.ancestors().reverse().map(n => n.data.name);
     const total = root.value;
     const pct = (d.value / total * 100).toFixed(2);
-    tooltip.html(`
-      <div class="breadcrumb">${path.split(' › ').slice(0, -1).join(' › ')}</div>
+    return `
+      <div class="breadcrumb">${path.slice(0, -1).join(' › ') || '&nbsp;'}</div>
       <div class="name">${d.data.name}</div>
       <div><span class="count">${d.value.toLocaleString()}</span> papers <span class="pct">(${pct}%)</span></div>
-    `);
+    `;
+  }
+  function showTooltip(event, d) {
+    tooltip.html(buildTooltipHTML(d));
     tooltip.classed('visible', true);
     moveTooltip(event);
   }
@@ -331,16 +349,30 @@ d3.json('tree_data.json').then(data => {
   function hideTooltip() {
     tooltip.classed('visible', false);
   }
+  // Show tooltip at the centroid of node `d` (used for keyboard nav).
+  function showTooltipAtNode(d) {
+    tooltip.html(buildTooltipHTML(d));
+    tooltip.classed('visible', true);
+    // Compute centroid in SVG coords, then convert to client coords.
+    const [cx, cy] = arc.centroid(d);
+    const svgEl = svg.node();
+    const pt = svgEl.createSVGPoint();
+    pt.x = cx; pt.y = cy;
+    const screen = pt.matrixTransform(svgEl.getScreenCTM());
+    tooltip.style('left', (screen.x + 16) + 'px')
+           .style('top', (screen.y + 16) + 'px');
+  }
 
-  // Selection / lineage highlight
+  // Selection / lineage highlight + focus
   function selectNode(d) {
+    focusedNode = d;
     const ancestors = new Set(d.ancestors());
     const descendants = new Set(d.descendants());
 
     arcs.classed('dimmed', n => !ancestors.has(n) && !descendants.has(n))
-        .classed('highlighted', n => ancestors.has(n) || descendants.has(n));
+        .classed('highlighted', n => ancestors.has(n) || descendants.has(n))
+        .classed('focused', n => n === d);
 
-    // Update breadcrumb bar
     const crumbs = d.ancestors().reverse().slice(1)
       .map(n => `<span class="crumb">${n.data.name}</span>`)
       .join(' <span style="color:#5a6270">›</span> ');
@@ -350,13 +382,71 @@ d3.json('tree_data.json').then(data => {
       <span class="label">선택됨:</span>
       ${crumbs}
       <span class="crumb-count">${d.value.toLocaleString()} papers · ${pct}%</span>
+      <span style="margin-left:14px; color:#5a6270; font-size:11px;">
+        화살표 키로 이동
+      </span>
     `);
+    showTooltipAtNode(d);
   }
 
   function resetSelection() {
-    arcs.classed('dimmed', false).classed('highlighted', false);
-    breadcrumb.html('<span class="empty">아무 wedge나 클릭하면 그 계열만 강조됩니다.</span>');
+    focusedNode = null;
+    arcs.classed('dimmed', false)
+        .classed('highlighted', false)
+        .classed('focused', false);
+    breadcrumb.html('<span class="empty">아무 wedge나 클릭하면 그 계열만 강조됩니다. 클릭 후 ← → ↑ ↓ 화살표로 인접 셀 탐색.</span>');
+    hideTooltip();
   }
+
+  // ----- Keyboard navigation -----
+  function navigate(direction) {
+    if (!focusedNode) return;
+    const d = focusedNode;
+    let target = null;
+
+    switch (direction) {
+      case 'parent':
+        // Go up one level. Skip if at root (depth=1 is Phylum, depth=0 is root).
+        if (d.parent && d.parent.depth >= 0) {
+          target = d.parent.depth === 0 ? null : d.parent;
+        }
+        break;
+      case 'child':
+        // Go to first (largest) child. Children are already sorted by value desc.
+        if (d.children && d.children.length > 0) {
+          target = d.children[0];
+        }
+        break;
+      case 'next':
+      case 'prev': {
+        // Move to neighboring sibling (same parent, ordered by x0 angle).
+        if (!d.parent || !d.parent.children) break;
+        const siblings = d.parent.children.slice().sort((a, b) => a.x0 - b.x0);
+        const i = siblings.indexOf(d);
+        if (i < 0) break;
+        const n = siblings.length;
+        const j = direction === 'next' ? (i + 1) % n : (i - 1 + n) % n;
+        target = siblings[j];
+        break;
+      }
+    }
+
+    if (target) selectNode(target);
+  }
+
+  d3.select(window).on('keydown', (event) => {
+    if (!focusedNode) return;
+    let handled = true;
+    switch (event.key) {
+      case 'ArrowLeft':  navigate('prev');   break;
+      case 'ArrowRight': navigate('next');   break;
+      case 'ArrowUp':    navigate('parent'); break;
+      case 'ArrowDown':  navigate('child');  break;
+      case 'Escape':     resetSelection();   break;
+      default: handled = false;
+    }
+    if (handled) event.preventDefault();
+  });
 
   // Reset on background click or button
   svg.on('click', resetSelection);
