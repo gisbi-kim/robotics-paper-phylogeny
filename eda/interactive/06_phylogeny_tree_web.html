@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robotics Phylogeny — Interactive Horizontal Tree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&family=Roboto+Mono&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-subtle: #f8f9fa;
+    --text: #202124;
+    --text-secondary: #5f6368;
+    --text-muted: #80868b;
+    --border: #e8eaed;
+    --border-strong: #dadce0;
+    --primary: #1a73e8;
+    --primary-bg: #e8f0fe;
+    --warning: #b06000;
+    --warning-bg: #fef7e0;
+    --focus: #fbbc04;
+    --elev-1: 0 1px 2px 0 rgba(60,64,67,0.30), 0 1px 3px 1px rgba(60,64,67,0.15);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Google Sans', 'Roboto', 'Noto Sans KR', -apple-system, sans-serif;
+    line-height: 1.5;
+    overflow: hidden;
+    height: 100vh;
+  }
+  a { color: var(--primary); text-decoration: none; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: 100vh;
+  }
+
+  /* ============== Left Sidebar ============== */
+  .sidebar {
+    background: var(--bg-subtle);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px;
+    font-size: 13px;
+  }
+  .sidebar h1 {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 16px; font-weight: 500;
+    margin: 0 0 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sidebar .subtitle {
+    color: var(--text-secondary);
+    font-size: 12px; margin-bottom: 16px;
+  }
+  .help-card {
+    background: white; border-radius: 8px; padding: 14px;
+    margin-bottom: 16px; box-shadow: var(--elev-1);
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .help-card .row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 4px 0;
+  }
+  .help-card kbd {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+  }
+  .btn-row {
+    display: flex; gap: 6px; margin-top: 10px;
+  }
+  .btn {
+    flex: 1;
+    background: white; color: var(--primary);
+    border: 1px solid var(--border-strong);
+    padding: 6px 8px; border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 11px; font-weight: 500;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--bg-subtle); }
+  .btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+  .btn.primary:hover { background: #1557b0; }
+
+  /* Info card */
+  .info-card {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: var(--elev-1);
+    margin-bottom: 12px;
+  }
+  .info-empty {
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+    padding: 24px 12px;
+    font-style: italic;
+  }
+  .info-source {
+    display: inline-block; font-size: 10px;
+    background: var(--bg-subtle); color: var(--text-muted);
+    padding: 2px 8px; border-radius: 10px;
+    margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+  .info-source.focus { background: var(--warning-bg); color: var(--warning); }
+  .info-source.hover { background: var(--primary-bg); color: var(--primary); }
+  .info-breadcrumb {
+    color: var(--text-secondary);
+    font-size: 11px; line-height: 1.5;
+    margin-bottom: 8px; word-break: break-word;
+  }
+  .info-breadcrumb .crumb { color: var(--text-secondary); }
+  .info-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
+  .info-name {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 18px; font-weight: 500;
+    color: var(--text); margin-bottom: 8px;
+    word-break: break-word;
+  }
+  .info-stats {
+    display: flex; gap: 12px; margin-bottom: 12px;
+  }
+  .info-stat {
+    flex: 1; background: var(--bg-subtle);
+    border-radius: 4px; padding: 8px 10px;
+  }
+  .info-stat .v {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 18px; font-weight: 500; color: var(--text);
+  }
+  .info-stat .l {
+    font-size: 10px; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .info-meta {
+    display: grid; grid-template-columns: 50px 1fr;
+    gap: 4px 8px; font-size: 11px;
+  }
+  .info-meta .k {
+    color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.05em; font-weight: 500; font-size: 10px;
+  }
+  .info-meta .v { color: var(--text); }
+
+  /* ============== Main (SVG) ============== */
+  .main {
+    position: relative;
+    overflow: auto;
+    background: var(--bg);
+  }
+  svg.tree {
+    display: block;
+    background: var(--bg);
+    cursor: grab;
+  }
+  svg.tree:active { cursor: grabbing; }
+
+  .link {
+    fill: none;
+    stroke: #c0c0c0;
+    stroke-width: 1px;
+    transition: stroke 0.2s, stroke-width 0.2s;
+  }
+  .link.highlighted {
+    stroke: #1a73e8;
+    stroke-width: 2px;
+  }
+  .link.dimmed { stroke-opacity: 0.2; }
+
+  .node circle {
+    cursor: pointer;
+    stroke: white;
+    stroke-width: 1.5;
+    transition: r 0.2s;
+  }
+  .node:hover circle { r: 7; }
+  .node text {
+    pointer-events: none;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 12px;
+    fill: var(--text);
+  }
+  .node.has-hidden circle {
+    stroke: var(--primary);
+    stroke-width: 2;
+  }
+  .node.focused circle {
+    stroke: var(--focus);
+    stroke-width: 3;
+  }
+  .node.dimmed { opacity: 0.25; }
+
+  .count-badge {
+    fill: var(--text-muted);
+    font-size: 10px;
+    font-family: 'Roboto Mono', monospace;
+    pointer-events: none;
+  }
+
+  /* Vertical depth axis labels at top */
+  .depth-header {
+    position: absolute; top: 0; left: 0; right: 0;
+    background: linear-gradient(to bottom, white 70%, transparent);
+    padding: 8px 16px;
+    pointer-events: none;
+    display: flex;
+    z-index: 5;
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    font-family: 'Google Sans', sans-serif;
+  }
+  .depth-header span {
+    /* width handled by JS based on column width */
+    text-align: left;
+  }
+
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 100%; grid-template-rows: 280px 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <h1>🌳 Phylogeny Tree</h1>
+    <div class="subtitle">Horizontal collapsible tree · 7,477 papers</div>
+
+    <div class="help-card">
+      <div class="row"><span>노드 클릭</span><kbd>토글</kbd></div>
+      <div class="row"><span>호버 (정보)</span><kbd>mouse</kbd></div>
+      <div class="row"><span>형제 이동</span><kbd>↑ ↓</kbd></div>
+      <div class="row"><span>한 단계 펼치기</span><kbd>→</kbd></div>
+      <div class="row"><span>한 단계 접기</span><kbd>←</kbd></div>
+      <div class="row"><span>해제</span><kbd>Esc</kbd></div>
+      <div class="btn-row">
+        <button class="btn primary" id="btn-expand-2">L2까지</button>
+        <button class="btn" id="btn-expand-3">L3까지</button>
+        <button class="btn" id="btn-collapse">전부 접기</button>
+      </div>
+    </div>
+
+    <div id="focused-card"></div>
+    <div id="hovered-card"></div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="depth-header" id="depth-header"></div>
+    <svg class="tree" id="tree"></svg>
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+const COL_WIDTH  = 240;   // horizontal space per depth level
+const ROW_HEIGHT = 24;    // vertical space per leaf
+const MARGIN     = { top: 50, right: 320, bottom: 30, left: 40 };
+const DEPTH_KIND = ['Robotics', 'Phylum', 'Class', 'Order', 'Genus'];
+
+const svg = d3.select('#tree');
+const main = d3.select('#main').node();
+const focusedCard = d3.select('#focused-card');
+const hoveredCard = d3.select('#hovered-card');
+const depthHeader = d3.select('#depth-header');
+
+let root, focusedNode = null;
+let totalPapers = 0;
+
+d3.json('tree_data.json').then(data => {
+  root = d3.hierarchy(data)
+    .sum(d => d.value || 0)
+    .sort((a, b) => b.value - a.value);
+
+  totalPapers = root.value;
+
+  // Assign IDs and prepare collapse state — collapse Class+Order+Genus by default
+  let i = 0;
+  root.each(d => {
+    d.id = ++i;
+    d._children = d.children;
+  });
+  // Collapse beyond Phylum (depth 1)
+  collapseBelow(root, 1);
+
+  buildDepthHeader();
+  update();
+
+  // Sidebar buttons
+  d3.select('#btn-expand-2').on('click', () => { collapseBelow(root, 2); update(); });
+  d3.select('#btn-expand-3').on('click', () => { collapseBelow(root, 3); update(); });
+  d3.select('#btn-collapse').on('click', () => { collapseBelow(root, 1); update(); });
+
+  // Initial empty info
+  renderFocusedPanel(null);
+  renderHoverPanel(null);
+
+  // Keyboard nav
+  d3.select(window).on('keydown', (event) => {
+    if (event.key === 'Escape') {
+      resetSelection(); event.preventDefault(); return;
+    }
+    if (!focusedNode) return;
+    let handled = true;
+    switch (event.key) {
+      case 'ArrowUp':    navigate('prev');   break;
+      case 'ArrowDown':  navigate('next');   break;
+      case 'ArrowLeft':  collapseNode(focusedNode); break;
+      case 'ArrowRight': expandNode(focusedNode);   break;
+      default: handled = false;
+    }
+    if (handled) event.preventDefault();
+  });
+});
+
+
+// ============ Tree state helpers ============
+function collapseBelow(node, maxDepth) {
+  // Restore _children → children for nodes at depth ≤ maxDepth
+  // Collapse otherwise (children → null, originals saved in _children)
+  function visit(n) {
+    if (!n._children) return;  // leaf
+    if (n.depth < maxDepth) {
+      n.children = n._children;
+      n.children.forEach(visit);
+    } else {
+      n.children = null;
+    }
+  }
+  visit(node);
+}
+
+function expandNode(d) {
+  if (d._children && !d.children) {
+    d.children = d._children;
+    update();
+  }
+}
+function collapseNode(d) {
+  if (d.children) {
+    d.children = null;
+    update();
+  } else if (d.parent) {
+    selectNode(d.parent);
+  }
+}
+function toggleNode(d) {
+  if (d.children) d.children = null;
+  else if (d._children) d.children = d._children;
+  update();
+}
+
+
+// ============ Render ============
+function update() {
+  // Layout
+  const treeLayout = d3.tree()
+    .nodeSize([ROW_HEIGHT, COL_WIDTH])
+    .separation((a, b) => a.parent === b.parent ? 1 : 1.2);
+  treeLayout(root);
+
+  const nodes = root.descendants();
+  const links = root.links();
+
+  // Compute SVG dimensions
+  const xs = nodes.map(d => d.x);
+  const ys = nodes.map(d => d.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const maxDepth = Math.max(...nodes.map(d => d.depth));
+  const width = MARGIN.left + (maxDepth + 1) * COL_WIDTH + MARGIN.right;
+  const height = MARGIN.top + (maxX - minX) + MARGIN.bottom;
+
+  svg.attr('width', width).attr('height', height);
+
+  // Container group
+  let g = svg.select('g.root');
+  if (g.empty()) {
+    g = svg.append('g').attr('class', 'root');
+  }
+  g.attr('transform', `translate(${MARGIN.left},${MARGIN.top - minX})`);
+
+  // ---- Links ----
+  const linkSel = g.selectAll('path.link')
+    .data(links, d => d.target.id);
+  linkSel.exit().remove();
+  const linkEnter = linkSel.enter().append('path')
+    .attr('class', 'link');
+  linkSel.merge(linkEnter)
+    .attr('d', d3.linkHorizontal()
+      .x(d => d.y)
+      .y(d => d.x));
+
+  // ---- Nodes ----
+  const nodeSel = g.selectAll('g.node')
+    .data(nodes, d => d.id);
+  nodeSel.exit().remove();
+
+  const nodeEnter = nodeSel.enter().append('g')
+    .attr('class', 'node')
+    .attr('transform', d => `translate(${d.y},${d.x})`)
+    .on('click', (event, d) => {
+      event.stopPropagation();
+      // Click toggles expand/collapse AND selects
+      toggleNode(d);
+      selectNode(d);
+    })
+    .on('mouseover', (event, d) => renderHoverPanel(d))
+    .on('mouseout', () => renderHoverPanel(null));
+
+  nodeEnter.append('circle')
+    .attr('r', 5)
+    .attr('fill', d => nodeColor(d));
+
+  // Label
+  nodeEnter.append('text')
+    .attr('dy', '0.32em')
+    .attr('x', 10)
+    .attr('text-anchor', 'start')
+    .text(d => truncate(d.data.name, 26));
+
+  // Count badge
+  nodeEnter.append('text')
+    .attr('class', 'count-badge')
+    .attr('dy', '0.32em')
+    .attr('text-anchor', 'end')
+    .attr('x', d => measureLabelEnd(d) + 8)
+    .text(d => d.value.toLocaleString());
+
+  // Update existing
+  const merged = nodeSel.merge(nodeEnter)
+    .attr('transform', d => `translate(${d.y},${d.x})`)
+    .classed('has-hidden', d => d._children && !d.children)
+    .classed('focused', d => d === focusedNode);
+  merged.select('circle').attr('fill', d => nodeColor(d));
+  merged.select('text').text(d => truncate(d.data.name, 26));
+  merged.select('text.count-badge')
+    .attr('x', d => measureLabelEnd(d) + 8)
+    .text(d => d.value.toLocaleString());
+
+  // Background click → reset
+  svg.on('click', resetSelection);
+
+  // Re-apply highlighting if a focused node exists
+  if (focusedNode) selectNode(focusedNode, /*skipUpdate=*/true);
+}
+
+function measureLabelEnd(d) {
+  const name = truncate(d.data.name, 26);
+  return 10 + name.length * 6.5;
+}
+
+function truncate(s, n) {
+  return s.length > n ? s.slice(0, n - 1) + '…' : s;
+}
+
+function nodeColor(d) {
+  if (d.depth === 0) return '#444';
+  let phyAncestor = d;
+  while (phyAncestor.depth > 1) phyAncestor = phyAncestor.parent;
+  return phyAncestor.data.color || '#888';
+}
+
+function buildDepthHeader() {
+  const labels = ['🌍 Root', '🌳 Phylum', '🌿 Class', '🌱 Order', '· Genus'];
+  depthHeader.html('');
+  for (let i = 0; i < 5; i++) {
+    depthHeader.append('span')
+      .style('width', COL_WIDTH + 'px')
+      .style('padding-left', i === 0 ? (MARGIN.left + 12) + 'px' : '0')
+      .text(labels[i]);
+  }
+}
+
+
+// ============ Selection ============
+function selectNode(d, skipUpdate = false) {
+  focusedNode = d;
+  // Apply CSS classes
+  const ancestors = new Set(d.ancestors());
+  const descendants = new Set(d.descendants());
+  const allNodes = root.descendants();
+  const allLinks = root.links();
+
+  svg.selectAll('g.node')
+    .classed('focused', n => n === d)
+    .classed('dimmed', n => !ancestors.has(n) && !descendants.has(n));
+  svg.selectAll('path.link')
+    .classed('highlighted', l => ancestors.has(l.target) || descendants.has(l.target))
+    .classed('dimmed', l => !ancestors.has(l.target) && !descendants.has(l.target));
+
+  renderFocusedPanel(d);
+  if (!skipUpdate) scrollNodeIntoView(d);
+}
+
+function resetSelection() {
+  focusedNode = null;
+  svg.selectAll('g.node').classed('focused', false).classed('dimmed', false);
+  svg.selectAll('path.link').classed('highlighted', false).classed('dimmed', false);
+  renderFocusedPanel(null);
+}
+
+function scrollNodeIntoView(d) {
+  // Compute the absolute position of the node within the SVG
+  if (!d) return;
+  // d.x = vertical, d.y = horizontal in our layout
+  const xs = root.descendants().map(n => n.x);
+  const minX = Math.min(...xs);
+  const screenY = MARGIN.top - minX + d.x;
+  const screenX = MARGIN.left + d.y;
+  main.scrollTo({
+    left: Math.max(0, screenX - main.clientWidth / 2),
+    top:  Math.max(0, screenY - main.clientHeight / 2),
+    behavior: 'smooth',
+  });
+}
+
+
+// ============ Keyboard nav ============
+function navigate(direction) {
+  if (!focusedNode) return;
+  const d = focusedNode;
+  let target = null;
+
+  if (direction === 'prev' || direction === 'next') {
+    if (!d.parent || !d.parent.children) return;
+    const sibs = d.parent.children;
+    const i = sibs.indexOf(d);
+    if (i < 0) return;
+    const j = direction === 'next'
+      ? Math.min(i + 1, sibs.length - 1)
+      : Math.max(i - 1, 0);
+    target = sibs[j];
+  }
+
+  if (target) selectNode(target);
+}
+
+
+// ============ Sidebar info cards ============
+function buildBreadcrumbHTML(d) {
+  return d.ancestors().reverse()
+    .map((n, i, arr) => {
+      const isLast = i === arr.length - 1;
+      return `<span class="crumb"${isLast ? ' style="color:#202124;font-weight:500"' : ''}>${escapeHTML(n.data.name)}</span>`;
+    })
+    .join('<span class="sep">›</span>');
+}
+
+function buildInfoCardHTML(d, sourceLabel, sourceClass) {
+  if (!d) {
+    return `<div class="info-card"><div class="info-empty">${
+      sourceLabel === 'FOCUSED'
+        ? '아무 노드나 클릭하면 여기에 정보가 표시됩니다.'
+        : '노드에 마우스를 올려보세요.'
+    }</div></div>`;
+  }
+  const pct = (d.value / totalPapers * 100).toFixed(2);
+  const kind = DEPTH_KIND[d.depth] || `Depth ${d.depth}`;
+  const all = d._children || d.children || [];
+  const childCount = all.length;
+  const expanded = !!d.children;
+
+  return `
+    <div class="info-card">
+      <span class="info-source ${sourceClass}">${sourceLabel}</span>
+      <div class="info-breadcrumb">${buildBreadcrumbHTML(d)}</div>
+      <div class="info-name">${escapeHTML(d.data.name)}</div>
+      <div class="info-stats">
+        <div class="info-stat"><div class="v">${d.value.toLocaleString()}</div><div class="l">Papers</div></div>
+        <div class="info-stat"><div class="v">${pct}%</div><div class="l">of total</div></div>
+      </div>
+      <div class="info-meta">
+        <span class="k">Kind</span><span class="v">${kind}</span>
+        <span class="k">Depth</span><span class="v">${d.depth} / 4</span>
+        <span class="k">Children</span><span class="v">${childCount} (${expanded ? 'expanded' : 'collapsed'})</span>
+      </div>
+    </div>`;
+}
+
+function renderFocusedPanel(d) {
+  focusedCard.html(buildInfoCardHTML(d, 'FOCUSED', 'focus'));
+}
+
+function renderHoverPanel(d) {
+  hoveredCard.html(buildInfoCardHTML(d, 'HOVER', 'hover'));
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+</script>
+</body>
+</html>
