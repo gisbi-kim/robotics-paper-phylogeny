@@ -337,9 +337,12 @@
     border-bottom-color: var(--primary);
   }
   .tab-content { display: none; }
-  #tab-b:checked ~ .tab-panels #panel-b,
-  #tab-c:checked ~ .tab-panels #panel-c,
-  #tab-i:checked ~ .tab-panels #panel-i {
+  /* Use `~ *` to allow .tab-panels to be nested inside .container,
+     since the radio inputs are siblings of .container, not of
+     .tab-panels directly. */
+  #tab-b:checked ~ * #panel-b,
+  #tab-c:checked ~ * #panel-c,
+  #tab-i:checked ~ * #panel-i {
     display: block;
   }
 
