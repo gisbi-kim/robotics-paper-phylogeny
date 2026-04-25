@@ -139,7 +139,8 @@ def plot_1_phylum_stack():
         height=600,
         legend=dict(orientation='v'),
     )
-    fig.write_html(INTERACTIVE / '01_phylum_stack.html')
+    fig.write_html(INTERACTIVE / '01_phylum_stack.html',
+                   include_plotlyjs='cdn')
     print(f"  → {INTERACTIVE / '01_phylum_stack.html'}")
 
 
@@ -203,6 +204,64 @@ def plot_2_phylum_small_multiples():
                 dpi=150, bbox_inches='tight')
     plt.close()
     print(f"  → {FIGS / '02_phylum_small_multiples.png'}")
+
+    # ---- Plotly interactive version ----
+    from plotly.subplots import make_subplots
+    nrows_p, ncols_p = 5, 3
+    titles = list(plot_phyla)
+    while len(titles) < nrows_p * ncols_p:
+        titles.append('')
+    fig = make_subplots(rows=nrows_p, cols=ncols_p,
+                        subplot_titles=titles,
+                        shared_xaxes=False, shared_yaxes=False,
+                        vertical_spacing=0.07,
+                        horizontal_spacing=0.06)
+
+    for ax_idx, phy in enumerate(plot_phyla):
+        r = ax_idx // ncols_p + 1
+        c = ax_idx % ncols_p + 1
+        classes = phylum_class_year[phy]
+        cls_totals = {cls: sum(year_counts.values())
+                      for cls, year_counts in classes.items()}
+        top_classes = sorted(cls_totals.items(), key=lambda x: -x[1])[:8]
+        palette = px.colors.qualitative.Pastel + px.colors.qualitative.Set2
+        for i, (cls, _) in enumerate(top_classes):
+            yvals = [classes[cls].get(y, 0) for y in YEARS]
+            fig.add_trace(
+                go.Scatter(
+                    x=YEARS, y=yvals,
+                    mode='lines',
+                    name=cls,
+                    legendgroup=phy,
+                    showlegend=False,
+                    stackgroup=f'stk_{ax_idx}',
+                    fillcolor=palette[i % len(palette)],
+                    line=dict(width=0.5, color='white'),
+                    hovertemplate=f'<b>{phy}</b><br>{cls}<br>'
+                                  'Year: %{x}<br>Papers: %{y}<extra></extra>',
+                ),
+                row=r, col=c)
+
+    # Color subplot title text by Phylum color
+    for i, ann in enumerate(fig['layout']['annotations']):
+        if i < len(plot_phyla):
+            phy = plot_phyla[i]
+            ann['font'] = dict(size=11, color=PHY_COLORS[phy], family='Google Sans')
+
+    fig.update_layout(
+        title='Per-Phylum breakdown by Class over time '
+              '(top 8 Classes per Phylum)',
+        height=1300,
+        showlegend=False,
+        template='plotly_white',
+        margin=dict(t=70, l=40, r=20, b=20),
+    )
+    fig.update_xaxes(showgrid=True, gridcolor='#eee', range=[1988, 2025])
+    fig.update_yaxes(showgrid=True, gridcolor='#eee')
+
+    out = INTERACTIVE / '02_phylum_small_multiples.html'
+    fig.write_html(out, include_plotlyjs='cdn')
+    print(f"  → {out}")
 
 
 # ============================================================
@@ -303,7 +362,8 @@ def plot_3_class_heatmap():
         height=max(800, nrows * 14),
         template='plotly_white',
     )
-    fig.write_html(INTERACTIVE / '03_class_heatmap.html')
+    fig.write_html(INTERACTIVE / '03_class_heatmap.html',
+                   include_plotlyjs='cdn')
     print(f"  → {INTERACTIVE / '03_class_heatmap.html'}")
 
 
@@ -366,6 +426,66 @@ def plot_4_top_classes_drill():
                 dpi=150, bbox_inches='tight')
     plt.close()
     print(f"  → {FIGS / '04_top_classes_drill.png'}")
+
+    # ---- Plotly interactive version ----
+    from plotly.subplots import make_subplots
+    nrows_p, ncols_p = 4, 3
+    titles = [f"{phy} > {cls}<br><sub>{total} papers</sub>"
+              for ((phy, cls), total) in top12]
+    fig = make_subplots(rows=nrows_p, cols=ncols_p,
+                        subplot_titles=titles,
+                        shared_xaxes=False, shared_yaxes=False,
+                        vertical_spacing=0.10,
+                        horizontal_spacing=0.06)
+
+    for ax_idx, ((phy, cls), total) in enumerate(top12):
+        r = ax_idx // ncols_p + 1
+        c = ax_idx % ncols_p + 1
+        order_year = defaultdict(lambda: defaultdict(int))
+        for p in papers:
+            if p['phylum'] == phy and p['class'] == cls:
+                order_year[p['order']][p['year']] += 1
+        ord_totals = {o: sum(yc.values()) for o, yc in order_year.items()}
+        top_orders = sorted(ord_totals.items(), key=lambda x: -x[1])[:6]
+        palette = px.colors.qualitative.Set3 + px.colors.qualitative.Pastel2
+        for i, (ord_, _) in enumerate(top_orders):
+            yvals = [order_year[ord_].get(y, 0) for y in YEARS]
+            fig.add_trace(
+                go.Scatter(
+                    x=YEARS, y=yvals,
+                    mode='lines',
+                    name=ord_,
+                    legendgroup=f"{phy}>{cls}",
+                    showlegend=False,
+                    stackgroup=f'stk4_{ax_idx}',
+                    fillcolor=palette[i % len(palette)],
+                    line=dict(width=0.5, color='white'),
+                    hovertemplate=(
+                        f'<b>{phy} &gt; {cls}</b><br>{ord_}<br>'
+                        'Year: %{x}<br>Papers: %{y}<extra></extra>'),
+                ),
+                row=r, col=c)
+
+    for i, ann in enumerate(fig['layout']['annotations']):
+        if i < len(top12):
+            phy = top12[i][0][0]
+            ann['font'] = dict(size=10, color=PHY_COLORS[phy],
+                               family='Google Sans')
+
+    fig.update_layout(
+        title='Top 12 Classes — Order breakdown over time '
+              '(top 6 Orders per Class)',
+        height=1100,
+        showlegend=False,
+        template='plotly_white',
+        margin=dict(t=70, l=40, r=20, b=20),
+    )
+    fig.update_xaxes(showgrid=True, gridcolor='#eee', range=[1988, 2025])
+    fig.update_yaxes(showgrid=True, gridcolor='#eee')
+
+    out = INTERACTIVE / '04_top_classes_drill.html'
+    fig.write_html(out, include_plotlyjs='cdn')
+    print(f"  → {out}")
 
 
 # ============================================================

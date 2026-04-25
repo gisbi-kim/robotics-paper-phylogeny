@@ -400,7 +400,8 @@ def draw_plotly_sunburst():
         height=900,
         template='plotly_white',
     )
-    fig.write_html(INTERACTIVE / '05_phylogeny_sunburst.html')
+    fig.write_html(INTERACTIVE / '05_phylogeny_sunburst.html',
+                   include_plotlyjs='cdn')
     print(f"  → {INTERACTIVE / '05_phylogeny_sunburst.html'}")
 
 

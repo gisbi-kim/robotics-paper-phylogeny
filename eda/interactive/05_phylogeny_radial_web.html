@@ -270,15 +270,40 @@
     stroke: var(--focus) !important;
     stroke-width: 3px !important;
   }
-  .label {
+  .label-inline {
     pointer-events: none;
-    font-size: 9px;
-    fill: #fff;
-    font-weight: 600;
-    text-shadow: 0 0 2px rgba(0,0,0,0.6);
     font-family: 'Google Sans', sans-serif;
   }
-  .label-class { font-size: 7px; fill: #1a1a1a; font-weight: 500; text-shadow: none; }
+  .label-inline.depth-1 {
+    font-size: 11px;
+    font-weight: 700;
+    fill: #fff;
+    text-shadow: 0 0 3px rgba(0,0,0,0.7);
+  }
+  .label-inline.depth-2 {
+    font-size: 8.5px;
+    font-weight: 500;
+    fill: #1a1a1a;
+  }
+  .label-inline.depth-3 {
+    font-size: 7px;
+    font-weight: 400;
+    fill: #333;
+  }
+  .leader-line {
+    fill: none;
+    stroke: #999;
+    stroke-width: 0.7;
+    pointer-events: none;
+  }
+  .label-leader {
+    pointer-events: none;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    fill: #1a1a1a;
+  }
+  .label-leader.depth-1 { font-size: 10px; font-weight: 700; }
 
   .center-label {
     text-anchor: middle;
@@ -326,16 +351,19 @@
 
   <!-- ============ MAIN (SVG) ============ -->
   <main class="main">
-    <svg id="tree" viewBox="-450 -450 900 900"></svg>
+    <svg id="tree" viewBox="-560 -560 1120 1120"></svg>
   </main>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script>
-const RADIUS = 430;
+const RADIUS = 420;       // outer radius of the tree itself
 const ROOT_R0 = 0;
 const ROOT_R1 = 60;
+const LEADER_INNER = RADIUS + 12;   // where leaders start (just past tree)
+const LEADER_OUTER = RADIUS + 38;   // where leaders bend / labels begin
+const LABEL_PAD    = 4;             // gap between line and text
 
 const svg = d3.select('#tree');
 const focusedCard = d3.select('#focused-card');
@@ -419,29 +447,164 @@ d3.json('tree_data.json').then(data => {
     .attr('y', 14)
     .text(`${root.value.toLocaleString()} papers`);
 
-  // Labels for visible Phyla and large Classes
-  svg.selectAll('text.label')
-    .data(allNodes.filter(d =>
-      (d.x1 - d.x0) > 0.06
-      && d.depth <= 2))
+  // ============== Label system ==============
+  //
+  //  All labels are oriented RADIALLY OUTWARD (along the line from
+  //  the center to the wedge). For wedges where the text is too long
+  //  to fit inside the band, we draw an L-shaped leader line that
+  //  ends in the outer margin, with a horizontal label at the tip.
+  //
+  //   ─────────────────────────────────────────────────────────────
+  //   Inline:   wedge ▒▒▒▒░░░░ ―→ "Manipulation"  (radial inside)
+  //
+  //   Leader:   wedge ▒  ╮
+  //                       ╰─── "Robot Software & Architecture"
+  //   ─────────────────────────────────────────────────────────────
+
+  const FONT_PER_CHAR = 0.55;   // approx text-width / fontSize per char
+
+  function midAngleOf(d) { return (d.x0 + d.x1) / 2; }
+  function bandRadialWidth(d) { return d.y1 - d.y0; }
+  function bandMidR(d) { return (d.y0 + d.y1) / 2; }
+
+  function fontSizeFor(depth) {
+    if (depth === 1) return 11;   // Phylum
+    if (depth === 2) return 8.5;  // Class
+    return 7;                     // Order/Genus
+  }
+
+  function approxTextWidth(name, fontSize) {
+    return name.length * fontSize * FONT_PER_CHAR;
+  }
+
+  // Polar (D3 sunburst convention: 0 at top, CW) → cartesian (SVG y-down)
+  function polarXY(angleRad, r) {
+    return [Math.sin(angleRad) * r, -Math.cos(angleRad) * r];
+  }
+
+  // For a label centered at angle `mid`, returns text rotation (degrees)
+  // so the text reads radially outward AND is upright when viewed normally.
+  function radialUprightRotation(angleRad) {
+    let deg = (angleRad * 180 / Math.PI) - 90;   // tangent angle (CCW from +x)
+    // Rotate by `deg + 90` to align text along the radial direction
+    let rot = deg + 90;
+    // Normalize to (-180, 180]
+    while (rot > 180) rot -= 360;
+    while (rot <= -180) rot += 360;
+    // Auto-flip so the text is never upside down
+    if (rot > 90) rot -= 180;
+    else if (rot < -90) rot += 180;
+    return rot;
+  }
+
+  // Decide between inline and leader for one node.
+  // Returns { mode: 'inline'|'leader'|'skip', label: string }
+  function labelDecision(d) {
+    if (d.depth === 0 || d.depth > 3) return { mode: 'skip' };
+
+    // Skip very tiny wedges entirely (leader area would be too crowded)
+    const span = d.x1 - d.x0;
+    if (span < 0.005) return { mode: 'skip' };  // < ~0.3°
+
+    // Limit how many we show per band
+    if (d.depth === 1) {
+      // Phylum: always label
+    } else if (d.depth === 2) {
+      // Class: only top 4 per Phylum AND must occupy ≥ 0.6° of arc
+      const sib = d.parent.children.slice().sort((a, b) => b.value - a.value);
+      const idx = sib.indexOf(d);
+      if (idx >= 4 || span < 0.011) return { mode: 'skip' };
+    } else if (d.depth === 3) {
+      // Order: only top 2 per Class with span ≥ 1.5°
+      const sib = d.parent.children.slice().sort((a, b) => b.value - a.value);
+      const idx = sib.indexOf(d);
+      if (idx >= 2 || span < 0.026) return { mode: 'skip' };
+    }
+
+    const fontSize = fontSizeFor(d.depth);
+    const name = d.data.name;
+    const textW = approxTextWidth(name, fontSize);
+    const radialBudget = bandRadialWidth(d) * 0.92;
+
+    // If radial text fits inside the band: inline
+    if (textW <= radialBudget) {
+      return { mode: 'inline', label: name };
+    }
+
+    // Otherwise: leader line + label at outer margin
+    return { mode: 'leader', label: name };
+  }
+
+  // Make label decisions once
+  const labelDecisions = allNodes.map(d => ({ d, ...labelDecision(d) }));
+  const inlineLabels = labelDecisions.filter(x => x.mode === 'inline');
+  const leaderLabels = labelDecisions.filter(x => x.mode === 'leader');
+
+  // ----- Inline radial labels -----
+  svg.selectAll('text.label-inline')
+    .data(inlineLabels)
     .join('text')
-    .attr('class', d => d.depth === 1 ? 'label' : 'label-class')
-    .attr('transform', d => labelTransform(d))
+    .attr('class', x => `label-inline depth-${x.d.depth}`)
+    .attr('transform', x => {
+      const mid = midAngleOf(x.d);
+      const r = bandMidR(x.d);
+      const [cx, cy] = polarXY(mid, r);
+      const rot = radialUprightRotation(mid);
+      return `translate(${cx},${cy}) rotate(${rot})`;
+    })
     .attr('text-anchor', 'middle')
     .attr('dy', '0.35em')
-    .text(d => {
-      const max = d.depth === 1 ? 18 : 16;
-      const name = d.data.name;
-      return name.length > max ? name.slice(0, max - 1) + '…' : name;
+    .text(x => x.label);
+
+  // ----- Leader lines (L-shape) + labels at outer margin -----
+  // Geometry per leader:
+  //   p0 = (mid, R_band_outer)            — start at outer edge of wedge
+  //   p1 = (mid, LEADER_INNER)            — first kink: short radial step out
+  //   p2 = (mid, LEADER_OUTER)            — second kink: further out
+  //   text at (mid, LEADER_OUTER + PAD), oriented radially upright
+  //   (We stack across rings naturally — no overlap because each leader
+  //    follows its own midangle.)
+  const leaderG = svg.append('g').attr('class', 'leaders');
+
+  leaderG.selectAll('polyline')
+    .data(leaderLabels)
+    .join('polyline')
+    .attr('class', 'leader-line')
+    .attr('points', x => {
+      const mid = midAngleOf(x.d);
+      const p0 = polarXY(mid, x.d.y1);
+      const p1 = polarXY(mid, LEADER_INNER);
+      const p2 = polarXY(mid, LEADER_OUTER);
+      return `${p0[0]},${p0[1]} ${p1[0]},${p1[1]} ${p2[0]},${p2[1]}`;
     });
 
-  function labelTransform(d) {
-    const angle = (d.x0 + d.x1) / 2;
-    const r = (d.y0 + d.y1) / 2;
-    const deg = (angle * 180 / Math.PI) - 90;
-    const rotation = (deg >= 90 || deg < -90) ? deg + 180 : deg;
-    return `rotate(${deg}) translate(${r},0) rotate(${rotation - deg})`;
-  }
+  leaderG.selectAll('text.label-leader')
+    .data(leaderLabels)
+    .join('text')
+    .attr('class', x => `label-leader depth-${x.d.depth}`)
+    .attr('transform', x => {
+      const mid = midAngleOf(x.d);
+      const r = LEADER_OUTER + LABEL_PAD;
+      const [cx, cy] = polarXY(mid, r);
+      const rot = radialUprightRotation(mid);
+      return `translate(${cx},${cy}) rotate(${rot})`;
+    })
+    .attr('text-anchor', x => {
+      // Text reads outward from center; auto-flip means letters' tops always
+      // point "outward enough". For leader labels, anchor at start so the
+      // text begins right after the leader line tip.
+      const mid = midAngleOf(x.d);
+      const deg = (mid * 180 / Math.PI) - 90;
+      // After auto-flip, the radial-outward direction may have been reversed.
+      // Determine if the text was flipped (lower half).
+      let rot = deg + 90;
+      while (rot > 180) rot -= 360;
+      while (rot <= -180) rot += 360;
+      const flipped = (rot > 90) || (rot < -90);
+      return flipped ? 'end' : 'start';
+    })
+    .attr('dy', '0.35em')
+    .text(x => x.label);
 
   // Initial empty info
   renderFocusedPanel(null);
