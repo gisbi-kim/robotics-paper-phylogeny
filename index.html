@@ -620,12 +620,12 @@
 <!-- PLOT 1 -->
 <section class="card">
   <h2><span class="num">PLOT 1</span> Phylum × 연도 stack chart</h2>
-  <p class="desc">X = 1988~2025, Y = 연간 논문 수 (stacked). 색 = 13개 Phylum + Editorial + Unclassified.</p>
+  <p class="desc">X = 1988~2025, Y = 연간 논문 수 (stacked). 색 = 13개 Phylum + Editorial + Unclassified. 호버 시 정확한 카운트 표시.</p>
   <div class="links">
-    <a href="eda/figures/01_phylum_stack.png" target="_blank">📷 PNG</a>
-    <a href="eda/interactive/01_phylum_stack.html" target="_blank">🖱️ Interactive</a>
+    <a href="eda/interactive/01_phylum_stack.html" target="_blank">🖱️ Open in new tab</a>
+    <a href="eda/figures/01_phylum_stack.png" target="_blank">📷 PNG download</a>
   </div>
-  <img src="eda/figures/01_phylum_stack.png" alt="Phylum stack chart over time">
+  <iframe src="eda/interactive/01_phylum_stack.html" style="height:650px;"></iframe>
   <details open>
     <summary>📍 보이는 패턴 + 데이터 사실</summary>
     <ul>
@@ -641,11 +641,12 @@
 <!-- PLOT 2 -->
 <section class="card">
   <h2><span class="num">PLOT 2</span> Per-Phylum small multiples</h2>
-  <p class="desc">13 Phylum 각각에 대해 패널 1개. 각 패널 안에서 top 8 Class가 stacked area.</p>
+  <p class="desc">13 Phylum 각각에 대해 패널 1개. 각 패널 안에서 top 8 Class가 stacked area. 패널마다 Phylum 색으로 제목 표시.</p>
   <div class="links">
-    <a href="eda/figures/02_phylum_small_multiples.png" target="_blank">📷 PNG</a>
+    <a href="eda/interactive/02_phylum_small_multiples.html" target="_blank">🖱️ Open in new tab</a>
+    <a href="eda/figures/02_phylum_small_multiples.png" target="_blank">📷 PNG download</a>
   </div>
-  <img src="eda/figures/02_phylum_small_multiples.png" alt="Per-Phylum small multiples">
+  <iframe src="eda/interactive/02_phylum_small_multiples.html" style="height:1350px;"></iframe>
   <details>
     <summary>📍 보이는 패턴 + 데이터 사실</summary>
     <ul>
@@ -662,12 +663,12 @@
 <!-- PLOT 3 -->
 <section class="card">
   <h2><span class="num">PLOT 3</span> Class heatmap (전체 100 Class × 연도)</h2>
-  <p class="desc">행 = 모든 Class (Phylum 그룹 순서), 열 = 3년 bucket. 색 = log10(1 + 논문 수). Y라벨 색 = Phylum.</p>
+  <p class="desc">행 = 모든 Class (Phylum 그룹 순서), 열 = 3년 bucket. 색 = log10(1 + 논문 수). 호버 시 Class 이름 + 정확한 카운트.</p>
   <div class="links">
-    <a href="eda/figures/03_class_heatmap.png" target="_blank">📷 PNG</a>
-    <a href="eda/interactive/03_class_heatmap.html" target="_blank">🖱️ Interactive</a>
+    <a href="eda/interactive/03_class_heatmap.html" target="_blank">🖱️ Open in new tab</a>
+    <a href="eda/figures/03_class_heatmap.png" target="_blank">📷 PNG download</a>
   </div>
-  <img src="eda/figures/03_class_heatmap.png" alt="Class heatmap">
+  <iframe src="eda/interactive/03_class_heatmap.html" style="height:1500px;"></iframe>
   <details>
     <summary>📍 보이는 패턴 + 데이터 사실</summary>
     <ul>
@@ -683,11 +684,12 @@
 <!-- PLOT 4 -->
 <section class="card">
   <h2><span class="num">PLOT 4</span> Top 12 Class drill-down</h2>
-  <p class="desc">가장 큰 12개 Class에 대해 각각 mini panel. 내부에서 top 6 Order가 stacked area.</p>
+  <p class="desc">가장 큰 12개 Class에 대해 각각 mini panel. 내부에서 top 6 Order가 stacked area. 호버로 Order 이름 + 카운트 확인.</p>
   <div class="links">
-    <a href="eda/figures/04_top_classes_drill.png" target="_blank">📷 PNG</a>
+    <a href="eda/interactive/04_top_classes_drill.html" target="_blank">🖱️ Open in new tab</a>
+    <a href="eda/figures/04_top_classes_drill.png" target="_blank">📷 PNG download</a>
   </div>
-  <img src="eda/figures/04_top_classes_drill.png" alt="Top 12 Classes drill-down">
+  <iframe src="eda/interactive/04_top_classes_drill.html" style="height:1150px;"></iframe>
   <details>
     <summary>📍 보이는 패턴 + 데이터 사실</summary>
     <ul>
