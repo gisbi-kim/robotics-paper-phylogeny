@@ -1,0 +1,1 @@
+역사적으로 로봇공학에 어떤 주제가 있었는지 최대한 많이 나열해서 엑셀로 줘 . 단순히 단어를 분리해서 tf idf 하라는게 아니야. 시맨틱하게 너가 어텐션타서 잘 판단하란 얘기야 예를들어서 어떤 논문은 laser place recognition 이라고 할수도있고 어떤애는 point cloud based loop detection이라고도 할수있겠지만 이런 계열들은 다 place recognition으로 묶고 그 하위에 lidar-based 라는 계통도를 만들수있겠지. 아맞아 계통도까지 만들자 생물들 계통도처럼
