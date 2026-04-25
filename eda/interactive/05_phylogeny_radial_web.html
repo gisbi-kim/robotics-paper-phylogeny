@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robotics Phylogeny — Interactive Radial Tree</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #181b22;
+    --text: #e6e7ea;
+    --muted: #9aa0aa;
+    --accent: #6aa9ff;
+    --border: #2a2f3a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+                 "Noto Sans KR", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  .container {
+    display: flex; flex-direction: column;
+    height: 100vh; padding: 12px 16px;
+  }
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .header h1 { margin: 0; font-size: 16px; font-weight: 600; }
+  .header .help {
+    color: var(--muted); font-size: 12px;
+  }
+  .header kbd {
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 3px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 11px;
+  }
+  .reset-btn {
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px; cursor: pointer;
+    font-size: 12px;
+  }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 0;
+  }
+  svg {
+    max-width: 100%; max-height: 100%;
+    cursor: pointer;
+  }
+  .arc {
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+  }
+  .arc:hover { stroke: white; stroke-width: 1.5px; }
+  .dimmed { opacity: 0.12; }
+  .highlighted { opacity: 1; }
+  .label {
+    pointer-events: none;
+    font-size: 9px;
+    fill: #fff;
+    font-weight: 600;
+    text-shadow: 0 0 2px rgba(0,0,0,0.6);
+  }
+  .label-class { font-size: 7px; fill: #1a1a1a; font-weight: 500; text-shadow: none; }
+  .label-order { font-size: 5.5px; fill: #333; font-weight: 400; text-shadow: none; }
+
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(20, 24, 32, 0.96);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    max-width: 320px;
+    line-height: 1.4;
+    opacity: 0; transition: opacity 0.15s;
+    z-index: 100;
+  }
+  .tooltip.visible { opacity: 1; }
+  .tooltip .breadcrumb {
+    color: var(--muted); font-size: 10.5px;
+    margin-bottom: 4px;
+  }
+  .tooltip .name {
+    font-weight: 700; font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .tooltip .count {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .tooltip .pct {
+    color: var(--muted); margin-left: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .center-label {
+    text-anchor: middle;
+    font-weight: 700;
+    font-size: 14px;
+    fill: var(--text);
+  }
+  .center-sub {
+    text-anchor: middle;
+    font-size: 11px;
+    fill: var(--muted);
+  }
+
+  /* Selected node breadcrumb display */
+  .breadcrumb-bar {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    flex-shrink: 0;
+    min-height: 40px;
+  }
+  .breadcrumb-bar .label {
+    color: var(--muted); font-size: 11px; margin-right: 8px;
+  }
+  .breadcrumb-bar .crumb {
+    color: var(--text); font-weight: 600;
+  }
+  .breadcrumb-bar .crumb-count {
+    color: var(--accent); margin-left: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .breadcrumb-bar .empty {
+    color: var(--muted); font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>🌳 Robotics Paper Phylogenetic Tree — Interactive</h1>
+  <div class="help">
+    <span><kbd>hover</kbd> 호버 = 강조</span>
+    &nbsp;·&nbsp;
+    <span><kbd>click</kbd> 클릭 = 계열 선택</span>
+    &nbsp;·&nbsp;
+    <button class="reset-btn" id="reset">Reset</button>
+  </div>
+</div>
+
+<div class="main">
+  <svg id="tree" viewBox="-450 -450 900 900"></svg>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<div class="breadcrumb-bar" id="breadcrumb">
+  <span class="empty">아무 wedge나 클릭하면 그 계열만 강조됩니다.</span>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+const RADIUS = 430;
+const RING_COUNTS = 5; // root + Phylum + Class + Order + Genus
+// Inner cutout for center text
+const ROOT_R0 = 0;
+const ROOT_R1 = 60;
+
+const svg = d3.select('#tree');
+const tooltip = d3.select('#tooltip');
+const breadcrumb = d3.select('#breadcrumb');
+
+// Lighten color
+function lighten(hex, amt) {
+  const c = d3.color(hex);
+  if (!c) return hex;
+  return d3.interpolateRgb(hex, '#ffffff')(amt);
+}
+function darken(hex, amt) {
+  return d3.interpolateRgb(hex, '#000000')(amt);
+}
+
+d3.json('tree_data.json').then(data => {
+  const root = d3.hierarchy(data)
+    .sum(d => d.value || 0)
+    .sort((a, b) => b.value - a.value);
+
+  // Partition layout
+  const partition = d3.partition()
+    .size([2 * Math.PI, RADIUS - ROOT_R1]);
+
+  partition(root);
+
+  // Adjust y0/y1 to be RING-based, not value-proportional
+  // Root depth=0, Phylum=1, Class=2, Order=3, Genus=4
+  const ringWidth = (RADIUS - ROOT_R1) / 4;
+  root.each(d => {
+    if (d.depth === 0) {
+      d.y0 = 0; d.y1 = ROOT_R1;
+    } else {
+      d.y0 = ROOT_R1 + (d.depth - 1) * ringWidth;
+      d.y1 = ROOT_R1 + d.depth * ringWidth;
+    }
+  });
+
+  // Arc generator
+  const arc = d3.arc()
+    .startAngle(d => d.x0)
+    .endAngle(d => d.x1)
+    .innerRadius(d => d.y0)
+    .outerRadius(d => d.y1)
+    .padAngle(0.001)
+    .padRadius(RADIUS / 4);
+
+  // Compute color for each node based on depth + Phylum color
+  function nodeColor(d) {
+    if (d.depth === 0) return '#222';
+    // Find Phylum ancestor
+    let phyAncestor = d;
+    while (phyAncestor.depth > 1) phyAncestor = phyAncestor.parent;
+    const baseColor = phyAncestor.data.color || '#888';
+    if (d.depth === 1) return baseColor;
+    if (d.depth === 2) return lighten(baseColor, 0.35);
+    if (d.depth === 3) return lighten(baseColor, 0.55);
+    return lighten(baseColor, 0.72);
+  }
+
+  // Draw arcs
+  const allNodes = root.descendants().filter(d => d.depth > 0);
+  const arcs = svg.selectAll('path.arc')
+    .data(allNodes)
+    .join('path')
+    .attr('class', 'arc')
+    .attr('d', arc)
+    .attr('fill', d => nodeColor(d))
+    .attr('stroke', 'white')
+    .attr('stroke-width', 0.5)
+    .on('mouseover', function(event, d) {
+      d3.select(this).attr('stroke-width', 2);
+      showTooltip(event, d);
+    })
+    .on('mousemove', moveTooltip)
+    .on('mouseout', function(event, d) {
+      d3.select(this).attr('stroke-width', 0.5);
+      hideTooltip();
+    })
+    .on('click', function(event, d) {
+      event.stopPropagation();
+      selectNode(d);
+    });
+
+  // Center text
+  svg.append('text')
+    .attr('class', 'center-label')
+    .attr('y', -4)
+    .text('Robotics');
+  svg.append('text')
+    .attr('class', 'center-sub')
+    .attr('y', 14)
+    .text(`${root.value.toLocaleString()} papers`);
+
+  // Add labels for visible Phyla and large Classes
+  const labels = svg.selectAll('text.label')
+    .data(allNodes.filter(d =>
+      (d.x1 - d.x0) > 0.06   // ~3.5°
+      && d.depth <= 2))
+    .join('text')
+    .attr('class', d => d.depth === 1 ? 'label' : 'label-class')
+    .attr('transform', d => labelTransform(d))
+    .attr('text-anchor', 'middle')
+    .attr('dy', '0.35em')
+    .text(d => {
+      const max = d.depth === 1 ? 18 : 16;
+      const name = d.data.name;
+      return name.length > max ? name.slice(0, max - 1) + '…' : name;
+    });
+
+  function labelTransform(d) {
+    const angle = (d.x0 + d.x1) / 2;
+    const r = (d.y0 + d.y1) / 2;
+    // angle is in radians, with 0 at 12 o'clock and increasing clockwise
+    // (D3 partition default). Convert to a "screen rotation" that aligns
+    // the text along the radius (reading outward).
+    const deg = (angle * 180 / Math.PI) - 90;
+    // Flip if the resulting orientation would be upside-down to a viewer
+    // outside the circle. Use ≥ 90 (not >) so the boundary at exactly the
+    // 6 o'clock and 12 o'clock positions is handled symmetrically.
+    const rotation = (deg >= 90 || deg < -90) ? deg + 180 : deg;
+    return `rotate(${deg}) translate(${r},0) rotate(${rotation - deg})`;
+  }
+
+  // Tooltip helpers
+  function showTooltip(event, d) {
+    const path = d.ancestors().reverse().map(n => n.data.name).join(' › ');
+    const total = root.value;
+    const pct = (d.value / total * 100).toFixed(2);
+    tooltip.html(`
+      <div class="breadcrumb">${path.split(' › ').slice(0, -1).join(' › ')}</div>
+      <div class="name">${d.data.name}</div>
+      <div><span class="count">${d.value.toLocaleString()}</span> papers <span class="pct">(${pct}%)</span></div>
+    `);
+    tooltip.classed('visible', true);
+    moveTooltip(event);
+  }
+  function moveTooltip(event) {
+    const x = event.clientX, y = event.clientY;
+    tooltip.style('left', (x + 16) + 'px')
+           .style('top', (y + 16) + 'px');
+  }
+  function hideTooltip() {
+    tooltip.classed('visible', false);
+  }
+
+  // Selection / lineage highlight
+  function selectNode(d) {
+    const ancestors = new Set(d.ancestors());
+    const descendants = new Set(d.descendants());
+
+    arcs.classed('dimmed', n => !ancestors.has(n) && !descendants.has(n))
+        .classed('highlighted', n => ancestors.has(n) || descendants.has(n));
+
+    // Update breadcrumb bar
+    const crumbs = d.ancestors().reverse().slice(1)
+      .map(n => `<span class="crumb">${n.data.name}</span>`)
+      .join(' <span style="color:#5a6270">›</span> ');
+    const total = root.value;
+    const pct = (d.value / total * 100).toFixed(2);
+    breadcrumb.html(`
+      <span class="label">선택됨:</span>
+      ${crumbs}
+      <span class="crumb-count">${d.value.toLocaleString()} papers · ${pct}%</span>
+    `);
+  }
+
+  function resetSelection() {
+    arcs.classed('dimmed', false).classed('highlighted', false);
+    breadcrumb.html('<span class="empty">아무 wedge나 클릭하면 그 계열만 강조됩니다.</span>');
+  }
+
+  // Reset on background click or button
+  svg.on('click', resetSelection);
+  d3.select('#reset').on('click', resetSelection);
+
+}).catch(err => {
+  console.error('Failed to load tree_data.json', err);
+  document.getElementById('tooltip').innerText = 'Error loading tree data';
+});
+</script>
+</body>
+</html>

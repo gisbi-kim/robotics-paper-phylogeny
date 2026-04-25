@@ -395,28 +395,55 @@
 <div id="panel-c" class="tab-content">
 
 <section class="plot">
-  <h2><span class="num">Plot 5</span> 🌳 Phylogenetic Tree (Radial Dendrogram)</h2>
-  <p class="desc">생물 계통도 스타일. 안쪽 ring = 13 Phylum, 중간 ring = Class, 바깥 ring = Order. Wedge 각도 ∝ 논문 수.</p>
+  <h2><span class="num">Plot 5a</span> 🖱️ Interactive Radial Tree (D3.js)</h2>
+  <p class="desc"><strong>호버</strong>하면 wedge 강조 + 툴팁 (논문 수, 비중, 경로). <strong>클릭</strong>하면 해당 계열 (조상 + 후손)만 강조되고 나머지는 dimmed. 배경/Reset으로 해제.</p>
   <div class="links">
-    📷 <a href="eda/figures/05_phylogeny_radial.png" target="_blank">PNG 원본</a>
+    🖱️ <a href="eda/interactive/05_phylogeny_radial_web.html" target="_blank">새 탭에서 전체화면 열기</a>
   </div>
-  <img src="eda/figures/05_phylogeny_radial.png" alt="Phylogenetic radial dendrogram">
+  <iframe src="eda/interactive/05_phylogeny_radial_web.html"
+          style="width:100%; height:850px; border:1px solid var(--border); border-radius:6px; background:#0f1115;">
+  </iframe>
   <details open>
+    <summary>📍 사용법 + 데이터 사실</summary>
+    <ul>
+      <li><strong>호버</strong> → wedge 두꺼워짐 + 우측 상단 툴팁에 breadcrumb / 카운트 / 비중 표시</li>
+      <li><strong>클릭</strong> → 해당 계열만 강조 (위로는 root까지 ancestor, 아래로는 모든 descendant). 나머지는 dimmed.</li>
+      <li>아래쪽 "선택됨" bar에 현재 선택 경로 표시</li>
+      <li>배경 클릭 또는 우측 상단 <kbd>Reset</kbd> 버튼으로 선택 해제</li>
+      <li class="quant"><strong>📊 클릭 추천</strong>: <em>Manipulation > Contact-rich Manipulation > Deformable Object Manipulation</em>의 Genus까지 들어가보면 Cloth/Garment vs Rope/Cable/Wire vs Liquid 비중 비교 가능.</li>
+    </ul>
+  </details>
+</section>
+
+<section class="plot">
+  <h2><span class="num">Plot 5b</span> 🌳 Phylogenetic Tree (Static Vector — SVG/PDF)</h2>
+  <p class="desc">생물 계통도 스타일. 안쪽 ring = 13 Phylum, 중간 ring = Class, 바깥 ring = Order. Wedge 각도 ∝ 논문 수. 프린트/공유용 벡터 그래픽.</p>
+  <div class="links">
+    🖼️ <a href="eda/figures/05_phylogeny_radial.svg" target="_blank">SVG 원본 (확대해도 깨지지 않음)</a>
+    &nbsp;|&nbsp; 📄 <a href="eda/figures/05_phylogeny_radial.pdf" target="_blank">PDF</a>
+    &nbsp;|&nbsp; 📷 <a href="eda/figures/05_phylogeny_radial.png" target="_blank">PNG</a>
+  </div>
+  <object data="eda/figures/05_phylogeny_radial.svg" type="image/svg+xml"
+          style="width:100%; height:auto; display:block; border-radius:6px; background:white;">
+    <img src="eda/figures/05_phylogeny_radial.png" alt="Phylogenetic radial dendrogram (SVG)">
+  </object>
+  <details>
     <summary>📍 보이는 패턴</summary>
     <ul>
       <li><strong>가장 큰 wedge</strong>: Manipulation (12.5%, 녹색) &gt; Locomotion (11.3%) &gt; Planning (11.2%). 셋이 합쳐 전체의 약 1/3.</li>
       <li><strong>Locomotion / Manipulation 두 큰 가지</strong> 사이에서 SLAM &amp; Localization이 가장 sub-class가 다양 (LIO/VIO/Visual/LiDAR/Multi-modal/Neural-Implicit 등).</li>
       <li><strong>Robot Software &amp; Architecture</strong>는 거의 wedge가 안 보임 (0.4%) — 학술 논문에선 거의 다뤄지지 않는 영역.</li>
       <li><strong>Theoretical Foundations</strong>는 wedge는 크지만 (6.6%) 색이 갈색 계열로 시각적 무게가 덜함 (의도적).</li>
+      <li class="quant"><strong>📊 외곽 ring "결" 차이</strong>: Multi-Robot Systems (purple)나 Robot Design &amp; Hardware (red) 영역의 외곽 ring에 흰 분리선이 빽빽한 이유 = 좁은 Order가 많기 때문 (sub-category 다양성 시각적 표현).</li>
     </ul>
   </details>
 </section>
 
 <section class="plot">
-  <h2><span class="num">Plot 6</span> 🖱️ Interactive Sunburst (4-level)</h2>
-  <p class="desc">Phylum → Class → Order → Genus 4단계를 클릭/호버로 드릴다운. Plotly 인터랙티브.</p>
+  <h2><span class="num">Plot 6</span> 🖱️ Interactive Sunburst (Plotly, 4-level)</h2>
+  <p class="desc">Phylum → Class → Order → Genus 4단계를 클릭/호버로 드릴다운. Plotly의 sunburst 구현 (D3 viewer와 다른 인터페이스).</p>
   <div class="links">
-    🖱️ <a href="eda/interactive/05_phylogeny_sunburst.html" target="_blank">인터랙티브 열기 (새 탭)</a>
+    🖱️ <a href="eda/interactive/05_phylogeny_sunburst.html" target="_blank">새 탭에서 열기</a>
   </div>
   <iframe src="eda/interactive/05_phylogeny_sunburst.html"
           style="width:100%; height:900px; border:1px solid var(--border); border-radius:6px; background:white;">

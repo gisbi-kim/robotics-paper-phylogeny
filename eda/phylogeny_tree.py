@@ -11,10 +11,62 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from matplotlib.patches import Wedge, FancyArrowPatch
+from matplotlib.patches import Wedge
 import numpy as np
 
 import plotly.graph_objects as go
+
+
+# ============================================================
+# Helpers for cartesian polar drawing (avoid matplotlib polar projection
+# pitfalls with text rotation)
+# ============================================================
+def polar_to_xy(theta_rad, r):
+    """N=0, CW polar → cartesian (x, y) with y-up."""
+    return r * np.sin(theta_rad), r * np.cos(theta_rad)
+
+
+def label_rotation_tangential(theta_rad):
+    """Tangential (along-arc) text rotation, always upright from outside."""
+    bearing = np.rad2deg(theta_rad) % 360
+    rotation = -bearing
+    while rotation > 180:
+        rotation -= 360
+    while rotation <= -180:
+        rotation += 360
+    if rotation > 90:
+        rotation -= 180
+    elif rotation < -90:
+        rotation += 180
+    return rotation
+
+
+def label_rotation_radial(theta_rad):
+    """Radial (along-radius, reading outward) text rotation,
+    always upright when viewed from outside."""
+    bearing = np.rad2deg(theta_rad) % 360
+    rotation = 90 - bearing
+    while rotation > 180:
+        rotation -= 360
+    while rotation <= -180:
+        rotation += 360
+    if rotation > 90:
+        rotation -= 180
+    elif rotation < -90:
+        rotation += 180
+    return rotation
+
+
+def wedge_screen_angles(a0_polar, a1_polar):
+    """
+    Convert (a0, a1) in our polar (N=0, CW, radians) to matplotlib
+    Wedge angles (degrees CCW from +x axis).
+    """
+    s_start = (90 - np.rad2deg(a1_polar)) % 360
+    s_end = (90 - np.rad2deg(a0_polar)) % 360
+    if s_end < s_start:
+        s_end += 360
+    return s_start, s_end
 
 ROOT = Path(__file__).resolve().parent
 FIGS = ROOT / 'figures'
@@ -91,24 +143,27 @@ def lighten(color, amount=0.3):
 
 
 def draw_radial_phylogeny():
-    print("\n[1/2] Radial dendrogram…")
-    fig, ax = plt.subplots(figsize=(20, 20), subplot_kw={'projection': 'polar'})
-    ax.set_theta_zero_location('N')
-    ax.set_theta_direction(-1)
+    """
+    Cartesian-based radial dendrogram with Wedge patches.
+    Labels always upright (auto-flip in lower half).
+    Saves as SVG (vector, no pixelation) + PDF.
+    """
+    print("\n[1/2] Radial dendrogram (cartesian, vector output)…")
+    fig, ax = plt.subplots(figsize=(20, 20))
+    ax.set_aspect('equal')
 
     # Radial bands
-    R0, R1 = 0.5, 1.4   # Phylum band
-    R2 = 2.4            # Class band end
-    R3 = 3.4            # Order band end
-    R_LABEL_PHY = 0.95
-    R_LABEL_CLS = 1.9
-    R_LABEL_ORD = 2.9
+    R0, R1 = 0.55, 1.45   # Phylum band
+    R2 = 2.45             # Class band end
+    R3 = 3.55             # Order band end
+    R_LABEL_PHY = (R0 + R1) / 2
+    R_LABEL_CLS = (R1 + R2) / 2
+    R_LABEL_ORD = (R2 + R3) / 2
 
     # Allocate angular space proportional to phy_totals
     angles = {}
     cur = 0.0
     full_angle = 2 * np.pi
-    # Padding: leave 1° between phyla
     n_phyla = len(phy_totals)
     pad_rad = np.deg2rad(1.0)
     usable = full_angle - n_phyla * pad_rad
@@ -121,68 +176,67 @@ def draw_radial_phylogeny():
         angles[phy] = (cur, cur + span)
         cur += span + pad_rad
 
-    # ---- Draw Phylum band (innermost) ----
+    # Helper to add a wedge
+    def add_wedge(a0, a1, r_inner, r_outer, color,
+                  edgecolor='white', linewidth=0.5, alpha=1.0):
+        s0, s1 = wedge_screen_angles(a0, a1)
+        w = Wedge(center=(0, 0), r=r_outer,
+                  theta1=s0, theta2=s1,
+                  width=r_outer - r_inner,
+                  facecolor=color, edgecolor=edgecolor,
+                  linewidth=linewidth, alpha=alpha)
+        ax.add_patch(w)
+
+    # ---- Phylum band ----
     for phy, (a0, a1) in angles.items():
-        color = PHY_COLORS[phy]
-        # Phylum wedge — solid color
-        n_pts = 50
-        thetas = np.linspace(a0, a1, n_pts)
-        ax.fill_between(thetas, R0, R1, color=color, alpha=0.95,
-                        edgecolor='white', linewidth=0.5)
-        # Phylum label at outer edge of band
+        add_wedge(a0, a1, R0, R1, PHY_COLORS[phy],
+                  edgecolor='white', linewidth=1.2, alpha=0.95)
         mid = (a0 + a1) / 2
-        # Rotate text to follow arc
-        rot = np.rad2deg(mid)
-        ha = 'center'
-        # Adjust rotation for readability
-        if rot > 90 and rot < 270:
-            rot = rot + 180
-        ax.text(mid, R_LABEL_PHY, phy.replace(' & ', '\n& '),
-                rotation=rot - 90, rotation_mode='anchor',
-                ha=ha, va='center', fontsize=10, weight='bold',
+        x, y = polar_to_xy(mid, R_LABEL_PHY)
+        rotation = label_rotation_tangential(mid)
+        label = phy.replace(' & ', '\n& ')
+        ax.text(x, y, label, rotation=rotation,
+                ha='center', va='center', fontsize=11, weight='bold',
                 color='white')
 
-    # ---- Draw Class band (middle) ----
+    # ---- Class band (wedges + selective labels) ----
+    # Strategy: draw all Class wedges, but only LABEL the top 3 per Phylum
+    # AND only when wedge spans ≥4° (≈ enough room for tangential text).
+    # All sub-detail (Order/Genus) lives in the interactive sunburst.
     for phy, (pa0, pa1) in angles.items():
         classes = tree[phy]
         cls_total = sum(sum(o.values()) for o in classes.values())
         if cls_total == 0:
             continue
-        # Sort classes by count desc
         cls_sorted = sorted(classes.items(),
                             key=lambda x: -sum(x[1].values()))
         cur_a = pa0
-        cls_pad = np.deg2rad(0.2)
+        cls_pad = np.deg2rad(0.15)
         avail = (pa1 - pa0) - len(cls_sorted) * cls_pad
         if avail < 0:
             avail = (pa1 - pa0)
             cls_pad = 0
-        for cls, orders in cls_sorted:
+        cls_color = lighten(PHY_COLORS[phy], 0.4)
+
+        for idx_c, (cls, orders) in enumerate(cls_sorted):
             cls_count = sum(orders.values())
             share = cls_count / cls_total
             span = avail * share
             ca0, ca1 = cur_a, cur_a + span
-            cls_color = lighten(PHY_COLORS[phy], 0.4)
-            n_pts = max(6, int(span * 30))
-            thetas = np.linspace(ca0, ca1, n_pts)
-            ax.fill_between(thetas, R1, R2, color=cls_color,
-                            alpha=0.85, edgecolor='white', linewidth=0.4)
+            add_wedge(ca0, ca1, R1, R2, cls_color,
+                      edgecolor='white', linewidth=0.5, alpha=0.92)
 
-            # Label only larger classes (>= 0.6 deg span)
-            if span > np.deg2rad(0.6):
+            if idx_c < 3 and span > np.deg2rad(4):
                 mid = (ca0 + ca1) / 2
-                rot = np.rad2deg(mid)
-                if rot > 90 and rot < 270:
-                    rot = rot + 180
-                # Truncate long names
-                label = cls if len(cls) <= 28 else cls[:26] + '…'
-                ax.text(mid, R_LABEL_CLS, label,
-                        rotation=rot - 90, rotation_mode='anchor',
-                        ha='center', va='center', fontsize=6.5,
-                        color='#222')
+                x, y = polar_to_xy(mid, R_LABEL_CLS)
+                rotation = label_rotation_tangential(mid)
+                label = cls if len(cls) <= 26 else cls[:24] + '…'
+                ax.text(x, y, label, rotation=rotation,
+                        ha='center', va='center', fontsize=8,
+                        color='#1a1a1a', weight='500')
             cur_a = ca1 + cls_pad
 
-    # ---- Draw Order band (outermost) ----
+    # ---- Order band (wedges only, no labels — too dense for static view) ----
     for phy, (pa0, pa1) in angles.items():
         classes = tree[phy]
         cls_total = sum(sum(o.values()) for o in classes.values())
@@ -191,11 +245,12 @@ def draw_radial_phylogeny():
         cls_sorted = sorted(classes.items(),
                             key=lambda x: -sum(x[1].values()))
         cur_a = pa0
-        cls_pad = np.deg2rad(0.2)
+        cls_pad = np.deg2rad(0.15)
         avail = (pa1 - pa0) - len(cls_sorted) * cls_pad
         if avail < 0:
             avail = (pa1 - pa0)
             cls_pad = 0
+        ord_color = lighten(PHY_COLORS[phy], 0.65)
 
         for cls, orders in cls_sorted:
             cls_count = sum(orders.values())
@@ -203,59 +258,55 @@ def draw_radial_phylogeny():
             span = avail * share
             ca0, ca1 = cur_a, cur_a + span
 
-            # Sub-divide by Order
             ord_sorted = sorted(orders.items(), key=lambda x: -x[1])
             ord_total = sum(orders.values())
             ord_cur = ca0
-            ord_pad = 0.0
             for ord_, ocount in ord_sorted:
                 oshare = ocount / ord_total if ord_total else 0
                 ospan = span * oshare
                 oa0, oa1 = ord_cur, ord_cur + ospan
-                ord_color = lighten(PHY_COLORS[phy], 0.65)
-                n_pts = max(4, int(ospan * 30))
-                thetas = np.linspace(oa0, oa1, n_pts)
-                ax.fill_between(thetas, R2, R3, color=ord_color,
-                                alpha=0.75, edgecolor='white',
-                                linewidth=0.2)
-
-                # Label only larger orders
-                if ospan > np.deg2rad(0.4):
-                    mid = (oa0 + oa1) / 2
-                    rot = np.rad2deg(mid)
-                    if rot > 90 and rot < 270:
-                        rot = rot + 180
-                    label = ord_ if len(ord_) <= 30 else ord_[:28] + '…'
-                    ax.text(mid, R_LABEL_ORD, label,
-                            rotation=rot - 90, rotation_mode='anchor',
-                            ha='center', va='center', fontsize=5,
-                            color='#444')
+                add_wedge(oa0, oa1, R2, R3, ord_color,
+                          edgecolor='white', linewidth=0.2, alpha=0.85)
                 ord_cur = oa1
             cur_a = ca1 + cls_pad
 
-    # Center text
-    ax.text(0, 0, 'Robotics\n7,477', ha='center', va='center',
-            fontsize=14, weight='bold', color='#222',
-            transform=ax.transData._b if hasattr(ax.transData, '_b') else ax.transData)
-    # Use polar (0,0) center label via add_artist
-    ax.set_ylim(0, R3 + 0.5)
-    ax.set_yticks([])
-    ax.set_xticks([])
-    ax.spines['polar'].set_visible(False)
-    ax.grid(False)
+    # Center disc + label
+    center = mpatches.Circle((0, 0), R0, facecolor='white',
+                             edgecolor='#dddddd', linewidth=0.8, zorder=10)
+    ax.add_patch(center)
+    ax.text(0, 0.06, 'Robotics', ha='center', va='center',
+            fontsize=15, weight='bold', color='#1a1a1a', zorder=11)
+    ax.text(0, -0.10, f'{overall_total:,} papers', ha='center', va='center',
+            fontsize=10, color='#555', zorder=11)
+
+    # Frame
+    margin = 0.4
+    ax.set_xlim(-R3 - margin, R3 + margin)
+    ax.set_ylim(-R3 - margin, R3 + margin)
+    ax.axis('off')
 
     plt.suptitle('Robotics Paper Phylogenetic Tree '
-                 '(13 Phylum × Class × Order, 7,261 papers)',
-                 fontsize=16, weight='bold', y=0.97)
-    plt.figtext(0.5, 0.04,
-                'Inner ring: Phylum (color) — Middle: Class — Outer: Order. '
-                'Wedge angle ∝ paper count. '
-                'Label color: white=Phylum, dark=Class, gray=Order.',
-                ha='center', fontsize=10, color='#555')
+                 f'(13 Phylum × Class × Order, {overall_total:,} papers)',
+                 fontsize=16, weight='bold', y=0.96)
+    plt.figtext(0.5, 0.05,
+                'Inner ring: Phylum (color) · Middle: Class · Outer: Order · '
+                'Wedge angle ∝ paper count. Labels always upright.',
+                ha='center', fontsize=10, color='#666')
     plt.tight_layout()
-    plt.savefig(FIGS / '05_phylogeny_radial.png',
-                dpi=170, bbox_inches='tight', facecolor='white')
+
+    # Save vector formats (no pixelation on zoom)
+    svg_path = FIGS / '05_phylogeny_radial.svg'
+    pdf_path = FIGS / '05_phylogeny_radial.pdf'
+    plt.savefig(svg_path, format='svg', bbox_inches='tight',
+                facecolor='white')
+    plt.savefig(pdf_path, format='pdf', bbox_inches='tight',
+                facecolor='white')
+    # Keep PNG fallback for GitHub README preview
+    plt.savefig(FIGS / '05_phylogeny_radial.png', dpi=180,
+                bbox_inches='tight', facecolor='white')
     plt.close()
+    print(f"  → {svg_path}")
+    print(f"  → {pdf_path}")
     print(f"  → {FIGS / '05_phylogeny_radial.png'}")
 
 
@@ -353,7 +404,63 @@ def draw_plotly_sunburst():
     print(f"  → {INTERACTIVE / '05_phylogeny_sunburst.html'}")
 
 
+# ============================================================
+# 3) Export tree JSON (for D3.js interactive web viewer)
+# ============================================================
+def export_tree_json():
+    print("\n[3/3] Exporting tree JSON for D3 viewer…")
+
+    # Build hierarchy with Genus as leaf when present (else Order)
+    root = {'name': 'Robotics', 'color': '#888', 'children': []}
+    for phy in PHYLA:
+        if phy not in tree:
+            continue
+        phy_node = {
+            'name': phy,
+            'color': PHY_COLORS[phy],
+            'children': []
+        }
+        for cls, orders in sorted(tree[phy].items(),
+                                  key=lambda x: -sum(x[1].values())):
+            cls_node = {
+                'name': cls,
+                'color': PHY_COLORS[phy],
+                'children': []
+            }
+            for ord_, ocount in sorted(orders.items(), key=lambda x: -x[1]):
+                # Group by Genus
+                genus_sub = Counter()
+                for p in papers:
+                    if (p['phylum'] == phy and p['class'] == cls
+                            and p['order'] == ord_):
+                        genus_sub[p['genus']] += 1
+                ord_node = {
+                    'name': ord_,
+                    'color': PHY_COLORS[phy],
+                }
+                if len(genus_sub) > 1:
+                    ord_node['children'] = []
+                    for gen, gcount in sorted(genus_sub.items(),
+                                              key=lambda x: -x[1]):
+                        ord_node['children'].append({
+                            'name': gen,
+                            'color': PHY_COLORS[phy],
+                            'value': gcount,
+                        })
+                else:
+                    ord_node['value'] = ocount
+                cls_node['children'].append(ord_node)
+            phy_node['children'].append(cls_node)
+        root['children'].append(phy_node)
+
+    out_path = INTERACTIVE / 'tree_data.json'
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(root, f, ensure_ascii=False)
+    print(f"  → {out_path}")
+
+
 if __name__ == '__main__':
     draw_radial_phylogeny()
     draw_plotly_sunburst()
+    export_tree_json()
     print("\nDone.")
