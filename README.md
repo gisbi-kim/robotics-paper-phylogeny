@@ -8,6 +8,21 @@
 
 ---
 
+## EDA 시각화 (Stage B)
+
+[`eda/`](eda/) 폴더에 4개의 raw 데이터 시각화 — 자세한 설명은 [eda/README.md](eda/README.md).
+
+| Plot | 미리보기 | 설명 |
+|---|---|---|
+| 1. Phylum stack | [![](eda/figures/01_phylum_stack.png)](eda/figures/01_phylum_stack.png) | 13 Phylum × 연도 stacked area. 시대별 분야 비중. |
+| 2. Per-Phylum small multiples | [![](eda/figures/02_phylum_small_multiples.png)](eda/figures/02_phylum_small_multiples.png) | 각 Phylum 내 top 8 Class 변화. |
+| 3. Class heatmap | [![](eda/figures/03_class_heatmap.png)](eda/figures/03_class_heatmap.png) | 100 Class × 3년 bucket. 어느 Class가 언제 활성화? |
+| 4. Top 12 Class drill | [![](eda/figures/04_top_classes_drill.png)](eda/figures/04_top_classes_drill.png) | 인기 Class 내부 Order 분해 (SLAM, Grasping 등 패러다임 전환 가시화). |
+
+> 인터랙티브 버전: [eda/interactive/01_phylum_stack.html](eda/interactive/01_phylum_stack.html), [eda/interactive/03_class_heatmap.html](eda/interactive/03_class_heatmap.html) — 다운로드 후 브라우저로 열기.
+
+---
+
 ## 산출물 (Deliverables)
 
 | 파일 | 설명 |
