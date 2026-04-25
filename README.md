@@ -34,21 +34,21 @@
 
 | Phylum | 논문 수 | % |
 |---|---:|---:|
-| Manipulation | 912 | 12.2% |
-| Locomotion | 786 | 10.5% |
-| Planning | 766 | 10.2% |
-| SLAM & Localization | 661 | 8.8% |
-| Robot Design & Hardware | 604 | 8.1% |
-| Perception & Sensing | 437 | 5.8% |
-| Control | 395 | 5.3% |
-| Multi-Robot Systems | 390 | 5.2% |
-| Theoretical Foundations | 384 | 5.1% |
-| Human-Robot Interaction | 383 | 5.1% |
-| Application Domains | 369 | 4.9% |
-| Learning for Robotics | 294 | 3.9% |
-| Robot Software & Architecture | 22 | 0.3% |
-| Other / Editorial | 150 | 2.0% |
-| **Other / Unclassified** | **924** | **12.4%** |
+| Manipulation | 934 | 12.5% |
+| Locomotion | 842 | 11.3% |
+| Planning | 835 | 11.2% |
+| SLAM & Localization | 670 | 9.0% |
+| Robot Design & Hardware | 623 | 8.3% |
+| Perception & Sensing | 554 | 7.4% |
+| Theoretical Foundations | 491 | 6.6% |
+| Control | 441 | 5.9% |
+| Multi-Robot Systems | 408 | 5.5% |
+| Application Domains | 396 | 5.3% |
+| Human-Robot Interaction | 395 | 5.3% |
+| Learning for Robotics | 354 | 4.7% |
+| Robot Software & Architecture | 30 | 0.4% |
+| Other / Editorial | 288 | 3.9% |
+| **Other / Unclassified** | **216** | **2.9%** |
 | **합계** | **7,477** | **100%** |
 
 ### Top 10 Class

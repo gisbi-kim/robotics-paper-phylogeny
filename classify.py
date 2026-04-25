@@ -2434,7 +2434,590 @@ def classify(title_orig):
                 'Robot Design (general)')
 
     # ===========================================================
-    # DEFAULT
+    # AGGRESSIVE FALLBACK — push everything to nearest Phylum/Class
+    # (small accuracy loss tolerated; user wants minimal Unclassified)
+    # ===========================================================
+
+    # --- Kinematics-related theoretical
+    if any(k in t for k in ['inverse velocity', 'inverse acceleration',
+                            'redundancy', 'redundant', 'singular',
+                            'workspace', 'dexterity', 'manipulability',
+                            'isotropy', 'jacobian',
+                            'reuleaux', 'serial robot', 'serial manipulator',
+                            'spherical wrist', 'forward kinematic',
+                            'inverse kinematic', 'closed-loop joint',
+                            'geometric model', 'spatial robot',
+                            'spatial linkage', 'denavit', 'six-dof',
+                            'six dof']):
+        return ('Theoretical Foundations', 'Kinematics', 'Kinematic Analysis')
+
+    # --- Dynamics-related theoretical
+    if any(k in t for k in ['inertia matrix', 'mass matrix', 'inertial parameter',
+                            'inertia identification', 'multibody',
+                            'multi-body', 'lagrange equation', 'lagrangian',
+                            'newton-euler', 'rigid body dynamic',
+                            'flexible link', 'flexible joint',
+                            'flexible mechanism', 'elastic robot',
+                            'elastic joint', 'parameter identification',
+                            'load identification', 'cyclic friction']):
+        return ('Theoretical Foundations', 'Dynamics', 'Robot Dynamics')
+
+    # --- Contact / friction / collision (theoretical)
+    if any(k in t for k in ['friction-dominated', 'pushed object',
+                            'contact mechanics', 'contact sensing',
+                            'contact state', 'contact task',
+                            'planar rigid body', 'rigid body contact',
+                            'wrench cone', 'limit surface',
+                            'penetration', 'polyhedral object',
+                            'convex polyhedra', 'intersection test',
+                            'distance between convex', 'minimum distance',
+                            'voronoi', 'collision prediction',
+                            'pose and motion from contact',
+                            'contact force', 'contact dynamics']):
+        return ('Theoretical Foundations', 'Dynamics',
+                'Contact / Friction Modeling')
+
+    # --- Geometric theoretical methods (general)
+    if any(k in t for k in ['geometric reasoning', 'geometric model',
+                            'algebraic invariant', 'implicit polynomial',
+                            'tensor-based representation',
+                            'fourier transform', 'discrete-motion group',
+                            'group theoretic', 'tangent space',
+                            'interval analysis', 'symbolic computation',
+                            'symbolic calculation', 'matrix algebra',
+                            'three-cubic', 'quaternion field',
+                            'dual quaternion', 'rotation matrix',
+                            'screw geometry', 'screw theory']):
+        return ('Theoretical Foundations', 'Geometric Methods',
+                'Geometric Mechanics')
+
+    # --- Polygon / shape / geometry-based grasping/planning
+    if any(k in t for k in ['polygon', 'polyhedral', 'shape from',
+                            'shape representation', 'capture region',
+                            'enveloping grasp', 'grip ', 'gripped',
+                            'shape description', 'curved surface',
+                            'frictional contact', 'planar shapes',
+                            'planar object']):
+        return ('Manipulation', 'Grasping', 'Grasp Planning / Synthesis')
+
+    # --- Sensor data fusion / multi-sensor
+    if any(k in t for k in ['sensor data', 'sensor fusion', 'fusing',
+                            'multi-sensor', 'multisensor', 'sensor system',
+                            'sensor information', 'sensor model',
+                            'sensor integration', 'sensor placement',
+                            'sensor planning', 'data fusion',
+                            'sensor-based exploration']):
+        return ('Perception & Sensing', 'Multi-modal Perception',
+                'Sensor Fusion')
+
+    # --- Tactile / touch / tactile sensing variants
+    if any(k in t for k in ['active touch', ' touch ', 'touching',
+                            'feel', 'frictional surface']):
+        return ('Perception & Sensing', 'Tactile Sensing',
+                'Tactile Sensors / Algorithms')
+
+    # --- Vision / visual / image
+    if any(k in t for k in ['visual map', 'noisy visual', 'computer vision',
+                            'stereo view', 'stereo vision',
+                            'visual algorithm', 'dynamic vision',
+                            'vision algorithm', 'visual maps',
+                            'multi-view', 'multiview', 'multiple cameras',
+                            'multicamera', 'camera viewpoint',
+                            'object modeling in computer vision',
+                            'matching method', 'machine vision',
+                            'visual measurement']):
+        return ('Perception & Sensing', 'Visual Perception',
+                'Object Detection / Recognition')
+
+    # --- Aerial / honeybee / insect-flight inspiration
+    if any(k in t for k in ['honeybee', 'bee ', 'fruit fly',
+                            'airborne vehicle', 'uninhabited airborne']):
+        return ('Locomotion', 'Aerial Locomotion',
+                'Insect-scale / Pico Aerial')
+
+    # --- Walking / vehicle with legs (catchall)
+    if any(k in t for k in ['walking vehicle', 'walker', 'walking machine',
+                            'horse model', 'galloping', 'trotting',
+                            'biped gait', 'stair climb']):
+        return ('Locomotion', 'Legged Locomotion', 'Legged (general)')
+
+    # --- Wheeled / car-like / vehicle
+    if any(k in t for k in ['car-like', 'carlike', 'car like',
+                            'nonholonomic system', 'nonholonomic',
+                            'reeds-shepp', 'reeds and shepp',
+                            'fire truck', 'continuous-curvature',
+                            'mobile vehicle', 'autonomous guided vehicle',
+                            'agv ', 'guided vehicle', 'ground vehicle']):
+        return ('Locomotion', 'Wheeled Locomotion', 'Mobile Wheeled Robot')
+
+    # --- Path / motion / trajectory algorithms
+    if any(k in t for k in ['path algorithm', 'findpath', 'shortest path',
+                            'optimal path', 'optimal feedback',
+                            'feedback motion', 'motion strategies',
+                            'motion plan', 'path plan',
+                            'path tracking', 'cost function',
+                            'path transform', 'kinodynamic']):
+        return ('Planning', 'Path/Motion Planning', 'Motion / Path Planning')
+
+    # --- Coverage / Morse / sensor-based exploration
+    if any(k in t for k in ['coverage task', 'coverage planning',
+                            'morse decomposition', 'sensor-based coverage',
+                            'sensor-based exploration', 'unknown environment',
+                            'exploration of', 'autonomous exploration']):
+        return ('Planning', 'Navigation', 'Coverage Planning')
+
+    # --- Optimal control / stochastic optimal control
+    if any(k in t for k in ['stochastic optimal control', 'optimal control',
+                            'feedback control', 'nonlinear pid',
+                            'pid control', 'feedforward control',
+                            'tracking control', 'feedback linear',
+                            'fuzzy control', 'fuzzy supervisory',
+                            'hybrid control', 'feedback law',
+                            'task-space control', 'task space control']):
+        return ('Control', 'General Control', 'Robot Control')
+
+    # --- Architecture / system / framework / programming
+    if any(k in t for k in ['architecture', 'autonomy', 'concurrent programming',
+                            'remote-brained', 'remote brained',
+                            'platform for robotics', 'system architecture',
+                            'modular architecture', 'control concept',
+                            'embedded system', 'real-time system']):
+        return ('Robot Software & Architecture',
+                'Robot Architecture / Middleware', 'Architecture / Software')
+
+    # --- Industrial / repeatability / manufacturing / industry
+    if any(k in t for k in ['industrial', 'repeatability', 'tolerance',
+                            'manufacturing', 'cargo', 'palletizing',
+                            'paint stripping', 'large vessel',
+                            'load identification', 'gear', 'gimbal',
+                            'shaft-encoder', 'transmission']):
+        return ('Application Domains', 'Field Robotics',
+                'Industrial / Manufacturing')
+
+    # --- Field robotics / extreme terrain
+    if any(k in t for k in ['extreme terrain', 'planetary',
+                            'tonne field', 'tethered robot', 'submunition',
+                            'paint stripping', 'desert driving',
+                            'autonomous walker', 'workpartner',
+                            'anser project', 'grislee']):
+        return ('Application Domains', 'Field Robotics',
+                'Field Robotics (general)')
+
+    # --- Survey / vision papers / meta papers
+    if any(k in t for k in ['look back and a look forward',
+                            'past and future', 'research toward',
+                            'redefining', 'advances in', 'dlr experience',
+                            'progress in', 'overview of',
+                            'a look back', 'years of', 'direction',
+                            'lessons learned']):
+        return ('Other / Editorial', 'Editorial / Meta',
+                'Survey / Vision')
+
+    # --- Cooperative behavior / multi-robot generic
+    if any(k in t for k in ['cooperative hunt', 'cooperative behavior',
+                            'mobile robot troop', 'multi-robot',
+                            'multirobot', 'multiple robot', 'multiple robots',
+                            'cooperative', 'collective']):
+        return ('Multi-Robot Systems', 'Coordination',
+                'Multi-Robot Coordination')
+
+    # --- Vehicle motion / vehicle stability
+    if any(k in t for k in ['vehicle trajectory', 'vehicle on a',
+                            'micro-satellite', 'micro satellite',
+                            'satellite servicing']):
+        return ('Application Domains', 'Autonomous Driving',
+                'General Driving')
+
+    # --- Sliding / motion / impacts / pushing
+    if any(k in t for k in ['rigid body sliding', 'sliding with impact',
+                            'pushing', 'sliding', 'spinning']):
+        return ('Manipulation', 'Non-prehensile', 'Pushing / Sliding')
+
+    # --- Catastrophe theory / planar mechanism
+    if any(k in t for k in ['catastrophe theory', 'two-spring mechanism',
+                            'mechanism design', 'mechanism analysis',
+                            'spatial mechanism', 'planar mechanism',
+                            'mechanism geometry', 'mechanism kinematic',
+                            'novel mechanism', 'spring mechanism',
+                            'coupled mechanism']):
+        return ('Robot Design & Hardware', 'Mechanism Design',
+                'Mechanism / Joint Design')
+
+    # --- Soft robot generic (tissue, viscoelastic, soft fingers)
+    if any(k in t for k in ['soft finger', 'viscoelastic', 'rubber',
+                            'self-healing', 'soft tissue interaction',
+                            'soft body interaction']):
+        return ('Robot Design & Hardware', 'Soft Robotics',
+                'Soft Robot Design')
+
+    # --- Microassembly / micro-positioning / micro-fluidic
+    if any(k in t for k in ['micro-positioning', 'micro positioning',
+                            'micro-fluidic', 'microfluidic', 'micro-device',
+                            'microdevice', 'micro-engine', 'microjet']):
+        return ('Robot Design & Hardware', 'Microrobotics',
+                'Micromanipulation / Microassembly')
+
+    # --- Artificial muscle / Soft actuator (catchall)
+    if 'artificial muscle' in t or 'artificial muscles' in t \
+            or 'pneumatic muscle' in t:
+        return ('Robot Design & Hardware', 'Soft Robotics',
+                'Artificial Muscle / Pneumatic Muscle')
+
+    # --- HRI / human-robot generic
+    if any(k in t for k in ['human safety', 'safety mechanism',
+                            'human-friendly', 'human friendly',
+                            'human-centered', 'human centered',
+                            'haptic simulation', 'embodiment',
+                            'human-machine']):
+        return ('Human-Robot Interaction', 'Physical HRI',
+                'General HRI')
+
+    # --- Sensor design / encoder / measurement
+    if any(k in t for k in ['encoder', 'measurement system',
+                            'measure position', 'measure orientation',
+                            'angular velocity', 'angular acceleration',
+                            'position measurement', 'velocity measurement',
+                            'observability', 'state observer']):
+        return ('SLAM & Localization', 'State Estimation',
+                'General State Estimation')
+
+    # --- Robot platform / device / hand-held / tool
+    if any(k in t for k in ['tool ', 'gripping system',
+                            'hand-held', 'handheld', 'end-effector',
+                            'end effector', 'grasper', 'micro-tool']):
+        return ('Robot Design & Hardware', 'Mechanism Design',
+                'Robotic System / Device Design')
+
+    # --- Anything mentioning "robot" or "robotic" → put in design fallback
+    if 'robot' in t or 'robotic' in t:
+        # Last big bucket — design / general
+        if 'control' in t or 'feedback' in t:
+            return ('Control', 'General Control', 'Robot Control')
+        if 'plan' in t:
+            return ('Planning', 'Path/Motion Planning', 'Motion / Path Planning')
+        if 'design' in t or 'mechanism' in t:
+            return ('Robot Design & Hardware', 'Mechanism Design',
+                    'Robot Design (general)')
+        if 'learn' in t or 'training' in t:
+            return ('Learning for Robotics', 'Deep Learning Application',
+                    'Generic Learning')
+        if 'sens' in t or 'percept' in t:
+            return ('Perception & Sensing', 'Visual Perception',
+                    'General Perception')
+        # Default "robot" fallback
+        return ('Other / Editorial', 'Robot Vision / Generic',
+                'Generic Robot Topic')
+
+    # ===========================================================
+    # FOURTH PASS — final aggressive catch
+    # ===========================================================
+
+    # --- Leg / knee / ankle actuators (assistive)
+    if any(k in t for k in ['knee actuator', 'ankle actuator',
+                            'leg actuator', 'gait in stroke',
+                            'leg orthosis', 'orthosis ', 'orthoses',
+                            'gravity-balancing', 'gravity balancing']):
+        return ('Human-Robot Interaction', 'Assistive Robotics',
+                'Rehabilitation / Orthosis')
+
+    # --- Haptic stuff that fell through
+    if 'haptic' in t:
+        return ('Human-Robot Interaction', 'Haptic Devices & Rendering',
+                'Haptic Display / Force Feedback')
+
+    # --- Search / heuristic / A* / Multi-heuristic
+    if 'multi-heuristic' in t or ' a* ' in t or 'a-star' in t \
+            or 'a* search' in t or 'heuristic search' in t \
+            or 'search-based' in t or 'lazy search' in t:
+        return ('Planning', 'Path/Motion Planning', 'Search-based Planning')
+
+    # --- Verification / spec automata / temporal logic adjacency
+    if 'specification automat' in t or 'verification of' in t \
+            or 'formal verification' in t or 'minimal revision' in t \
+            or 'reach-avoid' in t or 'control synthesis' in t:
+        return ('Theoretical Foundations', 'Formal Methods',
+                'Temporal Logic / Verification')
+
+    # --- Graph matching / correspondence / association
+    if 'graph matching' in t or 'correspondence identification' in t \
+            or 'framework matching' in t or 'data association' in t \
+            or 'point matching' in t:
+        return ('Theoretical Foundations', 'Probabilistic Methods',
+                'Robust Geometric Perception')
+
+    # --- Active touch / roughness / discrimination
+    if 'active touch' in t or 'active-touch' in t or 'roughness' in t \
+            or 'discrimination of surfaces' in t \
+            or 'palpation' in t or 'tactile palpation' in t:
+        return ('Perception & Sensing', 'Tactile Sensing',
+                'Tactile Sensors / Algorithms')
+
+    # --- Mobility / mobility-on-demand
+    if 'mobility-on-demand' in t or 'mobility on demand' in t \
+            or ' mod ' in t and 'mobility' in t \
+            or 'autonomous mobility' in t:
+        return ('Application Domains', 'Autonomous Driving',
+                'Mobility-on-Demand')
+
+    # --- Cogging / torque ripple / actuator characterization
+    if 'cogging' in t or 'torque ripple' in t or 'anticogging' in t \
+            or 'parameter selection' in t and 'torque' in t:
+        return ('Robot Design & Hardware', 'Actuators',
+                'Actuator Characterization')
+
+    # --- Phantom / palpation / training
+    if 'abdominal phantom' in t or 'palpation training' in t:
+        return ('Application Domains', 'Medical & Surgical Robotics',
+                'Medical Training / Phantom')
+
+    # --- Routing / scheduling on graphs / aisle graph
+    if 'routing schedule' in t or 'aisle graph' in t \
+            or 'scheduling' in t and 'graph' in t \
+            or 'spectral graph' in t and 'robot' in t:
+        return ('Multi-Robot Systems', 'Coordination',
+                'Task Allocation / Scheduling')
+
+    # --- Range finder / range imaging / ranging / rangefinder
+    if 'range finder' in t or 'rangefinder' in t \
+            or 'range imag' in t or 'range scan' in t \
+            or 'amcw light' in t:
+        return ('Perception & Sensing', 'LiDAR Perception',
+                'Range Sensing')
+
+    # --- Verification / regional verification / probabilistic safety
+    if 'regional verification' in t or 'finite-time' in t and 'verification' in t \
+            or 'lcp solver' in t or 'rigid bodies in contact' in t:
+        return ('Theoretical Foundations', 'Dynamics',
+                'Contact / Friction Modeling')
+
+    # --- Time lag / driving performance
+    if 'time lag' in t and 'driving' in t \
+            or 'driving performance' in t \
+            or 'secure mobility' in t \
+            or 'autonomous driver' in t:
+        return ('Application Domains', 'Autonomous Driving',
+                'General Driving')
+
+    # --- 3D environment / sum of squares
+    if 'sum of squares' in t or 'polynomial' in t and 'planning' in t \
+            or 'semi-infinite' in t and 'collision' in t:
+        return ('Planning', 'Path/Motion Planning', 'Trajectory Optimization')
+
+    # --- Multicontact postures / multi-contact
+    if 'multicontact' in t or 'multi-contact' in t:
+        return ('Locomotion', 'Legged Locomotion', 'Legged (general)')
+
+    # --- BCMP network / stochastic networks
+    if 'bcmp network' in t or 'queueing' in t or 'queuing' in t \
+            or 'queue-' in t and 'robot' in t:
+        return ('Application Domains', 'Autonomous Driving',
+                'Mobility-on-Demand')
+
+    # --- Morphological computation / softness exploitation
+    if 'morphological computation' in t or 'morphology' in t and 'soft' in t:
+        return ('Robot Design & Hardware', 'Soft Robotics',
+                'Soft Robot Modeling')
+
+    # --- Selection / locomotion / fall risk
+    if 'falling risk' in t or 'fall detection' in t \
+            or 'fall recovery' in t:
+        return ('Locomotion', 'Legged Locomotion', 'Bipedal / Humanoid')
+
+    # --- Active stereo / line scan camera
+    if 'active stereo' in t or 'line scan camera' in t \
+            or 'line-scan camera' in t:
+        return ('Perception & Sensing', 'Visual Perception',
+                'Object Detection / Recognition')
+
+    # --- Detection / tracking in urban / multi-class
+    if 'multiclass' in t and ('detect' in t or 'track' in t) \
+            or 'urban environments' in t and ('detect' in t or 'track' in t):
+        return ('Perception & Sensing', 'Tracking',
+                'Object/Target Tracking')
+
+    # --- Dual REPS / policy search
+    if 'policy search' in t or ' reps ' in t \
+            or 'dual reps' in t:
+        return ('Learning for Robotics', 'Reinforcement Learning', 'RL')
+
+    # --- Optimal assignment under uncertainty
+    if 'optimal assignment' in t or 'assignment problem' in t \
+            and 'robot' in t:
+        return ('Multi-Robot Systems', 'Coordination',
+                'Task Allocation / Auction')
+
+    # --- Predictive perception / perception failure
+    if 'perception performance' in t or 'perception failure' in t \
+            or 'distribution shift' in t and 'robot' in t:
+        return ('Perception & Sensing', 'Active Perception',
+                'Perception Reliability')
+
+    # --- Vibration estimation / range imaging / sensors
+    if 'vibration estimation' in t or 'flexible space structure' in t:
+        return ('SLAM & Localization', 'State Estimation',
+                'Vibration / Flexible Structure Estimation')
+
+    # --- Network topology inference
+    if 'topology inference' in t or 'network topology' in t:
+        return ('Multi-Robot Systems', 'Communication / Networks',
+                'Network Topology / Inference')
+
+    # --- Bayesian / Approximate inference (general)
+    if 'bayesian inference' in t or 'approximate bayesian' in t \
+            or 'bayesian deep' in t:
+        return ('Theoretical Foundations', 'Probabilistic Methods',
+                'Bayesian Inference')
+
+    # --- Vehicle model identification
+    if 'vehicle model' in t and 'identification' in t \
+            or 'integrated prediction' in t:
+        return ('Theoretical Foundations', 'Dynamics',
+                'System Identification')
+
+    # --- Hand / DLR hand / SDM hand / specific hand designs
+    if 'dlr hand' in t or 'sdm hand' in t \
+            or 'hand arm system' in t or 'hand design' in t:
+        return ('Robot Design & Hardware', 'Mechanism Design',
+                'Robotic Hand / Finger Design')
+
+    # --- DensePhysNet / dense physical / object representations
+    if 'densephys' in t or 'dense physical' in t \
+            or 'physical object representation' in t:
+        return ('Learning for Robotics', 'Self-supervised Learning',
+                'Self-supervised / Representation')
+
+    # --- Active inference / inference robotics
+    if 'active inference' in t:
+        return ('Learning for Robotics', 'Reinforcement Learning', 'RL')
+
+    # --- Misbehavior monitors / monitoring of agents
+    if 'misbehavior monitor' in t or 'misbehavior' in t and 'agent' in t:
+        return ('Multi-Robot Systems', 'Coordination',
+                'Resilient / Adversarial Multi-Robot')
+
+    # --- Robust collaborative / object transport
+    if 'object transport' in t or 'object-transport' in t \
+            or 'collaborative transport' in t:
+        return ('Multi-Robot Systems', 'Coordination',
+                'Cooperative Manipulation / Transport')
+
+    # --- Inertial / appendage design
+    if 'inertial reorientation' in t or 'appendage' in t and 'design' in t:
+        return ('Robot Design & Hardware', 'Mechanism Design',
+                'Mechanism / Joint Design')
+
+    # --- Adaptive / SLIP variant
+    if 'slip model' in t or 'rolling slip' in t \
+            or 'spring loaded inverted pendulum' in t:
+        return ('Locomotion', 'Legged Locomotion', 'Bipedal / Humanoid')
+
+    # --- Provably feasible / semi-infinite
+    if 'provably' in t and 'plan' in t:
+        return ('Planning', 'Path/Motion Planning', 'Motion / Path Planning')
+
+    # --- Modeling and control of contact
+    if 'contact' in t and ('model' in t or 'control' in t):
+        return ('Theoretical Foundations', 'Dynamics',
+                'Contact / Friction Modeling')
+
+    # --- Aggressive Flight / Teach-Repeat / Replan
+    if 'teach-repeat' in t or 'aggressive flight' in t \
+            or 'aggressive maneuver' in t:
+        return ('Locomotion', 'Aerial Locomotion',
+                'Agile / Cluttered Environment Flight')
+
+    # --- Aisle / supermarket / store / patrol
+    if 'aisle' in t or 'supermarket' in t \
+            or 'patrol' in t and 'robot' in t:
+        return ('Multi-Robot Systems', 'Coordination',
+                'Patrolling / Surveillance')
+
+    # --- Image servoing variants / fourier shape
+    if 'fourier-based shape' in t or 'fourier based shape' in t \
+            or 'shape servoing' in t:
+        return ('Control', 'Visual Servoing', 'Visual Servoing')
+
+    # --- Geometry of 3D / convex
+    if 'distance between' in t or 'convex cone' in t or 'convex set' in t \
+            or 'convex hull' in t:
+        return ('Theoretical Foundations', 'Geometric Methods',
+                'Geometric Mechanics')
+
+    # --- Optimality principle / optimization
+    if 'optimality principle' in t or 'principle governing' in t:
+        return ('Theoretical Foundations', 'Optimization',
+                'Optimization Methods')
+
+    # --- Specific catch — Safety / verification / probabilistic
+    if 'safety' in t and 'plan' in t:
+        return ('Control', 'Safety-Critical Control', 'Safe Control')
+
+    # --- Force closure / ray-shooting (analytical grasping)
+    if 'ray-shooting' in t or 'force-closure test' in t:
+        return ('Manipulation', 'Grasping', 'Grasp Planning / Synthesis')
+
+    # --- Mahalanobis / labeling / outdoor classification
+    if 'mahalanobis' in t or 'path label' in t or 'terrain classification' in t \
+            or 'unsupervised terrain' in t:
+        return ('Perception & Sensing', 'Visual Perception',
+                'Terrain Classification')
+
+    # --- Unsupervised / supervised learning
+    if 'supervised learning' in t or 'unsupervised learning' in t \
+            or 'environment specialization' in t:
+        return ('Learning for Robotics', 'Self-supervised Learning',
+                'Self-supervised / Representation')
+
+    # --- "Tight Fusion" / "Direct Velocity" / event + IMU
+    if 'tight fusion' in t and 'event' in t \
+            or 'direct velocity' in t and ('event' in t or 'inertial' in t):
+        return ('SLAM & Localization', 'SLAM',
+                'Event-based VIO/SLAM')
+
+    # --- Acceleration / vector / rigid body
+    if 'acceleration vector' in t or 'rigid body' in t and 'kinematic' in t:
+        return ('Theoretical Foundations', 'Dynamics', 'Robot Dynamics')
+
+    # --- Time-related / mixed Time / driving improvement
+    if 'driving' in t and ('cars' in t or 'vehicle' in t):
+        return ('Application Domains', 'Autonomous Driving',
+                'General Driving')
+
+    # --- Truly stuck — last broad check, hit ANY common robotics word
+    if any(k in t for k in [' arm ', 'arm-', 'manipulator', 'manipulating',
+                            'gripper', 'grasping']):
+        return ('Manipulation', 'General Manipulation',
+                'Manipulator Control / Planning')
+    if any(k in t for k in ['camera', 'vision', 'image', 'visual']):
+        return ('Perception & Sensing', 'Visual Perception',
+                'General Perception')
+    if any(k in t for k in [' aerial ', 'flying', 'quadrotor', 'drone',
+                            'fixed-wing', 'flapping']):
+        return ('Locomotion', 'Aerial Locomotion', 'General Aerial')
+    if any(k in t for k in ['underwater', ' auv ', 'aquatic']):
+        return ('Locomotion', 'Underwater Locomotion', 'AUV / UUV')
+    if any(k in t for k in [' leg ', 'walking', 'biped', 'quadruped',
+                            'humanoid']):
+        return ('Locomotion', 'Legged Locomotion', 'Legged (general)')
+    if any(k in t for k in ['mobile', 'vehicle', 'wheel']):
+        return ('Locomotion', 'Wheeled Locomotion', 'Mobile Wheeled Robot')
+    if any(k in t for k in ['plan', 'navig', 'path', 'trajectory',
+                            'motion']):
+        return ('Planning', 'Path/Motion Planning', 'Motion / Path Planning')
+    if any(k in t for k in ['control', 'feedback', 'controller']):
+        return ('Control', 'General Control', 'Robot Control')
+    if any(k in t for k in ['perception', 'sensing', 'sensor', 'detect',
+                            'track', 'segment']):
+        return ('Perception & Sensing', 'Visual Perception',
+                'General Perception')
+    if any(k in t for k in ['learn', 'training', 'policy', 'reward']):
+        return ('Learning for Robotics', 'Deep Learning Application',
+                'Generic Learning')
+    if any(k in t for k in ['dynamic', 'kinematic', 'inertia', 'force']):
+        return ('Theoretical Foundations', 'Dynamics', 'Robot Dynamics')
+
+    # ===========================================================
+    # DEFAULT (truly nothing matches)
     # ===========================================================
     return ('Other / Unclassified', 'Unclassified', 'Unclassified')
 
