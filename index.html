@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robotics Paper Phylogeny — EDA</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #181b22;
+    --panel-2: #1f242d;
+    --text: #e6e7ea;
+    --muted: #9aa0aa;
+    --accent: #6aa9ff;
+    --accent-2: #ff8e6a;
+    --border: #2a2f3a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+                 "Noto Sans KR", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+  }
+  h1 {
+    margin: 0 0 8px; font-size: 28px; font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .subtitle { color: var(--muted); font-size: 15px; margin: 0 0 12px; }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    color: var(--muted); font-size: 13px; margin-top: 12px;
+  }
+  .meta span { display: inline-flex; align-items: center; gap: 4px; }
+  .badges {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;
+  }
+  .badge {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  /* Stats grid */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 24px; font-weight: 700; color: var(--accent);
+  }
+  .stat-label {
+    font-size: 12px; color: var(--muted); margin-top: 4px;
+  }
+
+  /* Phylum bars */
+  .phyla {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 24px 0;
+  }
+  .phyla h2 { margin: 0 0 16px; font-size: 18px; }
+  .phylum-bar {
+    display: grid;
+    grid-template-columns: 220px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+    margin: 6px 0;
+    font-size: 13px;
+  }
+  .phylum-bar-track {
+    height: 18px;
+    background: var(--panel-2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .phylum-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+  }
+  .phylum-name { color: var(--text); }
+  .phylum-count { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Plot sections */
+  section.plot {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  section.plot h2 {
+    margin: 0 0 8px; font-size: 20px;
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  section.plot .num {
+    color: var(--accent);
+    font-size: 14px; font-weight: 500;
+    background: var(--panel-2);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  section.plot .desc {
+    color: var(--muted); font-size: 14px; margin: 0 0 16px;
+  }
+  section.plot .links {
+    margin: 8px 0 16px; font-size: 13px;
+  }
+  section.plot img {
+    width: 100%; height: auto; display: block;
+    border-radius: 6px;
+    background: white;
+  }
+  section.plot iframe {
+    width: 100%; height: 700px; border: 1px solid var(--border);
+    border-radius: 6px; background: white;
+  }
+  details {
+    margin-top: 16px;
+    background: var(--panel-2);
+    border-radius: 6px;
+    padding: 12px 16px;
+  }
+  details summary {
+    cursor: pointer; font-weight: 600; font-size: 14px;
+  }
+  details ul { margin: 8px 0 0; padding-left: 20px; }
+  details li { margin: 4px 0; font-size: 13px; color: var(--text); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+    padding: 24px 0;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+  }
+  code {
+    background: var(--panel-2);
+    padding: 2px 6px; border-radius: 3px;
+    font-family: "SF Mono", Menlo, Monaco, monospace;
+    font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🤖 Robotics Paper Phylogeny — EDA</h1>
+  <p class="subtitle">7,477편의 로봇공학 논문 (T-RO / IJRR / RSS, 1988~2025)을 13 Phylum 시맨틱 계통도로 분류하고 raw 데이터를 시각화한 결과.</p>
+  <div class="badges">
+    <span class="badge">📦 7,477 papers</span>
+    <span class="badge">📅 1988 — 2025</span>
+    <span class="badge">🌳 13 Phylum × ~100 Class × ~330 Order × Genus</span>
+    <span class="badge">📰 T-RO / IJRR / RSS</span>
+  </div>
+  <div class="meta">
+    <span>📚 <a href="https://github.com/gisbi-kim/robotics-paper-phylogeny" target="_blank">GitHub repo</a></span>
+    <span>📖 <a href="TAXONOMY.md">Taxonomy spec</a></span>
+    <span>📊 <a href="robotics_taxonomy.xlsx">Excel download</a></span>
+    <span>📝 <a href="eda/README.md">EDA writeup</a></span>
+  </div>
+</header>
+
+<!-- Quick stats -->
+<div class="stats">
+  <div class="stat"><div class="stat-value">7,477</div><div class="stat-label">Papers</div></div>
+  <div class="stat"><div class="stat-value">37</div><div class="stat-label">Years (1988-2025)</div></div>
+  <div class="stat"><div class="stat-value">13</div><div class="stat-label">Phylum</div></div>
+  <div class="stat"><div class="stat-value">100</div><div class="stat-label">Class</div></div>
+  <div class="stat"><div class="stat-value">~330</div><div class="stat-label">Order</div></div>
+  <div class="stat"><div class="stat-value">2.9%</div><div class="stat-label">Unclassified</div></div>
+</div>
+
+<!-- Phylum distribution bars -->
+<div class="phyla">
+  <h2>Phylum 분포</h2>
+  <!-- Sorted by count, bar widths relative to max -->
+  <div class="phylum-bar">
+    <span class="phylum-name">Manipulation</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:100%; background:#2ca02c;"></div></div>
+    <span class="phylum-count">934 (12.5%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Locomotion</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:90.2%; background:#98df8a;"></div></div>
+    <span class="phylum-count">842 (11.3%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Planning</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:89.4%; background:#ff7f0e;"></div></div>
+    <span class="phylum-count">835 (11.2%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">SLAM &amp; Localization</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:71.7%; background:#aec7e8;"></div></div>
+    <span class="phylum-count">670 (9.0%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Robot Design &amp; Hardware</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:66.7%; background:#d62728;"></div></div>
+    <span class="phylum-count">623 (8.3%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Perception &amp; Sensing</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:59.3%; background:#1f77b4;"></div></div>
+    <span class="phylum-count">554 (7.4%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Theoretical Foundations</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:52.6%; background:#c49c94;"></div></div>
+    <span class="phylum-count">491 (6.6%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Control</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:47.2%; background:#ffbb78;"></div></div>
+    <span class="phylum-count">441 (5.9%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Multi-Robot Systems</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:43.7%; background:#9467bd;"></div></div>
+    <span class="phylum-count">408 (5.5%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Application Domains</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:42.4%; background:#8c564b;"></div></div>
+    <span class="phylum-count">396 (5.3%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Human-Robot Interaction</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:42.3%; background:#ff9896;"></div></div>
+    <span class="phylum-count">395 (5.3%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Learning for Robotics</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:37.9%; background:#c5b0d5;"></div></div>
+    <span class="phylum-count">354 (4.7%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Other / Editorial</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:30.8%; background:#bcbd22;"></div></div>
+    <span class="phylum-count">288 (3.9%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Other / Unclassified</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:23.1%; background:#7f7f7f;"></div></div>
+    <span class="phylum-count">216 (2.9%)</span>
+  </div>
+  <div class="phylum-bar">
+    <span class="phylum-name">Robot Software &amp; Architecture</span>
+    <div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:3.2%; background:#e377c2;"></div></div>
+    <span class="phylum-count">30 (0.4%)</span>
+  </div>
+</div>
+
+<!-- ============== PLOT 1 ============== -->
+<section class="plot" id="plot1">
+  <h2><span class="num">Plot 1</span> Phylum × 연도 stack chart</h2>
+  <p class="desc">X = 1988~2025, Y = 연간 논문 수 (stacked). 색 = 13개 Phylum + Editorial + Unclassified.</p>
+  <div class="links">
+    📷 <a href="eda/figures/01_phylum_stack.png" target="_blank">PNG 원본</a>
+    &nbsp;|&nbsp; 🖱️ <a href="eda/interactive/01_phylum_stack.html" target="_blank">인터랙티브 (호버 가능)</a>
+  </div>
+  <img src="eda/figures/01_phylum_stack.png" alt="Phylum stack chart over time">
+  <details>
+    <summary>📍 보이는 패턴</summary>
+    <ul>
+      <li><strong>2004년 점프</strong> — T-RO + IJRR 합쳐지면서 대폭 증가</li>
+      <li><strong>2017~2020년 정체기</strong> 후 <strong>2021년부터 다시 폭발</strong> — RSS 확대 + AI 시대</li>
+      <li><strong>하늘색 (SLAM &amp; Localization)</strong> 비중이 2005년부터 일관되게 큼</li>
+      <li><strong>녹색계열 (Manipulation + Locomotion)</strong> 이 2010년대 후반 이후 가장 두꺼워짐</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ============== PLOT 2 ============== -->
+<section class="plot" id="plot2">
+  <h2><span class="num">Plot 2</span> Per-Phylum small multiples (Class 분해)</h2>
+  <p class="desc">13 Phylum 각각에 대해 패널 1개. 각 패널 안에서 top 8 Class가 stacked area.</p>
+  <div class="links">
+    📷 <a href="eda/figures/02_phylum_small_multiples.png" target="_blank">PNG 원본</a>
+  </div>
+  <img src="eda/figures/02_phylum_small_multiples.png" alt="Per-Phylum small multiples">
+  <details>
+    <summary>📍 보이는 패턴</summary>
+    <ul>
+      <li><strong>SLAM &amp; Localization</strong>: 2005년경 SLAM Class 폭발 (FastSLAM/GraphSLAM era)</li>
+      <li><strong>Locomotion</strong>: 2010년 이후 Aerial이 Legged를 따라잡음 (드론 시대)</li>
+      <li><strong>Learning for Robotics</strong>: 2017년부터 등장, 2022~2025년 Foundation Models 폭발</li>
+      <li><strong>Theoretical Foundations</strong>: 1990년대 dominant, 2010년 이후 비중 감소</li>
+      <li><strong>HRI</strong>: 점진적 성장, 2020년대 안정적 비중</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ============== PLOT 3 ============== -->
+<section class="plot" id="plot3">
+  <h2><span class="num">Plot 3</span> Class heatmap (전체 100 Class × 연도)</h2>
+  <p class="desc">행 = 모든 Class (Phylum 그룹 순서), 열 = 3년 bucket. 색 = log10(1 + 논문 수). Y라벨 색이 Phylum.</p>
+  <div class="links">
+    📷 <a href="eda/figures/03_class_heatmap.png" target="_blank">PNG 원본</a>
+    &nbsp;|&nbsp; 🖱️ <a href="eda/interactive/03_class_heatmap.html" target="_blank">인터랙티브 (호버 가능)</a>
+  </div>
+  <img src="eda/figures/03_class_heatmap.png" alt="Class heatmap">
+  <details>
+    <summary>📍 보이는 패턴</summary>
+    <ul>
+      <li><strong>상시 활성</strong>: SLAM, Path/Motion Planning, Grasping, Bipedal — 모든 시대 빨강</li>
+      <li><strong>최근 부상</strong>: Foundation Models, Diffusion Policies, Aerial Swarms, 3D Scene Graph — 오른쪽 끝만 빨강</li>
+      <li><strong>옅어진 분야</strong>: 일부 1990년대 mechanism design은 최근 색 옅어짐</li>
+      <li>전체 패턴: 오른쪽으로 갈수록 진해짐 = 출판량 자체 증가</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ============== PLOT 4 ============== -->
+<section class="plot" id="plot4">
+  <h2><span class="num">Plot 4</span> Top 12 Class 드릴다운 (Order 분해)</h2>
+  <p class="desc">가장 큰 12개 Class에 대해 각각 mini panel. 내부에서 top 6 Order가 stacked area.</p>
+  <div class="links">
+    📷 <a href="eda/figures/04_top_classes_drill.png" target="_blank">PNG 원본</a>
+  </div>
+  <img src="eda/figures/04_top_classes_drill.png" alt="Top 12 Classes drill-down">
+  <details>
+    <summary>📍 보이는 패턴 (패러다임 전환 가시화)</summary>
+    <ul>
+      <li><strong>SLAM</strong>: General SLAM (초기) → Visual SLAM/Odometry (2010년대) → LIO/VIO/Multi-modal (최근)</li>
+      <li><strong>Path/Motion Planning</strong>: Sampling-based (RRT) → 다양화 → 최근 Trajectory Optimization 부상</li>
+      <li><strong>Grasping</strong>: 2010년대 중반부터 Learning-based가 Force-Closure를 추월</li>
+      <li><strong>Bipedal</strong>: ZMP → HZD → Sim-to-Real RL로 패러다임 전환</li>
+      <li><strong>Foundation Models</strong>: 2022년 이후 신생 — VLA / Diffusion / LLM이 거의 동시에 등장</li>
+    </ul>
+  </details>
+</section>
+
+<footer>
+  <p>Built with matplotlib + plotly. Phylogenetic-style classification by semantic synonym clustering.<br>
+  Source: <a href="https://github.com/gisbi-kim/robotics-paper-phylogeny">github.com/gisbi-kim/robotics-paper-phylogeny</a> ·
+  Original data: RoboPaper Atlas (DBLP + OpenAlex).</p>
+</footer>
+
+</div>
+</body>
+</html>
