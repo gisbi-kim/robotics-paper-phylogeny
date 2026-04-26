@@ -720,8 +720,8 @@
 
 <!-- ============== Tabs ============== -->
 <div id="explore"></div>
-<input type="radio" name="tabs" id="tab-b" class="tab-input" checked>
-<input type="radio" name="tabs" id="tab-c" class="tab-input">
+<input type="radio" name="tabs" id="tab-b" class="tab-input">
+<input type="radio" name="tabs" id="tab-c" class="tab-input" checked>
 <input type="radio" name="tabs" id="tab-i" class="tab-input">
 
 <div class="tabs-container">
@@ -1044,6 +1044,59 @@
   <p>Built with matplotlib · plotly · D3.js. Phylogenetic-style classification by semantic synonym clustering.</p>
   <p>Source: <a href="https://github.com/gisbi-kim/robotics-paper-phylogeny">github.com/gisbi-kim/robotics-paper-phylogeny</a> · Original data: RoboPaper Atlas (DBLP + OpenAlex)</p>
 </footer>
+
+<script>
+  // Tab ↔ URL hash sync. Lets users share a link to a specific tab
+  // (e.g. .../#tab=tree) and the page opens with that tab active.
+  // Default (no hash) is the Phylogenetic Tree tab.
+  (function() {
+    var TAB_TO_HASH = { 'tab-b': 'time', 'tab-c': 'tree', 'tab-i': 'insights' };
+    var HASH_TO_TAB = { 'time': 'tab-b', 'tree': 'tab-c', 'insights': 'tab-i' };
+
+    function parseTabFromHash() {
+      var h = window.location.hash || '';
+      var m = h.match(/[#&]tab=([a-z]+)/);
+      return m && HASH_TO_TAB[m[1]] ? HASH_TO_TAB[m[1]] : null;
+    }
+
+    function applyTabFromHash() {
+      var id = parseTabFromHash();
+      if (id) {
+        var radio = document.getElementById(id);
+        if (radio && !radio.checked) radio.checked = true;
+      }
+    }
+
+    function writeHashFromTab(id) {
+      var key = TAB_TO_HASH[id];
+      if (!key) return;
+      // history.replaceState avoids polluting the back/forward stack
+      // when the user just clicks between tabs.
+      var newHash = '#tab=' + key;
+      if (window.location.hash !== newHash) {
+        history.replaceState(null, '', newHash);
+      }
+    }
+
+    // 1. On load: honor any incoming #tab=…
+    applyTabFromHash();
+
+    // 2. On label click: write the hash. Use mousedown so it fires
+    //    before the radio actually flips (label click → radio change).
+    document.querySelectorAll('.tab-label').forEach(function(label) {
+      label.addEventListener('click', function() {
+        // setTimeout to run after the click toggles the radio
+        setTimeout(function() {
+          var checked = document.querySelector('.tab-input:checked');
+          if (checked) writeHashFromTab(checked.id);
+        }, 0);
+      });
+    });
+
+    // 3. Browser back/forward → re-apply from new hash
+    window.addEventListener('hashchange', applyTabFromHash);
+  })();
+</script>
 
 </body>
 </html>
