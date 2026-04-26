@@ -432,19 +432,19 @@ function update() {
     .attr('r', 5)
     .attr('fill', d => nodeColor(d));
 
-  // Label
+  // Label (text-anchor=start at x=10)
   nodeEnter.append('text')
+    .attr('class', 'node-label')
     .attr('dy', '0.32em')
     .attr('x', 10)
     .attr('text-anchor', 'start')
     .text(d => truncate(d.data.name, 26));
 
-  // Count badge
+  // Count badge (text-anchor=start, x set after label is measured)
   nodeEnter.append('text')
     .attr('class', 'count-badge')
     .attr('dy', '0.32em')
-    .attr('text-anchor', 'end')
-    .attr('x', d => measureLabelEnd(d) + 8)
+    .attr('text-anchor', 'start')
     .text(d => d.value.toLocaleString());
 
   // Update existing
@@ -453,10 +453,16 @@ function update() {
     .classed('has-hidden', d => d._children && !d.children)
     .classed('focused', d => d === focusedNode);
   merged.select('circle').attr('fill', d => nodeColor(d));
-  merged.select('text').text(d => truncate(d.data.name, 26));
-  merged.select('text.count-badge')
-    .attr('x', d => measureLabelEnd(d) + 8)
-    .text(d => d.value.toLocaleString());
+  merged.select('text.node-label').text(d => truncate(d.data.name, 26));
+  merged.select('text.count-badge').text(d => d.value.toLocaleString());
+
+  // Position count badges AFTER labels are rendered, using actual measured width
+  merged.each(function(d) {
+    const labelEl = d3.select(this).select('text.node-label').node();
+    const labelW = labelEl ? labelEl.getComputedTextLength() : 100;
+    d3.select(this).select('text.count-badge')
+      .attr('x', 10 + labelW + 8);
+  });
 
   // Background click → reset
   svg.on('click', resetSelection);

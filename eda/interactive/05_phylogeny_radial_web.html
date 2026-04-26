@@ -290,21 +290,6 @@
     font-weight: 400;
     fill: #333;
   }
-  .leader-line {
-    fill: none;
-    stroke: #999;
-    stroke-width: 0.7;
-    pointer-events: none;
-  }
-  .label-leader {
-    pointer-events: none;
-    font-family: 'Google Sans', sans-serif;
-    font-size: 9px;
-    font-weight: 500;
-    fill: #1a1a1a;
-  }
-  .label-leader.depth-1 { font-size: 10px; font-weight: 700; }
-
   .center-label {
     text-anchor: middle;
     font-weight: 500;
@@ -538,7 +523,6 @@ d3.json('tree_data.json').then(data => {
 
   const labelDecisions = allNodes.map(d => ({ d, ...labelDecision(d) }));
   const inlineLabels = labelDecisions.filter(x => x.mode === 'inline');
-  const leaderLabels = [];   // unused — keeping for future flexibility
 
   // ----- Inline radial labels -----
   svg.selectAll('text.label-inline')
@@ -556,55 +540,7 @@ d3.json('tree_data.json').then(data => {
     .attr('dy', '0.35em')
     .text(x => x.label);
 
-  // ----- Leader lines (L-shape) + labels at outer margin -----
-  // Geometry per leader:
-  //   p0 = (mid, R_band_outer)            — start at outer edge of wedge
-  //   p1 = (mid, LEADER_INNER)            — first kink: short radial step out
-  //   p2 = (mid, LEADER_OUTER)            — second kink: further out
-  //   text at (mid, LEADER_OUTER + PAD), oriented radially upright
-  //   (We stack across rings naturally — no overlap because each leader
-  //    follows its own midangle.)
-  const leaderG = svg.append('g').attr('class', 'leaders');
-
-  leaderG.selectAll('polyline')
-    .data(leaderLabels)
-    .join('polyline')
-    .attr('class', 'leader-line')
-    .attr('points', x => {
-      const mid = midAngleOf(x.d);
-      const p0 = polarXY(mid, x.d.y1);
-      const p1 = polarXY(mid, LEADER_INNER);
-      const p2 = polarXY(mid, LEADER_OUTER);
-      return `${p0[0]},${p0[1]} ${p1[0]},${p1[1]} ${p2[0]},${p2[1]}`;
-    });
-
-  leaderG.selectAll('text.label-leader')
-    .data(leaderLabels)
-    .join('text')
-    .attr('class', x => `label-leader depth-${x.d.depth}`)
-    .attr('transform', x => {
-      const mid = midAngleOf(x.d);
-      const r = LEADER_OUTER + LABEL_PAD;
-      const [cx, cy] = polarXY(mid, r);
-      const rot = radialUprightRotation(mid);
-      return `translate(${cx},${cy}) rotate(${rot})`;
-    })
-    .attr('text-anchor', x => {
-      // Text reads outward from center; auto-flip means letters' tops always
-      // point "outward enough". For leader labels, anchor at start so the
-      // text begins right after the leader line tip.
-      const mid = midAngleOf(x.d);
-      const deg = (mid * 180 / Math.PI) - 90;
-      // After auto-flip, the radial-outward direction may have been reversed.
-      // Determine if the text was flipped (lower half).
-      let rot = deg + 90;
-      while (rot > 180) rot -= 360;
-      while (rot <= -180) rot += 360;
-      const flipped = (rot > 90) || (rot < -90);
-      return flipped ? 'end' : 'start';
-    })
-    .attr('dy', '0.35em')
-    .text(x => x.label);
+  // (Leader lines removed — all labels are now inline-only with truncation.)
 
   // Initial empty info
   renderFocusedPanel(null);
