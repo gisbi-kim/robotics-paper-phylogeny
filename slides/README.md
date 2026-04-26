@@ -11,34 +11,44 @@ whatever snapshot is currently committed.
 
 ## Build
 
-This repo ships only the source. You need a TeX distribution
-(TeXLive / MacTeX / MiKTeX) with **XeLaTeX** and the `kotex` package
-(for Korean text support).
+The compiled PDF (`robotics_phylogeny.pdf`) is committed — open it
+directly. Rebuild only when the data refreshes or you edit
+`build_slides.py`.
+
+### Option A — Docker (no local TeX install)
 
 ```bash
-# 1. Regenerate the .tex from current data (optional — only if
-#    papers_classified.json has changed since the last commit)
+# 1. (Optional) Regenerate the .tex from the current dataset
 python3 slides/build_slides.py
 
-# 2. Compile (run twice so the table-of-contents resolves)
+# 2. Compile inside the texlive image (~8 GB on first pull, cached after)
 cd slides
-xelatex robotics_phylogeny.tex
+docker run --rm -v "$(pwd):/work" -w /work texlive/texlive:latest \
+  bash -c "xelatex -interaction=nonstopmode robotics_phylogeny.tex && \
+           xelatex -interaction=nonstopmode robotics_phylogeny.tex"
+```
+
+`texlive/texlive:latest-small` works for everything *except* Korean
+(no `kotex` pre-installed). Use the full `latest` tag.
+
+### Option B — Local XeLaTeX
+
+Need a TeX distribution (TeXLive / MacTeX / MiKTeX) with the `kotex`
+and `cjk-ko` packages installed.
+
+```bash
+python3 slides/build_slides.py    # optional, only if data changed
+cd slides
+xelatex robotics_phylogeny.tex    # run twice for the TOC to resolve
 xelatex robotics_phylogeny.tex
 ```
 
-Output: `slides/robotics_phylogeny.pdf`
+`lualatex` also works (kotex auto-detects the engine).
 
-### Don't have XeLaTeX?
+### Option C — Overleaf
 
-You can also try `lualatex` (kotex auto-detects the engine).
-`pdflatex` works only with `\usepackage[hangul]{kotex}`; if you swap
-the engine, change the `\usepackage{kotex}` line in
-`robotics_phylogeny.tex` accordingly.
-
-If you want to skip installing TeX entirely, the easiest path is
-[Overleaf](https://www.overleaf.com/) — upload the `.tex` file, set
-the compiler to XeLaTeX (Menu → Settings → Compiler), and click
-Recompile.
+Drag the `.tex` file into a fresh project, set the compiler to
+**XeLaTeX** (Menu → Settings → Compiler), and click Recompile.
 
 ## Editing
 
