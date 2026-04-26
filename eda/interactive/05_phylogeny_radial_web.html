@@ -1117,6 +1117,12 @@ d3.json('tree_data.json').then(data => {
     renderSuggestions();
   });
 
+  // Honor any incoming #node=... selection now that the tree exists
+  applySelectionFromURL();
+  // Re-apply if hash changes externally (e.g. parent updates iframe src
+  // hash via location, or browser back/forward in the iframe)
+  window.addEventListener('hashchange', applySelectionFromURL);
+
   // Keyboard nav
   d3.select(window).on('keydown', (event) => {
     // While the papers modal is open, the modal owns the keyboard (Esc
@@ -1151,6 +1157,7 @@ function selectNode(d) {
       .classed('focused', n => n === d);
 
   renderFocusedPanel(d);
+  writeSelectionToURL(d);
 }
 
 function resetSelection() {
@@ -1159,6 +1166,44 @@ function resetSelection() {
       .classed('highlighted', false)
       .classed('focused', false);
   renderFocusedPanel(null);
+  writeSelectionToURL(null);
+}
+
+// ----- URL <-> selection bridge -----
+//
+// Two outputs per selection:
+//   1. own URL hash (#node=Phylum/Class/...) — works when this viewer
+//      is opened standalone (the "Open in new tab" link).
+//   2. postMessage to parent — index.html embeds this viewer in an
+//      iframe and surfaces the selection in its OWN top-level URL,
+//      which is what users actually copy/paste when sharing.
+
+function nodeToPathArr(d) {
+  if (!d || d.depth === 0) return null;
+  return d.ancestors().reverse().slice(1).map(n => n.data.name);
+}
+
+function writeSelectionToURL(d) {
+  const path = nodeToPathArr(d);
+  const newHash = path
+    ? '#node=' + path.map(encodeURIComponent).join('/')
+    : '';
+  if (window.location.hash !== newHash) {
+    history.replaceState(null, '',
+      newHash || (window.location.pathname + window.location.search));
+  }
+  if (window.parent !== window) {
+    window.parent.postMessage(
+      { type: 'phylotree:select', source: 'radial', path: path }, '*');
+  }
+}
+
+function applySelectionFromURL() {
+  const m = (window.location.hash || '').match(/[#&]node=([^&]+)/);
+  if (!m || !root) return;
+  const path = m[1].split('/').map(decodeURIComponent);
+  const node = findNodeByPath(path);
+  if (node) selectNode(node);
 }
 
 function navigate(direction) {

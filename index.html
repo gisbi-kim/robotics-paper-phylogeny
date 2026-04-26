@@ -837,7 +837,7 @@
   <div class="links">
     <a href="eda/interactive/05_phylogeny_radial_web.html" target="_blank">🖱️ Open in new tab (full screen)</a>
   </div>
-  <iframe src="eda/interactive/05_phylogeny_radial_web.html"></iframe>
+  <iframe id="iframe-radial" src="eda/interactive/05_phylogeny_radial_web.html"></iframe>
   <details open>
     <summary>📍 사용법 + 추천 탐색</summary>
     <ul>
@@ -1046,54 +1046,89 @@
 </footer>
 
 <script>
-  // Tab ↔ URL hash sync. Lets users share a link to a specific tab
-  // (e.g. .../#tab=tree) and the page opens with that tab active.
-  // Default (no hash) is the Phylogenetic Tree tab.
+  // URL ↔ state sync. Two pieces of state live in the hash:
+  //   tab=<time|tree|insights>     active tab (default: tree)
+  //   node=<Phylum/Class/...>      focused node in the radial viewer
+  // Sharing the URL restores both.
   (function() {
     var TAB_TO_HASH = { 'tab-b': 'time', 'tab-c': 'tree', 'tab-i': 'insights' };
     var HASH_TO_TAB = { 'time': 'tab-b', 'tree': 'tab-c', 'insights': 'tab-i' };
 
-    function parseTabFromHash() {
-      var h = window.location.hash || '';
-      var m = h.match(/[#&]tab=([a-z]+)/);
-      return m && HASH_TO_TAB[m[1]] ? HASH_TO_TAB[m[1]] : null;
+    function parseHash() {
+      // Returns { tab: 'tree', node: 'Manipulation/Grasping' } from
+      // #tab=tree&node=Manipulation/Grasping (any order, any subset).
+      var out = {};
+      var raw = (window.location.hash || '').replace(/^#/, '');
+      raw.split('&').forEach(function(pair) {
+        var i = pair.indexOf('=');
+        if (i < 0) return;
+        out[pair.slice(0, i)] = pair.slice(i + 1);
+      });
+      return out;
+    }
+
+    function writeHash(parts) {
+      var pieces = [];
+      if (parts.tab)  pieces.push('tab='  + parts.tab);
+      if (parts.node) pieces.push('node=' + parts.node);
+      var newHash = pieces.length ? '#' + pieces.join('&') : '';
+      if (window.location.hash !== newHash) {
+        history.replaceState(null, '',
+          newHash || (window.location.pathname + window.location.search));
+      }
     }
 
     function applyTabFromHash() {
-      var id = parseTabFromHash();
+      var h = parseHash();
+      var id = h.tab && HASH_TO_TAB[h.tab];
       if (id) {
         var radio = document.getElementById(id);
         if (radio && !radio.checked) radio.checked = true;
       }
     }
 
-    function writeHashFromTab(id) {
-      var key = TAB_TO_HASH[id];
-      if (!key) return;
-      // history.replaceState avoids polluting the back/forward stack
-      // when the user just clicks between tabs.
-      var newHash = '#tab=' + key;
-      if (window.location.hash !== newHash) {
-        history.replaceState(null, '', newHash);
-      }
+    // ---- Tab clicks ----
+    function getCurrentTabKey() {
+      var checked = document.querySelector('.tab-input:checked');
+      return checked ? TAB_TO_HASH[checked.id] : null;
     }
-
-    // 1. On load: honor any incoming #tab=…
-    applyTabFromHash();
-
-    // 2. On label click: write the hash. Use mousedown so it fires
-    //    before the radio actually flips (label click → radio change).
     document.querySelectorAll('.tab-label').forEach(function(label) {
       label.addEventListener('click', function() {
-        // setTimeout to run after the click toggles the radio
+        // Run after the radio flips
         setTimeout(function() {
-          var checked = document.querySelector('.tab-input:checked');
-          if (checked) writeHashFromTab(checked.id);
+          var h = parseHash();
+          var key = getCurrentTabKey();
+          if (key) h.tab = key;
+          writeHash(h);
         }, 0);
       });
     });
 
-    // 3. Browser back/forward → re-apply from new hash
+    // ---- Initial radial-viewer src: forward incoming #node= so the
+    //      iframe boots with the right wedge focused. ----
+    var initialNode = parseHash().node;
+    if (initialNode) {
+      var iframe = document.getElementById('iframe-radial');
+      if (iframe) {
+        iframe.src = iframe.src.split('#')[0] + '#node=' + initialNode;
+      }
+    }
+
+    // ---- Bubbled selections from the radial iframe ----
+    window.addEventListener('message', function(e) {
+      if (!e.data || e.data.type !== 'phylotree:select') return;
+      if (e.data.source !== 'radial') return;
+      var h = parseHash();
+      if (e.data.path && e.data.path.length) {
+        h.node = e.data.path.map(encodeURIComponent).join('/');
+      } else {
+        delete h.node;
+      }
+      writeHash(h);
+    });
+
+    // ---- Initial paint + back/forward ----
+    applyTabFromHash();
     window.addEventListener('hashchange', applyTabFromHash);
   })();
 </script>
