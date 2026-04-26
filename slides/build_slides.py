@@ -47,7 +47,7 @@ COHORT_HEADLINES = {
         'IJRR/T-RO 특집호 다수 발행 (Editorial 급증). '
         'Teleoperation, Acoustic perception, Robot architecture가 처음 부상.'),
     '2003-2007': ('SLAM 혁명',
-        'FastSLAM/EKF-SLAM/GraphSLAM 패러다임이 SLAM을 #9 → 주류로 끌어올림 (+43 ranks). '
+        r'FastSLAM/EKF-SLAM/GraphSLAM 패러다임이 SLAM을 \#9 $\to$ 주류로 끌어올림 (+43 ranks). '
         'Aerial, Medical surgical, Assistive robotics 동시 등장.'),
     '2008-2012': ('학습 기반 로보틱스의 씨앗',
         'Reinforcement Learning · Deep Learning · Datasets/Benchmarks가 '
@@ -56,10 +56,10 @@ COHORT_HEADLINES = {
         'Physical HRI 폭발 (+38 ranks), Task \\& Motion Planning 정착, '
         'Foundation Models의 미세한 첫 등장 (12편).'),
     '2018-2022': ('Sim-to-Real + RL 주류화',
-        'RL이 +17 ranks로 #12 진입. Tactile sensing 고점 (#17). '
+        r'RL이 +17 ranks로 \#12 진입. Tactile sensing 고점 (\#17). '
         '아직 Foundation Models 폭발 직전의 plateau.'),
     '2023-2025': ('Foundation Models 시대',
-        'Foundation Models가 단 3년만에 +52 ranks → \\#3 (66편). '
+        r'Foundation Models가 단 3년만에 +52 ranks $\to$ \#3 (66편). '
         'Diffusion Policy · VLA · 3D Gaussian Splatting SLAM이 동시기에 등장.'),
 }
 
@@ -189,10 +189,10 @@ PREAMBLE = r"""
 \newcommand{\cool}[1]{\textcolor{accentblue}{\textbf{#1}}}
 \newcommand{\muted}[1]{\textcolor{mutedgray}{#1}}
 
-\title{Robotics 30년의 흐름}
+\title[Robotics 30년]{Robotics 30년의 흐름}
 \subtitle{4-depth Phylogenetic Taxonomy로 본 paradigm shift}
-\author{Robotics Paper Phylogeny project}
-\institute{T-RO · IJRR · RSS, 7,477 papers (1988--2025)}
+\author[Phylogeny]{Robotics Paper Phylogeny project}
+\institute[7{,}477 papers]{T-RO · IJRR · RSS, 7,477 papers (1988--2025)}
 \date{\today}
 
 \begin{document}
@@ -362,30 +362,32 @@ def make_cohort_frame(stats, cohort_label_str):
     top_classes = cohort['classes'].most_common(5)
     top_phyla = cohort['phyla'].most_common(3)
 
+    # Truncate long Class names for the 2-column layout
+    def short(name, n=34):
+        return name if len(name) <= n else name[:n-1] + '…'
+
     cls_rows = '\n'.join(
-        f'    {i+1}. & {latex_escape(name)} & {n} \\\\'
+        f'    {i+1}. & {latex_escape(short(name))} & {n} \\\\'
         for i, (name, n) in enumerate(top_classes))
     phy_rows = ', '.join(f'{latex_escape(n)} ({v})' for n, v in top_phyla)
 
     # Emerging
-    idx = [c for c, _ in COHORTS]
     cohort_idx = next(i for i, (lo, hi) in enumerate(COHORTS)
                       if f'{lo}-{hi}' == cohort_label_str)
     prev = f'{COHORTS[cohort_idx-1][0]}-{COHORTS[cohort_idx-1][1]}' if cohort_idx > 0 else None
     movers = emerging_classes(stats, cohort_label_str, prev) if prev else []
     if movers:
         mover_rows = '\n'.join(
-            f'    \\hot{{$+${d}}} ranks $\\to$ \\#{r}: '
-            f'{latex_escape(name)} ({v} papers) \\\\'
+            f'    \\hot{{$+${d}}} \\#{r}: '
+            f'{latex_escape(short(name, 30))} ({v}) \\\\'
             for d, name, r, v in movers)
-        emerging_block = r"""
-\textbf{직전 cohort 대비 급부상 (rank $\uparrow$)}\\[2pt]
-\small
+        emerging_block = r"""\textbf{급부상 (rank $\uparrow$ vs 직전 cohort)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}p{0.95\linewidth}@{}}
 """ + mover_rows + r"""
 \end{tabular}"""
     else:
-        emerging_block = r'\muted{(첫 cohort — rank 비교 대상 없음)}'
+        emerging_block = r'\muted{\small (첫 cohort — rank 비교 대상 없음)}'
 
     return r"""
 \begin{frame}{""" + cohort_label_str + r' \quad — \quad ' + latex_escape(title_kr) + r"""}
@@ -394,17 +396,24 @@ def make_cohort_frame(stats, cohort_label_str):
 """ + narrative + r"""
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small """ + f"{cohort['total']:,}" + r""" papers)}\\[2pt]
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (""" + f"{cohort['total']:,}" + r""" papers)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}rlr@{}}
 """ + cls_rows + r"""
 \end{tabular}
-\vspace{6pt}
-
-\textbf{Top-3 Phyla:}\\[2pt]
-""" + phy_rows + r"""
 \vspace{8pt}
 
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize """ + phy_rows + r"""
+\end{column}
+
+\begin{column}{0.48\textwidth}
 """ + emerging_block + r"""
+\end{column}
+\end{columns}
 \end{frame}
 """
 
@@ -450,7 +459,7 @@ Grasping              & — & — & — & 12 & 9 & 8 & 7 & 8 \\
 
 \begin{frame}{2003-2007: SLAM 혁명}
 \begin{itemize}
-  \item 1998-2002 cohort: SLAM은 #50+ 부근.
+  \item 1998-2002 cohort: SLAM은 \#50+ 부근.
   \item 2003-2007: \hot{+43 ranks $\to$ \#9} (34 papers).
   \item 트리거: \cool{FastSLAM (2002)} $\to$ \cool{GraphSLAM/SAM (2006)} $\to$ \cool{EKF-SLAM 표준화}.
   \item Aerial Locomotion (+28 ranks) 동시 등장 — 드론 등장의 시발점.

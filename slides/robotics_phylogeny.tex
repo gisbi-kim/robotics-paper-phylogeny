@@ -27,10 +27,10 @@
 \newcommand{\cool}[1]{\textcolor{accentblue}{\textbf{#1}}}
 \newcommand{\muted}[1]{\textcolor{mutedgray}{#1}}
 
-\title{Robotics 30년의 흐름}
+\title[Robotics 30년]{Robotics 30년의 흐름}
 \subtitle{4-depth Phylogenetic Taxonomy로 본 paradigm shift}
-\author{Robotics Paper Phylogeny project}
-\institute{T-RO · IJRR · RSS, 7,477 papers (1988--2025)}
+\author[Phylogeny]{Robotics Paper Phylogeny project}
+\institute[7{,}477 papers]{T-RO · IJRR · RSS, 7,477 papers (1988--2025)}
 \date{\today}
 
 \begin{document}
@@ -199,21 +199,28 @@ Editorial / Unclassified         & 504 &  6.7\% \\
 기구학 · 고전 제어 · 매니퓰레이션의 정식화. 학술지 자체가 시작되는 시기.
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small 166 papers)}\\[2pt]
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (166 papers)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}rlr@{}}
-    1. & Manipulation > General Manipulation & 20 \\
-    2. & Theoretical Foundations > Kinematics & 20 \\
+    1. & Manipulation > General Manipulati… & 20 \\
+    2. & Theoretical Foundations > Kinemat… & 20 \\
     3. & Planning > Path/Motion Planning & 17 \\
     4. & Theoretical Foundations > Dynamics & 14 \\
     5. & Manipulation > Grasping & 11 \\
 \end{tabular}
-\vspace{6pt}
-
-\textbf{Top-3 Phyla:}\\[2pt]
-Manipulation (40), Theoretical Foundations (37), Planning (19)
 \vspace{8pt}
 
-\muted{(첫 cohort — rank 비교 대상 없음)}
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize Manipulation (40), Theoretical Foundations (37), Planning (19)
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\muted{\small (첫 cohort — rank 비교 대상 없음)}
+\end{column}
+\end{columns}
 \end{frame}
 
 
@@ -223,30 +230,36 @@ Manipulation (40), Theoretical Foundations (37), Planning (19)
 Path planning · force/impedance control이 기본 어휘로. Wheeled / 모듈러 메커니즘이 표준 platform으로 자리잡음.
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small 210 papers)}\\[2pt]
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (210 papers)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}rlr@{}}
-    1. & Manipulation > General Manipulation & 26 \\
+    1. & Manipulation > General Manipulati… & 26 \\
     2. & Planning > Path/Motion Planning & 20 \\
-    3. & Theoretical Foundations > Kinematics & 15 \\
+    3. & Theoretical Foundations > Kinemat… & 15 \\
     4. & Manipulation > Grasping & 14 \\
     5. & Theoretical Foundations > Dynamics & 12 \\
 \end{tabular}
-\vspace{6pt}
-
-\textbf{Top-3 Phyla:}\\[2pt]
-Manipulation (61), Theoretical Foundations (32), Planning (25)
 \vspace{8pt}
 
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize Manipulation (61), Theoretical Foundations (32), Planning (25)
+\end{column}
 
-\textbf{직전 cohort 대비 급부상 (rank $\uparrow$)}\\[2pt]
-\small
+\begin{column}{0.48\textwidth}
+\textbf{급부상 (rank $\uparrow$ vs 직전 cohort)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}p{0.95\linewidth}@{}}
-    \hot{$+$19} ranks $\to$ \#7: Robot Design \& Hardware > Mechanism Design (9 papers) \\
-    \hot{$+$7} ranks $\to$ \#9: Locomotion > Wheeled Locomotion (9 papers) \\
-    \hot{$+$5} ranks $\to$ \#6: Control > Force / Impedance Control (10 papers) \\
-    \hot{$+$4} ranks $\to$ \#11: Control > General Control (7 papers) \\
-    \hot{$+$2} ranks $\to$ \#15: Perception \& Sensing > Visual Perception (5 papers) \\
+    \hot{$+$19} \#7: Robot Design \& Hardware > Mec… (9) \\
+    \hot{$+$7} \#9: Locomotion > Wheeled Locomoti… (9) \\
+    \hot{$+$5} \#6: Control > Force / Impedance C… (10) \\
+    \hot{$+$4} \#11: Control > General Control (7) \\
+    \hot{$+$2} \#15: Perception \& Sensing > Visual… (5) \\
 \end{tabular}
+\end{column}
+\end{columns}
 \end{frame}
 
 
@@ -256,63 +269,75 @@ Manipulation (61), Theoretical Foundations (32), Planning (25)
 IJRR/T-RO 특집호 다수 발행 (Editorial 급증). Teleoperation, Acoustic perception, Robot architecture가 처음 부상.
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small 365 papers)}\\[2pt]
-\begin{tabular}{@{}rlr@{}}
-    1. & Robot Design \& Hardware > Mechanism Design & 26 \\
-    2. & Planning > Path/Motion Planning & 25 \\
-    3. & Other / Editorial > Editorial / Meta & 23 \\
-    4. & Locomotion > Legged Locomotion & 19 \\
-    5. & Manipulation > General Manipulation & 17 \\
-\end{tabular}
-\vspace{6pt}
 
-\textbf{Top-3 Phyla:}\\[2pt]
-Manipulation (60), Planning (43), Locomotion (39)
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (365 papers)}\\[2pt]
+\scriptsize
+\begin{tabular}{@{}rlr@{}}
+    1. & Robot Design \& Hardware > Mechani… & 26 \\
+    2. & Planning > Path/Motion Planning & 25 \\
+    3. & Other / Editorial > Editorial / M… & 23 \\
+    4. & Locomotion > Legged Locomotion & 19 \\
+    5. & Manipulation > General Manipulati… & 17 \\
+\end{tabular}
 \vspace{8pt}
 
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize Manipulation (60), Planning (43), Locomotion (39)
+\end{column}
 
-\textbf{직전 cohort 대비 급부상 (rank $\uparrow$)}\\[2pt]
-\small
+\begin{column}{0.48\textwidth}
+\textbf{급부상 (rank $\uparrow$ vs 직전 cohort)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}p{0.95\linewidth}@{}}
-    \hot{$+$83} ranks $\to$ \#13: Human-Robot Interaction > Teleoperation (9 papers) \\
-    \hot{$+$77} ranks $\to$ \#19: Perception \& Sensing > Acoustic Perception (7 papers) \\
-    \hot{$+$39} ranks $\to$ \#3: Other / Editorial > Editorial / Meta (23 papers) \\
-    \hot{$+$22} ranks $\to$ \#23: Robot Software \& Architecture > Robot Architecture / Middleware (5 papers) \\
-    \hot{$+$18} ranks $\to$ \#21: Control > Visual Servoing (5 papers) \\
+    \hot{$+$83} \#13: Human-Robot Interaction > Tel… (9) \\
+    \hot{$+$77} \#19: Perception \& Sensing > Acoust… (7) \\
+    \hot{$+$39} \#3: Other / Editorial > Editorial… (23) \\
+    \hot{$+$22} \#23: Robot Software \& Architecture… (5) \\
+    \hot{$+$18} \#21: Control > Visual Servoing (5) \\
 \end{tabular}
+\end{column}
+\end{columns}
 \end{frame}
 
 
 \begin{frame}{2003-2007 \quad — \quad SLAM 혁명}
 \small
 \begin{block}{Headline}
-FastSLAM/EKF-SLAM/GraphSLAM 패러다임이 SLAM을 #9 → 주류로 끌어올림 (+43 ranks). Aerial, Medical surgical, Assistive robotics 동시 등장.
+FastSLAM/EKF-SLAM/GraphSLAM 패러다임이 SLAM을 \#9 $\to$ 주류로 끌어올림 (+43 ranks). Aerial, Medical surgical, Assistive robotics 동시 등장.
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small 951 papers)}\\[2pt]
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (951 papers)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}rlr@{}}
     1. & Locomotion > Legged Locomotion & 67 \\
-    2. & Robot Design \& Hardware > Mechanism Design & 63 \\
+    2. & Robot Design \& Hardware > Mechani… & 63 \\
     3. & Planning > Path/Motion Planning & 57 \\
     4. & Control > General Control & 46 \\
-    5. & Manipulation > Contact-rich Manipulation & 45 \\
+    5. & Manipulation > Contact-rich Manip… & 45 \\
 \end{tabular}
-\vspace{6pt}
-
-\textbf{Top-3 Phyla:}\\[2pt]
-Locomotion (138), Manipulation (112), Control (88)
 \vspace{8pt}
 
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize Locomotion (138), Manipulation (112), Control (88)
+\end{column}
 
-\textbf{직전 cohort 대비 급부상 (rank $\uparrow$)}\\[2pt]
-\small
+\begin{column}{0.48\textwidth}
+\textbf{급부상 (rank $\uparrow$ vs 직전 cohort)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}p{0.95\linewidth}@{}}
-    \hot{$+$73} ranks $\to$ \#40: Human-Robot Interaction > Assistive Robotics (6 papers) \\
-    \hot{$+$43} ranks $\to$ \#9: SLAM \& Localization > SLAM (34 papers) \\
-    \hot{$+$35} ranks $\to$ \#19: SLAM \& Localization > State Estimation (19 papers) \\
-    \hot{$+$30} ranks $\to$ \#26: Application Domains > Medical \& Surgical Robotics (11 papers) \\
-    \hot{$+$28} ranks $\to$ \#25: Locomotion > Aerial Locomotion (11 papers) \\
+    \hot{$+$73} \#40: Human-Robot Interaction > Ass… (6) \\
+    \hot{$+$43} \#9: SLAM \& Localization > SLAM (34) \\
+    \hot{$+$35} \#19: SLAM \& Localization > State E… (19) \\
+    \hot{$+$30} \#26: Application Domains > Medical… (11) \\
+    \hot{$+$28} \#25: Locomotion > Aerial Locomotion (11) \\
 \end{tabular}
+\end{column}
+\end{columns}
 \end{frame}
 
 
@@ -322,30 +347,36 @@ Locomotion (138), Manipulation (112), Control (88)
 Reinforcement Learning · Deep Learning · Datasets/Benchmarks가 Learning for Robotics Phylum 안에서 처음으로 빈도 임계점 통과.
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small 1,308 papers)}\\[2pt]
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (1,308 papers)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}rlr@{}}
     1. & Planning > Path/Motion Planning & 95 \\
     2. & Locomotion > Legged Locomotion & 66 \\
     3. & Multi-Robot Systems > Coordination & 63 \\
-    4. & Manipulation > Contact-rich Manipulation & 60 \\
+    4. & Manipulation > Contact-rich Manip… & 60 \\
     5. & SLAM \& Localization > SLAM & 52 \\
 \end{tabular}
-\vspace{6pt}
-
-\textbf{Top-3 Phyla:}\\[2pt]
-Locomotion (171), Manipulation (141), Planning (141)
 \vspace{8pt}
 
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize Locomotion (171), Manipulation (141), Planning (141)
+\end{column}
 
-\textbf{직전 cohort 대비 급부상 (rank $\uparrow$)}\\[2pt]
-\small
+\begin{column}{0.48\textwidth}
+\textbf{급부상 (rank $\uparrow$ vs 직전 cohort)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}p{0.95\linewidth}@{}}
-    \hot{$+$80} ranks $\to$ \#43: Learning for Robotics > Reinforcement Learning (8 papers) \\
-    \hot{$+$77} ranks $\to$ \#46: Learning for Robotics > Datasets \& Benchmarks (7 papers) \\
-    \hot{$+$74} ranks $\to$ \#49: Learning for Robotics > Deep Learning Application (7 papers) \\
-    \hot{$+$72} ranks $\to$ \#51: Theoretical Foundations > Formal Methods (6 papers) \\
-    \hot{$+$27} ranks $\to$ \#22: Perception \& Sensing > Tactile Sensing (23 papers) \\
+    \hot{$+$80} \#43: Learning for Robotics > Reinf… (8) \\
+    \hot{$+$77} \#46: Learning for Robotics > Datas… (7) \\
+    \hot{$+$74} \#49: Learning for Robotics > Deep … (7) \\
+    \hot{$+$72} \#51: Theoretical Foundations > For… (6) \\
+    \hot{$+$27} \#22: Perception \& Sensing > Tactil… (23) \\
 \end{tabular}
+\end{column}
+\end{columns}
 \end{frame}
 
 
@@ -355,96 +386,114 @@ Locomotion (171), Manipulation (141), Planning (141)
 Physical HRI 폭발 (+38 ranks), Task \& Motion Planning 정착, Foundation Models의 미세한 첫 등장 (12편).
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small 1,349 papers)}\\[2pt]
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (1,349 papers)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}rlr@{}}
     1. & Planning > Path/Motion Planning & 109 \\
     2. & Locomotion > Legged Locomotion & 76 \\
     3. & Multi-Robot Systems > Coordination & 65 \\
     4. & SLAM \& Localization > SLAM & 52 \\
-    5. & Other / Unclassified > Unclassified & 49 \\
+    5. & Other / Unclassified > Unclassifi… & 49 \\
 \end{tabular}
-\vspace{6pt}
-
-\textbf{Top-3 Phyla:}\\[2pt]
-Planning (164), Locomotion (164), Manipulation (143)
 \vspace{8pt}
 
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize Planning (164), Locomotion (164), Manipulation (143)
+\end{column}
 
-\textbf{직전 cohort 대비 급부상 (rank $\uparrow$)}\\[2pt]
-\small
+\begin{column}{0.48\textwidth}
+\textbf{급부상 (rank $\uparrow$ vs 직전 cohort)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}p{0.95\linewidth}@{}}
-    \hot{$+$71} ranks $\to$ \#57: Planning > Task \& Motion Planning (5 papers) \\
-    \hot{$+$38} ranks $\to$ \#15: Human-Robot Interaction > Physical HRI (32 papers) \\
-    \hot{$+$34} ranks $\to$ \#34: Learning for Robotics > Foundation Models (12 papers) \\
-    \hot{$+$33} ranks $\to$ \#39: Multi-Robot Systems > Multi-Robot Planning (9 papers) \\
-    \hot{$+$33} ranks $\to$ \#38: Human-Robot Interaction > Shared Autonomy (9 papers) \\
+    \hot{$+$71} \#57: Planning > Task \& Motion Plan… (5) \\
+    \hot{$+$38} \#15: Human-Robot Interaction > Phy… (32) \\
+    \hot{$+$34} \#34: Learning for Robotics > Found… (12) \\
+    \hot{$+$33} \#39: Multi-Robot Systems > Multi-R… (9) \\
+    \hot{$+$33} \#38: Human-Robot Interaction > Sha… (9) \\
 \end{tabular}
+\end{column}
+\end{columns}
 \end{frame}
 
 
 \begin{frame}{2018-2022 \quad — \quad Sim-to-Real + RL 주류화}
 \small
 \begin{block}{Headline}
-RL이 +17 ranks로 #12 진입. Tactile sensing 고점 (#17). 아직 Foundation Models 폭발 직전의 plateau.
+RL이 +17 ranks로 \#12 진입. Tactile sensing 고점 (\#17). 아직 Foundation Models 폭발 직전의 plateau.
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small 1,547 papers)}\\[2pt]
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (1,547 papers)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}rlr@{}}
     1. & Planning > Path/Motion Planning & 103 \\
     2. & Multi-Robot Systems > Coordination & 70 \\
-    3. & Manipulation > Contact-rich Manipulation & 66 \\
+    3. & Manipulation > Contact-rich Manip… & 66 \\
     4. & Locomotion > Legged Locomotion & 61 \\
     5. & Locomotion > Aerial Locomotion & 57 \\
 \end{tabular}
-\vspace{6pt}
-
-\textbf{Top-3 Phyla:}\\[2pt]
-Manipulation (179), Planning (168), Locomotion (154)
 \vspace{8pt}
 
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize Manipulation (179), Planning (168), Locomotion (154)
+\end{column}
 
-\textbf{직전 cohort 대비 급부상 (rank $\uparrow$)}\\[2pt]
-\small
+\begin{column}{0.48\textwidth}
+\textbf{급부상 (rank $\uparrow$ vs 직전 cohort)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}p{0.95\linewidth}@{}}
-    \hot{$+$72} ranks $\to$ \#62: Perception \& Sensing > Radar Perception (5 papers) \\
-    \hot{$+$36} ranks $\to$ \#17: Perception \& Sensing > Tactile Sensing (29 papers) \\
-    \hot{$+$19} ranks $\to$ \#64: Theoretical Foundations > Robot Safety \& Failure (5 papers) \\
-    \hot{$+$17} ranks $\to$ \#53: Theoretical Foundations > Stability (8 papers) \\
-    \hot{$+$17} ranks $\to$ \#12: Learning for Robotics > Reinforcement Learning (38 papers) \\
+    \hot{$+$72} \#62: Perception \& Sensing > Radar … (5) \\
+    \hot{$+$36} \#17: Perception \& Sensing > Tactil… (29) \\
+    \hot{$+$19} \#64: Theoretical Foundations > Rob… (5) \\
+    \hot{$+$17} \#53: Theoretical Foundations > Sta… (8) \\
+    \hot{$+$17} \#12: Learning for Robotics > Reinf… (38) \\
 \end{tabular}
+\end{column}
+\end{columns}
 \end{frame}
 
 
 \begin{frame}{2023-2025 \quad — \quad Foundation Models 시대}
 \small
 \begin{block}{Headline}
-Foundation Models가 단 3년만에 +52 ranks → \#3 (66편). Diffusion Policy · VLA · 3D Gaussian Splatting SLAM이 동시기에 등장.
+Foundation Models가 단 3년만에 +52 ranks $\to$ \#3 (66편). Diffusion Policy · VLA · 3D Gaussian Splatting SLAM이 동시기에 등장.
 \end{block}
 \vspace{4pt}
-\textbf{Top-5 dominant Classes ({\small 1,581 papers)}\\[2pt]
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\textbf{Top-5 Classes} \muted{\scriptsize (1,581 papers)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}rlr@{}}
     1. & Planning > Path/Motion Planning & 117 \\
     2. & SLAM \& Localization > SLAM & 72 \\
-    3. & Learning for Robotics > Foundation Models & 66 \\
+    3. & Learning for Robotics > Foundatio… & 66 \\
     4. & Multi-Robot Systems > Coordination & 63 \\
     5. & Locomotion > Legged Locomotion & 59 \\
 \end{tabular}
-\vspace{6pt}
-
-\textbf{Top-3 Phyla:}\\[2pt]
-Manipulation (198), Planning (188), Learning for Robotics (159)
 \vspace{8pt}
 
+\textbf{\small Top-3 Phyla}\\[2pt]
+\scriptsize Manipulation (198), Planning (188), Learning for Robotics (159)
+\end{column}
 
-\textbf{직전 cohort 대비 급부상 (rank $\uparrow$)}\\[2pt]
-\small
+\begin{column}{0.48\textwidth}
+\textbf{급부상 (rank $\uparrow$ vs 직전 cohort)}\\[2pt]
+\scriptsize
 \begin{tabular}{@{}p{0.95\linewidth}@{}}
-    \hot{$+$52} ranks $\to$ \#3: Learning for Robotics > Foundation Models (66 papers) \\
-    \hot{$+$28} ranks $\to$ \#43: Control > Safety-Critical Control (12 papers) \\
-    \hot{$+$28} ranks $\to$ \#22: Control > Optimal / Predictive Control (23 papers) \\
-    \hot{$+$24} ranks $\to$ \#62: Perception \& Sensing > Event-based Vision (6 papers) \\
-    \hot{$+$24} ranks $\to$ \#24: Learning for Robotics > Datasets \& Benchmarks (21 papers) \\
+    \hot{$+$52} \#3: Learning for Robotics > Found… (66) \\
+    \hot{$+$28} \#43: Control > Safety-Critical Con… (12) \\
+    \hot{$+$28} \#22: Control > Optimal / Predictiv… (23) \\
+    \hot{$+$24} \#62: Perception \& Sensing > Event-… (6) \\
+    \hot{$+$24} \#24: Learning for Robotics > Datas… (21) \\
 \end{tabular}
+\end{column}
+\end{columns}
 \end{frame}
 
 
@@ -487,7 +536,7 @@ Grasping              & — & — & — & 12 & 9 & 8 & 7 & 8 \\
 
 \begin{frame}{2003-2007: SLAM 혁명}
 \begin{itemize}
-  \item 1998-2002 cohort: SLAM은 #50+ 부근.
+  \item 1998-2002 cohort: SLAM은 \#50+ 부근.
   \item 2003-2007: \hot{+43 ranks $\to$ \#9} (34 papers).
   \item 트리거: \cool{FastSLAM (2002)} $\to$ \cool{GraphSLAM/SAM (2006)} $\to$ \cool{EKF-SLAM 표준화}.
   \item Aerial Locomotion (+28 ranks) 동시 등장 — 드론 등장의 시발점.
