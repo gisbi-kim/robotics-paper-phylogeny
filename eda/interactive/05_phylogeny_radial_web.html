@@ -732,6 +732,24 @@
       <button class="reset-btn" id="reset">선택 해제</button>
     </div>
   </main>
+</div>
+
+<!-- ============ PAPERS MODAL ============ -->
+<div class="papers-modal" id="papers-modal">
+  <div class="panel">
+    <div class="panel-header">
+      <h2 id="papers-modal-title">Papers</h2>
+      <span class="meta" id="papers-modal-meta"></span>
+      <button class="panel-close" id="papers-modal-close" title="닫기 (Esc)">×</button>
+    </div>
+    <div class="panel-toolbar">
+      정렬:
+      <button class="sort-btn active" data-sort="citations">피인용 ↓</button>
+      <button class="sort-btn" data-sort="year">최신순 ↓</button>
+      <button class="sort-btn" data-sort="title">제목 A→Z</button>
+    </div>
+    <div class="panel-body" id="papers-modal-body"></div>
+  </div>
 
 </div>
 
@@ -754,6 +772,24 @@ function lighten(hex, amt) {
 
 let root, arcs, arc;
 let focusedNode = null;
+
+// Papers list (loaded asynchronously). Each entry has the four
+// taxonomy fields + title/authors/venue/year/citations + doi/url
+// (where available). buildInfoCardHTML reads .length to decide
+// whether to enable the "View papers" button.
+let papers = [];
+let papersByPath = null;  // lazy-built index, see filterPapers()
+
+d3.json('papers.json')
+  .then(arr => {
+    papers = Array.isArray(arr) ? arr : [];
+    // Re-render the focused card if a node is already selected so the
+    // "View papers" button switches from "loading…" to ready.
+    if (focusedNode) renderFocusedPanel(focusedNode);
+  })
+  .catch(err => {
+    console.warn('papers.json not loaded — paper list disabled', err);
+  });
 
 d3.json('tree_data.json').then(data => {
   root = d3.hierarchy(data)
@@ -977,6 +1013,9 @@ d3.json('tree_data.json').then(data => {
 
   // Keyboard nav
   d3.select(window).on('keydown', (event) => {
+    // While the papers modal is open, the modal owns the keyboard (Esc
+    // closes it, etc). Don't run tree navigation underneath.
+    if (d3.select('#papers-modal').classed('open')) return;
     if (!focusedNode) return;
     let handled = true;
     switch (event.key) {
@@ -1095,6 +1134,14 @@ function buildInfoCardHTML(d, sourceLabel, sourceClass) {
       </div>`;
   }
 
+  // "View papers" button — only on the FOCUSED card (not on hover-preview).
+  // disabled until papers.json finishes loading; updated on load.
+  const papersBtnHTML = sourceLabel === 'FOCUSED' ? `
+      <button class="papers-btn" data-action="open-papers"
+              ${papers.length === 0 ? 'disabled' : ''}>
+        📄 ${papers.length === 0 ? '논문 데이터 로딩…' : `이 계열의 논문 ${d.value.toLocaleString()}편 보기`}
+      </button>` : '';
+
   return `
     <div class="info-card">
       <span class="info-source ${sourceClass}">${sourceLabel}</span>
@@ -1110,6 +1157,7 @@ function buildInfoCardHTML(d, sourceLabel, sourceClass) {
         <span class="k">Children</span><span class="v">${d.children ? d.children.length : 0}</span>
       </div>
       ${childrenHTML}
+      ${papersBtnHTML}
     </div>`;
 }
 
@@ -1121,6 +1169,10 @@ function renderFocusedPanel(d) {
       const name = this.getAttribute('data-name');
       const child = (d.children || []).find(c => c.data.name === name);
       if (child) selectNode(child);
+    });
+    // Click on "view papers" button → open modal
+    focusedCard.select('button[data-action="open-papers"]').on('click', () => {
+      openPapersModal(d);
     });
   }
 }
@@ -1311,6 +1363,121 @@ function renderSuggestions() {
     container.node().insertBefore(btn, refreshBtn);
   });
 }
+
+
+// ============ Papers modal ============
+//
+// Filter papers by the focused node's taxonomy path. Each paper carries
+// its full {phylum, class, order, genus} address; the focused node's
+// path is rebuilt from its ancestors. A paper "belongs to" the node iff
+// the first N path segments match (N = node.depth).
+const PATH_FIELDS = ['phylum', 'class', 'order', 'genus'];
+
+function nodePath(d) {
+  // Skip root (depth 0). Returns ['Phylum', 'Class', ...] up to depth.
+  return d.ancestors().reverse().slice(1).map(n => n.data.name);
+}
+
+function filterPapers(d) {
+  if (!papers.length) return [];
+  if (d.depth === 0) return papers.slice();
+  const path = nodePath(d);
+  return papers.filter(p => {
+    for (let i = 0; i < path.length; i++) {
+      if (p[PATH_FIELDS[i]] !== path[i]) return false;
+    }
+    return true;
+  });
+}
+
+let currentPapersList = [];
+let currentSort = 'citations';
+
+function sortPapers(list, mode) {
+  const c = list.slice();
+  if (mode === 'citations') {
+    c.sort((a, b) => (b.citations || 0) - (a.citations || 0));
+  } else if (mode === 'year') {
+    c.sort((a, b) => (b.year || 0) - (a.year || 0)
+                  || (b.citations || 0) - (a.citations || 0));
+  } else if (mode === 'title') {
+    c.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+  }
+  return c;
+}
+
+function paperLink(p) {
+  // Prefer the explicit URL (https://doi.org/...) from RoboPaper Atlas.
+  // Fall back to a Google Scholar title search for the ~1% without DOI.
+  if (p.url) return p.url;
+  if (p.doi) return 'https://doi.org/' + p.doi;
+  return 'https://scholar.google.com/scholar?q=' + encodeURIComponent(p.title || '');
+}
+
+function renderPapersList() {
+  const sorted = sortPapers(currentPapersList, currentSort);
+  const body = d3.select('#papers-modal-body');
+  body.html('');
+  sorted.forEach(p => {
+    const item = body.append('div').attr('class', 'paper-item');
+    const row1 = item.append('div').attr('class', 'row1');
+    row1.append('a')
+      .attr('class', 'title-link')
+      .attr('href', paperLink(p))
+      .attr('target', '_blank')
+      .attr('rel', 'noopener noreferrer')
+      .html(escapeHTML(p.title || '(no title)') +
+            (p.url || p.doi ? ' <span class="ext-icon">↗</span>'
+                            : ' <span class="ext-icon" title="DOI 없음 — Scholar 검색">🔎</span>'));
+    row1.append('span')
+      .attr('class', 'citations')
+      .text(((p.citations || 0).toLocaleString()) + ' cites');
+    const row2 = item.append('div').attr('class', 'row2');
+    row2.append('span')
+      .attr('class', 'venue-year')
+      .text(`${p.venue || '?'} ${p.year || '?'}`);
+    row2.append('span')
+      .attr('class', 'authors')
+      .text(p.authors || '');
+  });
+}
+
+function openPapersModal(d) {
+  currentPapersList = filterPapers(d);
+  currentSort = 'citations';
+  d3.select('#papers-modal-title').text(d.data.name);
+  d3.select('#papers-modal-meta').text(
+    `${currentPapersList.length.toLocaleString()} papers · ${nodePath(d).join(' › ')}`
+  );
+  d3.selectAll('#papers-modal .sort-btn')
+    .classed('active', function() { return this.dataset.sort === currentSort; });
+  renderPapersList();
+  d3.select('#papers-modal').classed('open', true);
+}
+
+function closePapersModal() {
+  d3.select('#papers-modal').classed('open', false);
+}
+
+// Modal wiring (one-time)
+d3.select('#papers-modal-close').on('click', closePapersModal);
+d3.select('#papers-modal').on('click', function(event) {
+  // Click on the dim backdrop (not inside the panel) closes the modal
+  if (event.target === this) closePapersModal();
+});
+d3.selectAll('#papers-modal .sort-btn').on('click', function() {
+  currentSort = this.dataset.sort;
+  d3.selectAll('#papers-modal .sort-btn')
+    .classed('active', function() { return this.dataset.sort === currentSort; });
+  renderPapersList();
+});
+d3.select(window).on('keydown.modal', (event) => {
+  if (event.key === 'Escape' &&
+      d3.select('#papers-modal').classed('open')) {
+    closePapersModal();
+    event.stopPropagation();
+  }
+});
 </script>
 </body>
 </html>
