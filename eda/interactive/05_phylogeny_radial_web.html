@@ -133,16 +133,27 @@
   .info-breadcrumb {
     color: var(--text-secondary);
     font-size: 11px;
-    line-height: 1.5;
-    margin-bottom: 8px;
+    line-height: 1.45;
+    margin-bottom: 10px;
     word-break: break-word;
+    font-family: 'Roboto Mono', monospace;
   }
-  .info-breadcrumb .crumb {
+  .info-breadcrumb .crumb-row {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .info-breadcrumb .crumb-tree {
+    color: var(--text-muted);
+    user-select: none;
+  }
+  .info-breadcrumb .crumb-name {
     color: var(--text-secondary);
   }
-  .info-breadcrumb .sep {
-    color: var(--text-muted);
-    margin: 0 4px;
+  .info-breadcrumb .crumb-row.last .crumb-name {
+    color: #202124;
+    font-weight: 500;
   }
   .info-name {
     font-family: 'Google Sans', sans-serif;
@@ -259,6 +270,58 @@
   svg {
     max-width: 100%; max-height: 100%;
   }
+
+  /* Floating keyboard-shortcut overlay (bottom-left of canvas).
+     Lives outside the sidebar so the FOCUSED card stays above the
+     fold and users don't have to scroll the sidebar to read it. */
+  .help-floating {
+    position: absolute;
+    left: 14px;
+    bottom: 14px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 10px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    pointer-events: auto;
+    user-select: none;
+    box-shadow: var(--elev-1);
+    max-width: 220px;
+  }
+  .help-floating .row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  .help-floating kbd {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    padding: 0 5px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 9px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+  .help-floating .reset-btn {
+    width: 100%;
+    margin-top: 6px;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border-strong);
+    padding: 3px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+  .help-floating .reset-btn:hover { background: var(--bg-subtle); }
   .arc {
     transition: opacity 0.2s ease;
     cursor: pointer;
@@ -493,16 +556,6 @@
       <div class="match-list" id="search-results"></div>
     </div>
 
-    <div class="help-card">
-      <div class="row"><span>호버 (강조)</span><kbd>mouse</kbd></div>
-      <div class="row"><span>계열 선택</span><kbd>click</kbd></div>
-      <div class="row"><span>형제 이동</span><kbd>← →</kbd></div>
-      <div class="row"><span>부모</span><kbd>↑</kbd></div>
-      <div class="row"><span>첫 자식</span><kbd>↓</kbd></div>
-      <div class="row"><span>해제</span><kbd>Esc</kbd></div>
-      <button class="reset-btn" id="reset">선택 해제</button>
-    </div>
-
     <!-- Focused (sticky) info -->
     <div id="focused-card"></div>
     <!-- Hovered (transient) info -->
@@ -512,6 +565,17 @@
   <!-- ============ MAIN (SVG) ============ -->
   <main class="main">
     <svg id="tree" viewBox="-460 -460 920 920"></svg>
+
+    <!-- Keyboard / interaction hints, pinned to canvas bottom-left
+         so they don't push the FOCUSED info card below the fold. -->
+    <div class="help-floating">
+      <div class="row"><span>호버 (강조)</span><kbd>mouse</kbd></div>
+      <div class="row"><span>계열 선택</span><kbd>click</kbd></div>
+      <div class="row"><span>형제 이동</span><kbd>← →</kbd></div>
+      <div class="row"><span>부모 / 첫 자식</span><kbd>↑ ↓</kbd></div>
+      <div class="row"><span>해제</span><kbd>Esc</kbd></div>
+      <button class="reset-btn" id="reset">선택 해제</button>
+    </div>
   </main>
 
 </div>
@@ -828,12 +892,23 @@ function navigate(direction) {
 const DEPTH_KIND = ['Robotics', 'Phylum', 'Class', 'Order', 'Genus'];
 
 function buildBreadcrumbHTML(d) {
-  return d.ancestors().reverse()
-    .map((n, i, arr) => {
-      const isLast = i === arr.length - 1;
-      return `<span class="crumb"${isLast ? ' style="color:#202124;font-weight:500"' : ''}>${escapeHTML(n.data.name)}</span>`;
-    })
-    .join('<span class="sep">›</span>');
+  // Render ancestors as a vertically-stacked tree so the hierarchy is
+  // visually obvious at a glance (no more single-line ›-chain that
+  // collapses depth into a wall of text).
+  const chain = d.ancestors().reverse();
+  return chain.map((n, i, arr) => {
+    const isLast = i === arr.length - 1;
+    let prefix = '';
+    if (i > 0) {
+      // Indent: one "  " per ancestor level above the current row,
+      // then "└─ " for the current row's branch glyph.
+      prefix = '\u00A0\u00A0'.repeat(i - 1) + '└─\u00A0';
+    }
+    return `<span class="crumb-row${isLast ? ' last' : ''}">` +
+             `<span class="crumb-tree">${prefix}</span>` +
+             `<span class="crumb-name">${escapeHTML(n.data.name)}</span>` +
+           `</span>`;
+  }).join('');
 }
 
 function buildInfoCardHTML(d, sourceLabel, sourceClass) {
