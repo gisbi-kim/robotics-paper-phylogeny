@@ -1,3 +1,5 @@
+**언어**: [English](PLAN.en.md) | 한국어
+
 # 로봇공학 논문 계통도(Phylogenetic Taxonomy) 작성 플랜
 
 ## 1. 작업 정의

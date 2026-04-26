@@ -1,3 +1,5 @@
+**언어**: [English](README.en.md) | 한국어
+
 # Robotics Paper Phylogenetic Taxonomy
 
 🌐 **Live site**: <https://gisbi-kim.github.io/robotics-paper-phylogeny/>

@@ -1,3 +1,5 @@
+**언어**: [English](README.en.md) | 한국어
+
 # EDA — Stage B: Raw Taxonomy Visualization
 
 7,477편 분류 결과를 4개의 정적 플롯 + 2개의 인터랙티브 HTML로 시각화한 1차 분석.

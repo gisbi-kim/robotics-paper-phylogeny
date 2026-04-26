@@ -1,3 +1,5 @@
+**언어**: [English](REFRESH.en.md) | 한국어
+
 # Refresh 가이드
 
 이 리포의 산출물은 **RoboPaper Atlas** ([https://gisbi-kim.github.io/robopaper-atlas/](https://gisbi-kim.github.io/robopaper-atlas/))의 데이터 스냅샷에서 파생된다. atlas가 갱신될 때마다 다음이 stale해진다:

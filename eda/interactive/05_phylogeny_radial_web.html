@@ -778,16 +778,17 @@
     <div class="search-card">
       <!-- Random keyword suggestions -->
       <div class="suggestions" id="search-suggestions">
-        <span class="suggestions-label">추천:</span>
+        <span class="suggestions-label" data-en="Try:">추천:</span>
         <!-- chips populated by JS -->
-        <button class="refresh-btn" id="suggestions-refresh" title="다른 단어">↻</button>
+        <button class="refresh-btn" id="suggestions-refresh" title="다른 단어" data-en-title="Refresh">↻</button>
       </div>
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
         <input class="search-input" type="text" id="search-input"
                placeholder="계통 검색 (예: SLAM, Diffusion, Soft …)"
+               data-en-placeholder="Search categories (e.g. SLAM, Diffusion, Soft …)"
                autocomplete="off" />
-        <button class="search-clear" id="search-clear" title="지우기">×</button>
+        <button class="search-clear" id="search-clear" title="지우기" data-en-title="Clear">×</button>
       </div>
       <div id="search-summary"></div>
       <div class="match-list" id="search-results"></div>
@@ -799,15 +800,16 @@
         <span class="search-icon">📄</span>
         <input class="search-input" type="text" id="paper-search-input"
                placeholder="논문 제목 검색 (예: NeRF, BERT, Octree …)"
+               data-en-placeholder="Search paper titles (e.g. NeRF, BERT, Octree …)"
                autocomplete="off" />
-        <button class="search-clear" id="paper-search-clear" title="지우기">×</button>
+        <button class="search-clear" id="paper-search-clear" title="지우기" data-en-title="Clear">×</button>
       </div>
       <div id="paper-search-summary"></div>
       <div class="match-list" id="paper-search-results"></div>
       <div class="pager" id="paper-search-pager" style="display:none">
-        <button id="paper-prev" title="이전 (←)">◀</button>
+        <button id="paper-prev" title="이전 (←)" data-en-title="Previous (←)">◀</button>
         <span class="pager-info" id="paper-pager-info"></span>
-        <button id="paper-next" title="다음 (→)">▶</button>
+        <button id="paper-next" title="다음 (→)" data-en-title="Next (→)">▶</button>
       </div>
     </div>
 
@@ -824,12 +826,12 @@
     <!-- Keyboard / interaction hints, pinned to canvas bottom-left
          so they don't push the FOCUSED info card below the fold. -->
     <div class="help-floating">
-      <div class="row"><span>호버 (강조)</span><kbd>mouse</kbd></div>
-      <div class="row"><span>계열 선택</span><kbd>click</kbd></div>
-      <div class="row"><span>형제 이동</span><kbd>← →</kbd></div>
-      <div class="row"><span>부모 / 첫 자식</span><kbd>↑ ↓</kbd></div>
-      <div class="row"><span>해제</span><kbd>Esc</kbd></div>
-      <button class="reset-btn" id="reset">선택 해제</button>
+      <div class="row"><span data-en="Hover (highlight)">호버 (강조)</span><kbd>mouse</kbd></div>
+      <div class="row"><span data-en="Select lineage">계열 선택</span><kbd>click</kbd></div>
+      <div class="row"><span data-en="Sibling nav">형제 이동</span><kbd>← →</kbd></div>
+      <div class="row"><span data-en="Parent / first child">부모 / 첫 자식</span><kbd>↑ ↓</kbd></div>
+      <div class="row"><span data-en="Clear">해제</span><kbd>Esc</kbd></div>
+      <button class="reset-btn" id="reset" data-en="Clear selection">선택 해제</button>
     </div>
   </main>
 </div>
@@ -840,13 +842,13 @@
     <div class="panel-header">
       <h2 id="papers-modal-title">Papers</h2>
       <span class="meta" id="papers-modal-meta"></span>
-      <button class="panel-close" id="papers-modal-close" title="닫기 (Esc)">×</button>
+      <button class="panel-close" id="papers-modal-close" title="닫기 (Esc)" data-en-title="Close (Esc)">×</button>
     </div>
     <div class="panel-toolbar">
-      정렬:
-      <button class="sort-btn active" data-sort="citations">피인용 ↓</button>
-      <button class="sort-btn" data-sort="year">최신순 ↓</button>
-      <button class="sort-btn" data-sort="title">제목 A→Z</button>
+      <span data-en="Sort:">정렬:</span>
+      <button class="sort-btn active" data-sort="citations" data-en="Citations ↓">피인용 ↓</button>
+      <button class="sort-btn" data-sort="year" data-en="Newest ↓">최신순 ↓</button>
+      <button class="sort-btn" data-sort="title" data-en="Title A→Z">제목 A→Z</button>
     </div>
     <div class="panel-body" id="papers-modal-body"></div>
   </div>
@@ -1260,8 +1262,8 @@ function buildInfoCardHTML(d, sourceLabel, sourceClass) {
   if (!d) {
     return `<div class="info-card"><div class="info-empty">${
       sourceLabel === 'FOCUSED'
-        ? '아무 wedge나 클릭하면 여기에 정보가 표시됩니다.'
-        : 'wedge에 마우스를 올려보세요.'
+        ? t('Click any wedge to see its info here.', '아무 wedge나 클릭하면 여기에 정보가 표시됩니다.')
+        : t('Hover a wedge.', 'wedge에 마우스를 올려보세요.')
     }</div></div>`;
   }
   const total = root ? root.value : d.value;
@@ -1290,7 +1292,10 @@ function buildInfoCardHTML(d, sourceLabel, sourceClass) {
   const papersBtnHTML = sourceLabel === 'FOCUSED' ? `
       <button class="papers-btn" data-action="open-papers"
               ${papers.length === 0 ? 'disabled' : ''}>
-        📄 ${papers.length === 0 ? '논문 데이터 로딩…' : `이 계열의 논문 ${d.value.toLocaleString()}편 보기`}
+        📄 ${papers.length === 0
+              ? t('Loading paper data…', '논문 데이터 로딩…')
+              : t(`View all ${d.value.toLocaleString()} papers in this lineage`,
+                  `이 계열의 논문 ${d.value.toLocaleString()}편 보기`)}
       </button>` : '';
 
   return `
@@ -1396,7 +1401,7 @@ function renderSearchResults() {
   }
 
   d3.select('#search-summary').html(
-    `<div class="search-summary"><strong>${total}</strong> matches for "${escapeHTML(currentSearchQuery)}" — 클릭해서 이동</div>`);
+    `<div class="search-summary"><strong>${total}</strong> ${t('matches for', 'matches for')} "${escapeHTML(currentSearchQuery)}" — ${t('click to jump', '클릭해서 이동')}</div>`);
 
   // Sort by depth then by paper count desc (Phyla first, then larger nodes)
   const sorted = currentMatches.slice().sort((a, b) =>
@@ -1579,7 +1584,7 @@ function renderPapersList() {
       .attr('rel', 'noopener noreferrer')
       .html(escapeHTML(p.title || '(no title)') +
             (p.url || p.doi ? ' <span class="ext-icon">↗</span>'
-                            : ' <span class="ext-icon" title="DOI 없음 — Scholar 검색">🔎</span>'));
+                            : ` <span class="ext-icon" title="${t('No DOI — Scholar search', 'DOI 없음 — Scholar 검색')}">🔎</span>`));
     row1.append('span')
       .attr('class', 'citations')
       .text(((p.citations || 0).toLocaleString()) + ' cites');
@@ -1627,6 +1632,56 @@ d3.select(window).on('keydown.modal', (event) => {
       d3.select('#papers-modal').classed('open')) {
     closePapersModal();
     event.stopPropagation();
+  }
+});
+
+
+// ============ i18n ============
+//
+// Static HTML strings carry data-en (and data-en-placeholder /
+// data-en-title) attributes. JS-built dynamic strings call the t(en, ko)
+// helper. Lang is read from the URL hash (#lang=en) on load and from
+// postMessage when embedded in index.html.
+let currentLang = (function() {
+  var m = (window.location.hash || '').match(/[#&]lang=([a-z]+)/);
+  return m && m[1] === 'en' ? 'en' : 'ko';
+})();
+
+function t(en, ko) { return currentLang === 'en' ? en : ko; }
+
+function applyLang(lang) {
+  var en = lang === 'en';
+  document.documentElement.lang = en ? 'en' : 'ko';
+  document.querySelectorAll('[data-en]').forEach(function(el) {
+    if (el.dataset.ko === undefined) el.dataset.ko = el.innerHTML;
+    el.innerHTML = en ? el.dataset.en : el.dataset.ko;
+  });
+  ['placeholder', 'title'].forEach(function(attr) {
+    var dsKey = 'en' + attr.charAt(0).toUpperCase() + attr.slice(1);
+    var dsKeyKo = 'ko' + attr.charAt(0).toUpperCase() + attr.slice(1);
+    var sel = '[data-' + dsKey.replace(/([A-Z])/g, '-$1').toLowerCase() + ']';
+    document.querySelectorAll(sel).forEach(function(el) {
+      if (el.dataset[dsKeyKo] === undefined) {
+        el.dataset[dsKeyKo] = el.getAttribute(attr) || '';
+      }
+      el.setAttribute(attr, en ? el.dataset[dsKey] : el.dataset[dsKeyKo]);
+    });
+  });
+  currentLang = en ? 'en' : 'ko';
+  // Re-render any dynamic content that uses t() so it picks up new lang.
+  if (focusedNode) renderFocusedPanel(focusedNode);
+  if (currentSearchQuery) renderSearchResults();
+  if (paperSearchQuery) renderPaperResults();
+  if (typeof renderSuggestions === 'function') renderSuggestions();
+}
+
+// Boot: apply whatever lang the URL says
+applyLang(currentLang);
+
+// Listen for parent (index.html) telling us to switch
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'phylotree:lang') {
+    applyLang(e.data.lang === 'en' ? 'en' : 'ko');
   }
 });
 
@@ -1693,7 +1748,7 @@ function performPaperSearch(rawQuery) {
 
   if (!papers.length) {
     d3.select('#paper-search-summary').html(
-      '<div class="search-summary">논문 데이터 로딩 중…</div>');
+      `<div class="search-summary">${t('Loading paper data…', '논문 데이터 로딩 중…')}</div>`);
     return;
   }
 
@@ -1724,7 +1779,7 @@ function renderPaperResults() {
   const page = paperSearchMatches.slice(start, end);
 
   d3.select('#paper-search-summary').html(
-    `<div class="search-summary"><strong>${total.toLocaleString()}</strong> papers for "${escapeHTML(paperSearchQuery)}" — 클릭해서 계통 강조</div>`);
+    `<div class="search-summary"><strong>${total.toLocaleString()}</strong> papers for "${escapeHTML(paperSearchQuery)}" — ${t('click to highlight the lineage', '클릭해서 계통 강조')}</div>`);
 
   const list = d3.select('#paper-search-results');
   list.html('');

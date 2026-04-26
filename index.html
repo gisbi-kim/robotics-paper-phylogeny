@@ -392,6 +392,38 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 24px;
+    align-items: stretch;
+  }
+  .tab-spacer { flex: 1; }
+  .lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    background: var(--bg-subtle);
+    border-radius: 16px;
+    padding: 2px;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+  }
+  .lang-toggle button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 14px;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    transition: all 0.15s;
+  }
+  .lang-toggle button:hover { color: var(--text); }
+  .lang-toggle button.active {
+    background: var(--bg-elevated);
+    color: var(--primary);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   }
   .tab-input { display: none; }
   .tab-label {
@@ -616,7 +648,7 @@
 <section class="hero">
   <div class="hero-inner">
     <h1>Robotics Paper <strong>Phylogeny</strong></h1>
-    <p class="lede">
+    <p class="lede" data-en="7,477 robotics papers (T-RO / IJRR / RSS, 1988~2025)<br>classified into a 4-depth semantic phylogeny: 13 Phylum × ~100 Class × ~330 Order × Genus.">
       7,477편의 로봇공학 논문 (T-RO / IJRR / RSS, 1988~2025)을<br>
       13 Phylum × ~100 Class × ~330 Order × Genus 4-depth 시맨틱 계통도로 분류한 EDA 결과.
     </p>
@@ -651,52 +683,52 @@
 
 <!-- ============== Taxonomy terminology ============== -->
 <div class="card taxonomy-card">
-  <h2>🧬 4-depth 분류 용어</h2>
-  <div class="sub">생물 계통도(phylogenetic taxonomy)에서 빌려온 4단계. 위에서 아래로 점점 좁아지는 카테고리.</div>
+  <h2 data-en="🧬 4-depth taxonomy terms">🧬 4-depth 분류 용어</h2>
+  <div class="sub" data-en='Four levels borrowed from biological phylogenetic taxonomy. Each level narrows the category from the one above.'>생물 계통도(phylogenetic taxonomy)에서 빌려온 4단계. 위에서 아래로 점점 좁아지는 카테고리.</div>
 
   <div class="tx-grid">
     <div class="tx-h">L1</div>
     <div class="tx-en">Phylum</div>
-    <div class="tx-n">13개</div>
-    <div class="tx-desc">
+    <div class="tx-n" data-en="13">13개</div>
+    <div class="tx-desc" data-en='Top level — the broad areas within robotics<span class="tx-eg">e.g. <code>Manipulation</code>, <code>Locomotion</code>, <code>SLAM &amp; Localization</code></span>'>
       대분류 — 로봇공학 안의 큰 분야
       <span class="tx-eg">예: <code>Manipulation</code>, <code>Locomotion</code>, <code>SLAM &amp; Localization</code></span>
     </div>
 
     <div class="tx-h">L2</div>
     <div class="tx-en">Class</div>
-    <div class="tx-n">~100개</div>
-    <div class="tx-desc">
+    <div class="tx-n" data-en="~100">~100개</div>
+    <div class="tx-desc" data-en='Mid level — major branches inside a Phylum<span class="tx-eg">e.g. <code>Manipulation</code> ▸ <code>Grasping</code></span>'>
       중분류 — Phylum 안의 주요 갈래
       <span class="tx-eg">예: <code>Manipulation</code> ▸ <code>Grasping</code></span>
     </div>
 
     <div class="tx-h">L3</div>
     <div class="tx-en">Order</div>
-    <div class="tx-n">~330개</div>
-    <div class="tx-desc">
+    <div class="tx-n" data-en="~330">~330개</div>
+    <div class="tx-desc" data-en='Sub level — specific topics inside a Class<span class="tx-eg">e.g. <code>Grasping</code> ▸ <code>Grasp Planning / Synthesis</code></span>'>
       소분류 — Class 안의 세부 주제
       <span class="tx-eg">예: <code>Grasping</code> ▸ <code>Grasp Planning / Synthesis</code></span>
     </div>
 
     <div class="tx-h">L4</div>
     <div class="tx-en">Genus</div>
-    <div class="tx-n">가변</div>
-    <div class="tx-desc">
+    <div class="tx-n" data-en="varies">가변</div>
+    <div class="tx-desc" data-en='Leaf level — concrete approaches inside an Order. The top 45 Orders carry sub-rules; everything else is labelled (general)<span class="tx-eg">e.g. <code>Grasp Planning</code> ▸ <code>Learning-based Grasping</code></span>'>
       세부 — Order 안의 구체적 접근법. top 45 Order에만 sub-rule이 있고 나머지는 모두 (general)
       <span class="tx-eg">예: <code>Grasp Planning</code> ▸ <code>Learning-based Grasping</code></span>
     </div>
   </div>
 
-  <div class="tx-note">
+  <div class="tx-note" data-en='<strong>Why a phylogenetic taxonomy?</strong> The same topic surfaces under wildly different phrasings (e.g. "laser place recognition" ≈ "point cloud loop detection"). Instead of keyword-counting or TF-IDF, papers are clustered by <strong>semantic synonym groups</strong> and mapped onto a tree that drills field → branch → topic → approach. The payoff: at a glance you can see "which areas rose and fell, when" and "which paradigms coexist inside one topic".'>
     <strong>왜 생물 계통도?</strong> 같은 주제도 논문마다 표현이 다르다 (예: "laser place recognition" ≈ "point cloud loop detection"). 단순 키워드/TF-IDF 대신 <strong>시맨틱 동의어 클러스터</strong>로 묶고, 분야 → 갈래 → 주제 → 접근법으로 내려가는 트리에 매핑. 결과적으로 "어떤 분야가 언제 등장/소멸했는지" "한 주제 안에 어떤 패러다임이 공존하는지"를 한눈에 본다.
   </div>
 </div>
 
 <!-- ============== Phylum distribution ============== -->
 <div class="card phyla-card">
-  <h2>Phylum 분포</h2>
-  <div class="sub">전체 7,477편을 13 Phylum + Editorial + Unclassified로 분류한 결과</div>
+  <h2 data-en="Phylum distribution">Phylum 분포</h2>
+  <div class="sub" data-en="All 7,477 papers split across 13 Phyla + Editorial + Unclassified">전체 7,477편을 13 Phylum + Editorial + Unclassified로 분류한 결과</div>
 
   <div class="phylum-bar"><span class="phylum-name">Manipulation</span><div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:100%; background:#2ca02c;"></div></div><span class="phylum-count">934 · 12.5%</span></div>
   <div class="phylum-bar"><span class="phylum-name">Locomotion</span><div class="phylum-bar-track"><div class="phylum-bar-fill" style="width:90.2%; background:#98df8a;"></div></div><span class="phylum-count">842 · 11.3%</span></div>
@@ -729,6 +761,11 @@
     <label for="tab-b" class="tab-label">📊&nbsp; Time Series</label>
     <label for="tab-c" class="tab-label">🌳&nbsp; Phylogenetic Tree</label>
     <label for="tab-i" class="tab-label">📍&nbsp; Quantitative Insights</label>
+    <span class="tab-spacer"></span>
+    <span class="lang-toggle" id="lang-toggle">
+      <button data-lang="ko" class="active">한국어</button>
+      <button data-lang="en">English</button>
+    </span>
   </div>
 </div>
 
@@ -740,21 +777,21 @@
 
 <!-- PLOT 1 -->
 <section class="card">
-  <h2><span class="num">PLOT 1</span> Phylum × 연도 stack chart</h2>
-  <p class="desc">X = 1988~2025, Y = 연간 논문 수 (stacked). 색 = 13개 Phylum + Editorial + Unclassified. 호버 시 정확한 카운트 표시.</p>
+  <h2><span class="num">PLOT 1</span> <span data-en="Phylum × year stack chart">Phylum × 연도 stack chart</span></h2>
+  <p class="desc" data-en="X = 1988~2025, Y = papers per year (stacked). Colour = 13 Phyla + Editorial + Unclassified. Hover for exact counts.">X = 1988~2025, Y = 연간 논문 수 (stacked). 색 = 13개 Phylum + Editorial + Unclassified. 호버 시 정확한 카운트 표시.</p>
   <div class="links">
     <a href="eda/interactive/01_phylum_stack.html" target="_blank">🖱️ Open in new tab</a>
     <a href="eda/figures/01_phylum_stack.png" target="_blank">📷 PNG download</a>
   </div>
   <iframe src="eda/interactive/01_phylum_stack.html" style="height:650px;"></iframe>
   <details open>
-    <summary>📍 보이는 패턴 + 데이터 사실</summary>
+    <summary data-en="📍 Patterns + facts in the data">📍 보이는 패턴 + 데이터 사실</summary>
     <ul>
-      <li><strong>2004년 점프</strong> — T-RO + IJRR 합쳐지면서 대폭 증가</li>
-      <li><strong>2017~2020년 정체기</strong> 후 <strong>2021년부터 다시 폭발</strong> — RSS 확대 + AI 시대</li>
-      <li class="quant"><strong>📊 최근 5년 성장률 TOP 3 Phylum</strong>: Learning for Robotics <strong>+95.6%</strong> (113→221), Multi-Robot Systems <strong>+72.6%</strong>, Manipulation <strong>+57.6%</strong>. 반대로 Theoretical Foundations <strong>−13.7%</strong>로 감소.</li>
-      <li class="quant"><strong>📊 Peak year</strong>: 13개 Phylum 중 <strong>11개가 2024년 또는 2025년에 피크</strong> 도달.</li>
-      <li class="quant"><strong>📊 가장 일찍 등장한 Phylum</strong>: Theoretical Foundations / Manipulation / Locomotion 등 <strong>1988년부터</strong>. Robot Software &amp; Architecture는 1989년이지만 30년간 미미.</li>
+      <li data-en="<strong>2004 jump</strong> — sharp increase as T-RO and IJRR were merged"><strong>2004년 점프</strong> — T-RO + IJRR 합쳐지면서 대폭 증가</li>
+      <li data-en="<strong>2017~2020 plateau</strong> followed by <strong>another explosion from 2021</strong> — RSS expansion + the AI era"><strong>2017~2020년 정체기</strong> 후 <strong>2021년부터 다시 폭발</strong> — RSS 확대 + AI 시대</li>
+      <li class="quant" data-en="<strong>📊 Top-3 Phyla by 5-year growth rate</strong>: Learning for Robotics <strong>+95.6%</strong> (113→221), Multi-Robot Systems <strong>+72.6%</strong>, Manipulation <strong>+57.6%</strong>. The only decliner: Theoretical Foundations <strong>−13.7%</strong>."><strong>📊 최근 5년 성장률 TOP 3 Phylum</strong>: Learning for Robotics <strong>+95.6%</strong> (113→221), Multi-Robot Systems <strong>+72.6%</strong>, Manipulation <strong>+57.6%</strong>. 반대로 Theoretical Foundations <strong>−13.7%</strong>로 감소.</li>
+      <li class="quant" data-en="<strong>📊 Peak year</strong>: <strong>11 of 13 Phyla peak in 2024 or 2025</strong>."><strong>📊 Peak year</strong>: 13개 Phylum 중 <strong>11개가 2024년 또는 2025년에 피크</strong> 도달.</li>
+      <li class="quant" data-en="<strong>📊 Earliest-appearing Phyla</strong>: Theoretical Foundations / Manipulation / Locomotion etc. <strong>from 1988</strong>. Robot Software &amp; Architecture appears in 1989 but stays marginal for 30 years."><strong>📊 가장 일찍 등장한 Phylum</strong>: Theoretical Foundations / Manipulation / Locomotion 등 <strong>1988년부터</strong>. Robot Software &amp; Architecture는 1989년이지만 30년간 미미.</li>
     </ul>
   </details>
 </section>
@@ -762,42 +799,42 @@
 <!-- PLOT 2 -->
 <section class="card">
   <h2><span class="num">PLOT 2</span> Per-Phylum small multiples</h2>
-  <p class="desc">13 Phylum 각각에 대해 패널 1개. 각 패널 안에서 top 8 Class가 stacked area. 패널마다 Phylum 색으로 제목 표시.</p>
+  <p class="desc" data-en="One panel per Phylum. Inside each panel, the top 8 Classes are shown as a stacked area. Each panel title is tinted with that Phylum's colour.">13 Phylum 각각에 대해 패널 1개. 각 패널 안에서 top 8 Class가 stacked area. 패널마다 Phylum 색으로 제목 표시.</p>
   <div class="links">
     <a href="eda/interactive/02_phylum_small_multiples.html" target="_blank">🖱️ Open in new tab</a>
     <a href="eda/figures/02_phylum_small_multiples.png" target="_blank">📷 PNG download</a>
   </div>
   <iframe src="eda/interactive/02_phylum_small_multiples.html" style="height:1350px;"></iframe>
   <details>
-    <summary>📍 보이는 패턴 + 데이터 사실</summary>
+    <summary data-en="📍 Patterns + facts in the data">📍 보이는 패턴 + 데이터 사실</summary>
     <ul>
-      <li><strong>SLAM &amp; Localization</strong>: 2005년경 SLAM Class 폭발 (FastSLAM/GraphSLAM era)</li>
-      <li><strong>Locomotion</strong>: 2010년 이후 Aerial이 Legged를 따라잡음 (드론 시대)</li>
-      <li><strong>Learning for Robotics</strong>: 2017년부터 등장, 2022~2025년 Foundation Models 폭발</li>
-      <li><strong>Theoretical Foundations</strong>: 1990년대 dominant, 2010년 이후 비중 감소 — 5년 성장률 <strong>−13.7%</strong>로 유일하게 마이너스</li>
-      <li class="quant"><strong>📊 인용수 챔피언</strong>: SLAM &amp; Localization과 Locomotion이 평균 <strong>×1.26</strong> (전체 mean 67.7 대비). Robot Design &amp; Hardware <strong>×1.23</strong>.</li>
-      <li class="quant"><strong>📊 인용수 약자</strong>: Theoretical Foundations <strong>×0.66</strong>, Learning for Robotics <strong>×0.70</strong> — Learning은 인기 폭발했지만 평균 인용 낮음 (대부분 최근 논문).</li>
+      <li data-en="<strong>SLAM &amp; Localization</strong>: SLAM Class explodes around 2005 (FastSLAM/GraphSLAM era)"><strong>SLAM &amp; Localization</strong>: 2005년경 SLAM Class 폭발 (FastSLAM/GraphSLAM era)</li>
+      <li data-en="<strong>Locomotion</strong>: after 2010, Aerial catches up with Legged (drone era)"><strong>Locomotion</strong>: 2010년 이후 Aerial이 Legged를 따라잡음 (드론 시대)</li>
+      <li data-en="<strong>Learning for Robotics</strong>: emerges in 2017, Foundation Models explode 2022~2025"><strong>Learning for Robotics</strong>: 2017년부터 등장, 2022~2025년 Foundation Models 폭발</li>
+      <li data-en="<strong>Theoretical Foundations</strong>: dominant in the 1990s, share shrinks after 2010 — the only Phylum with a negative 5-year growth rate, <strong>−13.7%</strong>"><strong>Theoretical Foundations</strong>: 1990년대 dominant, 2010년 이후 비중 감소 — 5년 성장률 <strong>−13.7%</strong>로 유일하게 마이너스</li>
+      <li class="quant" data-en="<strong>📊 Citation champions</strong>: SLAM &amp; Localization and Locomotion average <strong>×1.26</strong> the overall mean (67.7). Robot Design &amp; Hardware <strong>×1.23</strong>."><strong>📊 인용수 챔피언</strong>: SLAM &amp; Localization과 Locomotion이 평균 <strong>×1.26</strong> (전체 mean 67.7 대비). Robot Design &amp; Hardware <strong>×1.23</strong>.</li>
+      <li class="quant" data-en="<strong>📊 Citation laggards</strong>: Theoretical Foundations <strong>×0.66</strong>, Learning for Robotics <strong>×0.70</strong> — Learning exploded in popularity but its citation average stays low (most papers are very recent)."><strong>📊 인용수 약자</strong>: Theoretical Foundations <strong>×0.66</strong>, Learning for Robotics <strong>×0.70</strong> — Learning은 인기 폭발했지만 평균 인용 낮음 (대부분 최근 논문).</li>
     </ul>
   </details>
 </section>
 
 <!-- PLOT 3 -->
 <section class="card">
-  <h2><span class="num">PLOT 3</span> Class heatmap (전체 100 Class × 연도)</h2>
-  <p class="desc">행 = 모든 Class (Phylum 그룹 순서), 열 = 3년 bucket. 색 = log10(1 + 논문 수). 호버 시 Class 이름 + 정확한 카운트.</p>
+  <h2><span class="num">PLOT 3</span> <span data-en="Class heatmap (all 100 Classes × year)">Class heatmap (전체 100 Class × 연도)</span></h2>
+  <p class="desc" data-en="Rows = every Class (grouped by Phylum), columns = 3-year buckets. Colour = log10(1 + paper count). Hover for Class name + exact count.">행 = 모든 Class (Phylum 그룹 순서), 열 = 3년 bucket. 색 = log10(1 + 논문 수). 호버 시 Class 이름 + 정확한 카운트.</p>
   <div class="links">
     <a href="eda/interactive/03_class_heatmap.html" target="_blank">🖱️ Open in new tab</a>
     <a href="eda/figures/03_class_heatmap.png" target="_blank">📷 PNG download</a>
   </div>
   <iframe src="eda/interactive/03_class_heatmap.html" style="height:1500px;"></iframe>
   <details>
-    <summary>📍 보이는 패턴 + 데이터 사실</summary>
+    <summary data-en="📍 Patterns + facts in the data">📍 보이는 패턴 + 데이터 사실</summary>
     <ul>
-      <li><strong>상시 활성</strong>: SLAM, Path/Motion Planning, Grasping, Bipedal — 모든 시대 빨강</li>
-      <li><strong>최근 부상</strong>: Foundation Models, Diffusion Policies, Aerial Swarms, 3D Scene Graph — 오른쪽 끝만 빨강</li>
-      <li class="quant"><strong>📊 정말 사라진 Class</strong>: <strong>Visual Servoing</strong> (50→4편, 잔존 8%), <strong>Computational Biology Robotics</strong> (28→0편, 완전 소멸).</li>
-      <li class="quant"><strong>📊 2020-2025 핫 Class TOP 3</strong>: Path/Motion Planning (178), Multi-Robot Coordination (111), Contact-rich Manipulation (105).</li>
-      <li class="quant"><strong>📊 Top 10에 Foundation Models</strong> 진입 (10위, 70편) — 2022년 이전엔 존재 자체가 없었던 카테고리.</li>
+      <li data-en="<strong>Always active</strong>: SLAM, Path/Motion Planning, Grasping, Bipedal — red across every era"><strong>상시 활성</strong>: SLAM, Path/Motion Planning, Grasping, Bipedal — 모든 시대 빨강</li>
+      <li data-en="<strong>Recent risers</strong>: Foundation Models, Diffusion Policies, Aerial Swarms, 3D Scene Graph — only the rightmost columns are red"><strong>최근 부상</strong>: Foundation Models, Diffusion Policies, Aerial Swarms, 3D Scene Graph — 오른쪽 끝만 빨강</li>
+      <li class="quant" data-en="<strong>📊 Genuinely faded Classes</strong>: <strong>Visual Servoing</strong> (50→4 papers, 8% remaining), <strong>Computational Biology Robotics</strong> (28→0, completely gone)."><strong>📊 정말 사라진 Class</strong>: <strong>Visual Servoing</strong> (50→4편, 잔존 8%), <strong>Computational Biology Robotics</strong> (28→0편, 완전 소멸).</li>
+      <li class="quant" data-en="<strong>📊 Hottest Classes 2020-2025 TOP 3</strong>: Path/Motion Planning (178), Multi-Robot Coordination (111), Contact-rich Manipulation (105)."><strong>📊 2020-2025 핫 Class TOP 3</strong>: Path/Motion Planning (178), Multi-Robot Coordination (111), Contact-rich Manipulation (105).</li>
+      <li class="quant" data-en="<strong>📊 Foundation Models breaks into the Top 10</strong> (#10, 70 papers) — a category that didn't exist before 2022."><strong>📊 Top 10에 Foundation Models</strong> 진입 (10위, 70편) — 2022년 이전엔 존재 자체가 없었던 카테고리.</li>
     </ul>
   </details>
 </section>
@@ -805,21 +842,21 @@
 <!-- PLOT 4 -->
 <section class="card">
   <h2><span class="num">PLOT 4</span> Top 12 Class drill-down</h2>
-  <p class="desc">가장 큰 12개 Class에 대해 각각 mini panel. 내부에서 top 6 Order가 stacked area. 호버로 Order 이름 + 카운트 확인.</p>
+  <p class="desc" data-en="A mini panel for each of the 12 largest Classes. Inside each, the top 6 Orders form a stacked area. Hover to see Order names + counts.">가장 큰 12개 Class에 대해 각각 mini panel. 내부에서 top 6 Order가 stacked area. 호버로 Order 이름 + 카운트 확인.</p>
   <div class="links">
     <a href="eda/interactive/04_top_classes_drill.html" target="_blank">🖱️ Open in new tab</a>
     <a href="eda/figures/04_top_classes_drill.png" target="_blank">📷 PNG download</a>
   </div>
   <iframe src="eda/interactive/04_top_classes_drill.html" style="height:1150px;"></iframe>
   <details>
-    <summary>📍 보이는 패턴 + 데이터 사실</summary>
+    <summary data-en="📍 Patterns + facts in the data">📍 보이는 패턴 + 데이터 사실</summary>
     <ul>
-      <li><strong>SLAM</strong>: General SLAM (초기) → Visual SLAM/Odometry (2010년대) → LIO/VIO/Multi-modal (최근)</li>
-      <li><strong>Path/Motion Planning</strong>: Sampling-based (RRT) → 다양화 → Trajectory Optimization 부상</li>
-      <li><strong>Grasping</strong>: 2010년대 중반부터 Learning-based가 Force-Closure를 추월</li>
-      <li><strong>Bipedal</strong>: ZMP → HZD → Sim-to-Real RL로 패러다임 전환</li>
-      <li class="quant"><strong>📊 패러다임 전환 첫 논문</strong>: <strong>VLA · Diffusion Policy · Foundation Models 모두 2023년 첫 등장</strong>. <strong>3D Gaussian Splatting SLAM 2024년</strong>. 모두 동시기에 폭발.</li>
-      <li class="quant"><strong>📊 Sim-to-Real Legged</strong>: 2018년 첫 등장, 2021-2025에 누적 18편 — 단 4년만에 표준 패러다임화.</li>
+      <li data-en="<strong>SLAM</strong>: General SLAM (early) → Visual SLAM/Odometry (2010s) → LIO/VIO/Multi-modal (recent)"><strong>SLAM</strong>: General SLAM (초기) → Visual SLAM/Odometry (2010년대) → LIO/VIO/Multi-modal (최근)</li>
+      <li data-en="<strong>Path/Motion Planning</strong>: Sampling-based (RRT) → diversification → Trajectory Optimization on the rise"><strong>Path/Motion Planning</strong>: Sampling-based (RRT) → 다양화 → Trajectory Optimization 부상</li>
+      <li data-en="<strong>Grasping</strong>: from the mid-2010s, Learning-based overtakes Force-Closure"><strong>Grasping</strong>: 2010년대 중반부터 Learning-based가 Force-Closure를 추월</li>
+      <li data-en="<strong>Bipedal</strong>: paradigm shift from ZMP → HZD → Sim-to-Real RL"><strong>Bipedal</strong>: ZMP → HZD → Sim-to-Real RL로 패러다임 전환</li>
+      <li class="quant" data-en="<strong>📊 First papers of paradigm shifts</strong>: <strong>VLA · Diffusion Policy · Foundation Models all debut in 2023</strong>. <strong>3D Gaussian Splatting SLAM in 2024</strong>. All explode in the same window."><strong>📊 패러다임 전환 첫 논문</strong>: <strong>VLA · Diffusion Policy · Foundation Models 모두 2023년 첫 등장</strong>. <strong>3D Gaussian Splatting SLAM 2024년</strong>. 모두 동시기에 폭발.</li>
+      <li class="quant" data-en="<strong>📊 Sim-to-Real Legged</strong>: first appears in 2018, 18 cumulative papers in 2021-2025 — standardised as a paradigm in just 4 years."><strong>📊 Sim-to-Real Legged</strong>: 2018년 첫 등장, 2021-2025에 누적 18편 — 단 4년만에 표준 패러다임화.</li>
     </ul>
   </details>
 </section>
@@ -833,19 +870,19 @@
 <!-- Radial Tree (pie chart, search-enabled) -->
 <section class="card">
   <h2>🥧 Radial Tree (D3.js)</h2>
-  <p class="desc">생물 계통도 파이 차트. <strong>사이드바 검색</strong>으로 단어가 들어간 wedge들을 한꺼번에 하이라이트. <strong>호버</strong>로 강조, <strong>클릭</strong>으로 계열 선택 후 <kbd>←→↑↓</kbd>로 탐색.</p>
+  <p class="desc" data-en="A phylogenetic-style pie chart. <strong>Sidebar search</strong> highlights every wedge containing the keyword at once. <strong>Hover</strong> to emphasise, <strong>click</strong> to focus a lineage, then use <kbd>←→↑↓</kbd> to navigate.">생물 계통도 파이 차트. <strong>사이드바 검색</strong>으로 단어가 들어간 wedge들을 한꺼번에 하이라이트. <strong>호버</strong>로 강조, <strong>클릭</strong>으로 계열 선택 후 <kbd>←→↑↓</kbd>로 탐색.</p>
   <div class="links">
     <a href="eda/interactive/05_phylogeny_radial_web.html" target="_blank">🖱️ Open in new tab (full screen)</a>
   </div>
   <iframe id="iframe-radial" src="eda/interactive/05_phylogeny_radial_web.html"></iframe>
   <details open>
-    <summary>📍 사용법 + 추천 탐색</summary>
+    <summary data-en="📍 How to use + suggested exploration">📍 사용법 + 추천 탐색</summary>
     <ul>
-      <li><strong>🔍 검색</strong> → 단어를 입력하거나 추천 칩(↻로 갱신)을 클릭. 매칭된 wedge에 주황 glow + 사이드바에 결과 리스트.</li>
-      <li><strong>결과 클릭</strong> → 해당 wedge로 점프, 계열(조상+후손) lineage 하이라이트.</li>
-      <li><strong>호버</strong> → wedge 두꺼워짐 + 사이드바 HOVER 카드.</li>
-      <li><strong>←/→</strong> = 형제, <strong>↑</strong> = 부모, <strong>↓</strong> = 첫 자식 (가장 큰 child부터)</li>
-      <li class="quant"><strong>📊 추천 탐색</strong>: <em>Manipulation → Contact-rich → Deformable Object</em>의 Genus까지 들어가보면 Cloth/Garment vs Rope/Cable vs Liquid 비중 비교 가능</li>
+      <li data-en="<strong>🔍 Search</strong> → type a word or click a suggestion chip (↻ refreshes). Matching wedges get an orange glow; the sidebar lists every match."><strong>🔍 검색</strong> → 단어를 입력하거나 추천 칩(↻로 갱신)을 클릭. 매칭된 wedge에 주황 glow + 사이드바에 결과 리스트.</li>
+      <li data-en="<strong>Click a result</strong> → jump to that wedge with full lineage (ancestors + descendants) highlighted."><strong>결과 클릭</strong> → 해당 wedge로 점프, 계열(조상+후손) lineage 하이라이트.</li>
+      <li data-en="<strong>Hover</strong> → wedge thickens, HOVER card appears in the sidebar."><strong>호버</strong> → wedge 두꺼워짐 + 사이드바 HOVER 카드.</li>
+      <li data-en="<strong>←/→</strong> = siblings, <strong>↑</strong> = parent, <strong>↓</strong> = first child (largest first)"><strong>←/→</strong> = 형제, <strong>↑</strong> = 부모, <strong>↓</strong> = 첫 자식 (가장 큰 child부터)</li>
+      <li class="quant" data-en="<strong>📊 Suggested path</strong>: drill <em>Manipulation → Contact-rich → Deformable Object</em> down to Genus to compare Cloth/Garment vs Rope/Cable vs Liquid shares."><strong>📊 추천 탐색</strong>: <em>Manipulation → Contact-rich → Deformable Object</em>의 Genus까지 들어가보면 Cloth/Garment vs Rope/Cable vs Liquid 비중 비교 가능</li>
     </ul>
   </details>
 </section>
@@ -853,19 +890,19 @@
 <!-- Horizontal Collapsible Tree -->
 <section class="card">
   <h2>🌳 Horizontal Collapsible Tree (D3.js)</h2>
-  <p class="desc">왼쪽 root에서 오른쪽으로 가지치는 전형적 phylogenetic tree. 노드 또는 라벨 클릭으로 펼치기/접기. 기본은 Phylum까지만 펼쳐져 있고 더 깊이 들어가려면 클릭하거나 사이드바 버튼 사용.</p>
+  <p class="desc" data-en="A classic phylogenetic tree branching from root (left) to leaves (right). Click any node or its label to expand/collapse. The default opens to Phylum only — go deeper by clicking or using the sidebar buttons.">왼쪽 root에서 오른쪽으로 가지치는 전형적 phylogenetic tree. 노드 또는 라벨 클릭으로 펼치기/접기. 기본은 Phylum까지만 펼쳐져 있고 더 깊이 들어가려면 클릭하거나 사이드바 버튼 사용.</p>
   <div class="links">
     <a href="eda/interactive/06_phylogeny_tree_web.html" target="_blank">🖱️ Open in new tab (full screen)</a>
   </div>
   <iframe src="eda/interactive/06_phylogeny_tree_web.html" style="height:850px;"></iframe>
   <details>
-    <summary>📍 사용법</summary>
+    <summary data-en="📍 How to use">📍 사용법</summary>
     <ul>
-      <li><strong>노드/라벨 클릭</strong> → 자식 펼치기/접기 + focus 선택 (해당 lineage 강조, 나머지 dim)</li>
-      <li><strong>호버</strong> → 사이드바 HOVER 카드에 정보 표시 (실시간)</li>
-      <li><strong>↑/↓</strong> = 같은 부모의 형제 노드로 이동, <strong>←</strong> = 접기, <strong>→</strong> = 펼치기, <strong>Esc</strong> = 해제</li>
-      <li>사이드바 버튼: <strong>L2까지</strong> = 모든 Class 펼침, <strong>L3까지</strong> = Order까지, <strong>전부 접기</strong> = Phylum만</li>
-      <li>파란 외곽 동그라미가 있는 노드 = 접힌 자식이 있음을 의미</li>
+      <li data-en="<strong>Click a node or label</strong> → expand/collapse + focus selection (the lineage stays bright, the rest dims)"><strong>노드/라벨 클릭</strong> → 자식 펼치기/접기 + focus 선택 (해당 lineage 강조, 나머지 dim)</li>
+      <li data-en="<strong>Hover</strong> → live HOVER card in the sidebar"><strong>호버</strong> → 사이드바 HOVER 카드에 정보 표시 (실시간)</li>
+      <li data-en="<strong>↑/↓</strong> = sibling navigation, <strong>←</strong> = collapse, <strong>→</strong> = expand, <strong>Esc</strong> = clear focus"><strong>↑/↓</strong> = 같은 부모의 형제 노드로 이동, <strong>←</strong> = 접기, <strong>→</strong> = 펼치기, <strong>Esc</strong> = 해제</li>
+      <li data-en="Sidebar buttons: <strong>To L2</strong> = expand every Class, <strong>To L3</strong> = expand to Order, <strong>Collapse all</strong> = back to Phylum">사이드바 버튼: <strong>L2까지</strong> = 모든 Class 펼침, <strong>L3까지</strong> = Order까지, <strong>전부 접기</strong> = Phylum만</li>
+      <li data-en="A blue ring around a node = it has hidden children">파란 외곽 동그라미가 있는 노드 = 접힌 자식이 있음을 의미</li>
     </ul>
   </details>
 </section>
@@ -878,8 +915,8 @@
 
 <!-- Insight 1 -->
 <section class="card">
-  <h2><span class="num">📊 #1</span> Phylum별 출현 · 피크 · 5년 성장률</h2>
-  <p class="desc">전체 7,477편 중 13 Phylum 각각의 첫 등장 연도, 피크 연도/논문 수, 그리고 2016-20 → 2021-25 5년 성장률.</p>
+  <h2><span class="num">📊 #1</span> <span data-en="First appearance · peak · 5-year growth, by Phylum">Phylum별 출현 · 피크 · 5년 성장률</span></h2>
+  <p class="desc" data-en="For each of the 13 Phyla (out of 7,477 papers): year of first appearance, peak year/count, and 2016-20 → 2021-25 5-year growth.">전체 7,477편 중 13 Phylum 각각의 첫 등장 연도, 피크 연도/논문 수, 그리고 2016-20 → 2021-25 5년 성장률.</p>
   <table class="insight">
     <thead><tr><th>Phylum</th><th>Total</th><th>First</th><th>Peak</th><th>2016-20</th><th>2021-25</th><th>Growth</th></tr></thead>
     <tbody>
@@ -898,15 +935,15 @@
       <tr><td>Robot Software &amp; Architecture</td><td class="num">30</td><td class="num">1989</td><td class="num">2024 (5)</td><td class="num">3</td><td class="num">8</td><td class="num pos">+166.7%</td></tr>
     </tbody>
   </table>
-  <div class="insight-card">
+  <div class="insight-card" data-en="<strong>Headline</strong>: <strong>Theoretical Foundations is the only Phylum with negative growth</strong>. The other 12 all grow from 2016-20 to 2021-25. Fastest grower: <strong>Learning for Robotics +95.6%</strong> (the RL / IL / VLA / Diffusion explosion).">
     <strong>핵심 사실</strong>: <strong>Theoretical Foundations만 마이너스 성장</strong>. 나머지 12 Phylum은 모두 2021-25에서 2016-20 대비 증가. 가장 빠른 성장은 <strong>Learning for Robotics +95.6%</strong> (RL/IL/VLA/Diffusion 폭발의 결과).
   </div>
 </section>
 
 <!-- Insight 2 -->
 <section class="card">
-  <h2><span class="num">📊 #2</span> 2020-2025 가장 핫한 Class TOP 10</h2>
-  <p class="desc">최근 5년간 논문 수 기준 Top 10 Class.</p>
+  <h2><span class="num">📊 #2</span> <span data-en="Hottest Classes 2020-2025 (TOP 10)">2020-2025 가장 핫한 Class TOP 10</span></h2>
+  <p class="desc" data-en="Top 10 Classes by paper count in the last 5 years.">최근 5년간 논문 수 기준 Top 10 Class.</p>
   <table class="insight">
     <thead><tr><th>#</th><th>Phylum</th><th>Class</th><th>Papers</th></tr></thead>
     <tbody>
@@ -922,15 +959,15 @@
       <tr><td>10</td><td>Learning for Robotics</td><td>Foundation Models</td><td class="num">70</td></tr>
     </tbody>
   </table>
-  <div class="insight-card">
+  <div class="insight-card" data-en="<strong>Headline</strong>: <strong>Foundation Models hit the Top 10 in just three years</strong>. A category that didn't exist before 2022 reached 70 papers, surpassing Grasping.">
     <strong>핵심 사실</strong>: <strong>Foundation Models가 등장 3년만에 Top 10</strong>. 2022년까지 존재하지 않던 카테고리가 70편으로 Grasping을 넘어섬.
   </div>
 </section>
 
 <!-- Insight 3 -->
 <section class="card">
-  <h2><span class="num">📊 #3</span> 사라진 분야 (Pre-2015 ≥ 20편 → Post-2020 ≤ 10%)</h2>
-  <p class="desc">한때 활발했지만 최근 거의 사라진 Class.</p>
+  <h2><span class="num">📊 #3</span> <span data-en="Faded categories (Pre-2015 ≥ 20 papers → Post-2020 ≤ 10% retained)">사라진 분야 (Pre-2015 ≥ 20편 → Post-2020 ≤ 10%)</span></h2>
+  <p class="desc" data-en="Classes once active but nearly extinct now.">한때 활발했지만 최근 거의 사라진 Class.</p>
   <table class="insight">
     <thead><tr><th>Phylum &gt; Class</th><th>Pre-2015</th><th>Post-2020</th><th>Retain</th></tr></thead>
     <tbody>
@@ -938,15 +975,15 @@
       <tr><td>Application &gt; Computational Biology Robotics</td><td class="num">28</td><td class="num">0</td><td class="num neg">0.0%</td></tr>
     </tbody>
   </table>
-  <div class="insight-card">
+  <div class="insight-card" data-en="<strong>Headline</strong>: <strong>Visual Servoing was a 90s–2000s control staple, then was absorbed by learning-based control / end-to-end policies</strong>. Computational Biology Robotics (multiple IJRR special issues) is completely gone after 2015.">
     <strong>핵심 사실</strong>: <strong>Visual Servoing은 90년대-2000년대 control 핵심 주제였지만 학습 기반 제어/end-to-end 정책이 흡수</strong>. Computational Biology Robotics(IJRR 특집호 다수)는 2015년 이후 완전 소멸.
   </div>
 </section>
 
 <!-- Insight 4 -->
 <section class="card">
-  <h2><span class="num">📊 #4</span> 신생 카테고리 첫 등장 연도</h2>
-  <p class="desc">키워드 매칭으로 각 핫 카테고리의 first paper year + 누적 카운트.</p>
+  <h2><span class="num">📊 #4</span> <span data-en="First-appearance year of emerging categories">신생 카테고리 첫 등장 연도</span></h2>
+  <p class="desc" data-en="Keyword-matched first-paper year + cumulative count for each hot category.">키워드 매칭으로 각 핫 카테고리의 first paper year + 누적 카운트.</p>
   <table class="insight">
     <thead><tr><th>Category</th><th>First year</th><th>Total</th><th>2021-25 cum</th></tr></thead>
     <tbody>
@@ -962,7 +999,7 @@
       <tr><td>Humanoid Whole-Body Control</td><td class="num">2025</td><td class="num">4</td><td class="num">4</td></tr>
     </tbody>
   </table>
-  <div class="insight-card">
+  <div class="insight-card" data-en="<strong>Headline</strong>: <strong>VLA / Diffusion Policy / Foundation Models all debut in 2023</strong>. That single year is the inflection point of modern robot learning.">
     <strong>핵심 사실</strong>: <strong>VLA / Diffusion Policy / Foundation Models 셋 모두 2023년 동시 등장</strong>. 그 한 해가 modern robot learning의 분기점.
   </div>
 </section>
@@ -970,7 +1007,7 @@
 <!-- Insight 5 -->
 <section class="card">
   <h2><span class="num">📊 #5</span> Top-cited paper per Phylum</h2>
-  <p class="desc">각 Phylum의 최다 인용 논문 (시간 보정 X).</p>
+  <p class="desc" data-en="The single most-cited paper in each Phylum (no time normalisation).">각 Phylum의 최다 인용 논문 (시간 보정 X).</p>
   <table class="insight">
     <thead><tr><th>Phylum</th><th>Cites</th><th>Year</th><th>Title</th></tr></thead>
     <tbody>
@@ -985,15 +1022,15 @@
       <tr><td>Theoretical Foundations</td><td class="num">394</td><td class="num">2007</td><td>Gaussian Processes for Signal Strength-Based Location Estimation</td></tr>
     </tbody>
   </table>
-  <div class="insight-card">
+  <div class="insight-card" data-en="<strong>Headline</strong>: <strong>Papers published 2006-2011 dominate the top-cited slot of nearly every Phylum</strong> — citation accumulation effect. The single most-cited paper is <strong>Saxena et al. (2008) — 943 cites</strong>.">
     <strong>핵심 사실</strong>: <strong>2006-2011년 사이 출판된 논문이 거의 모든 Phylum의 top-cited 차지</strong>. 인용 누적 시간 효과. 가장 인용 많은 단일 논문은 <strong>Saxena et al. (2008) — 943 cites</strong>.
   </div>
 </section>
 
 <!-- Insight 6 -->
 <section class="card">
-  <h2><span class="num">📊 #6</span> 저널별 색깔 (T-RO vs IJRR vs RSS)</h2>
-  <p class="desc">각 저널의 Phylum 비중 (%).</p>
+  <h2><span class="num">📊 #6</span> <span data-en="Per-venue character (T-RO vs IJRR vs RSS)">저널별 색깔 (T-RO vs IJRR vs RSS)</span></h2>
+  <p class="desc" data-en="Each journal's Phylum mix (%).">각 저널의 Phylum 비중 (%).</p>
   <table class="insight">
     <thead><tr><th>Venue</th><th>Top 1</th><th>Top 2</th><th>Top 3</th></tr></thead>
     <tbody>
@@ -1002,15 +1039,15 @@
       <tr><td><strong>RSS</strong></td><td>Planning (14.1%)</td><td>Learning for Robotics (13.1%)</td><td>Manipulation (12.0%)</td></tr>
     </tbody>
   </table>
-  <div class="insight-card">
+  <div class="insight-card" data-en="<strong>Headline</strong>: <strong>RSS is 13.1% Learning — about 3× the other journals</strong>. The data confirms RSS as the hub of the modern AI era. T-RO leans hardware/design; IJRR leans algorithms.">
     <strong>핵심 사실</strong>: <strong>RSS는 Learning 13.1% — 다른 저널의 약 3배</strong>. RSS가 modern AI 시대의 hub임을 데이터로 확인. T-RO는 hardware/design, IJRR은 알고리즘 위주.
   </div>
 </section>
 
 <!-- Insight 7 -->
 <section class="card">
-  <h2><span class="num">📊 #7</span> Phylum별 인용수 정규화</h2>
-  <p class="desc">각 Phylum의 평균 인용 vs 전체 평균 (67.7).</p>
+  <h2><span class="num">📊 #7</span> <span data-en="Citation normalisation per Phylum">Phylum별 인용수 정규화</span></h2>
+  <p class="desc" data-en="Each Phylum's mean citations vs the overall mean (67.7).">각 Phylum의 평균 인용 vs 전체 평균 (67.7).</p>
   <table class="insight">
     <thead><tr><th>Phylum</th><th>Mean</th><th>Median</th><th>× overall</th></tr></thead>
     <tbody>
@@ -1029,7 +1066,7 @@
       <tr><td>Theoretical Foundations</td><td class="num">44.8</td><td class="num">21</td><td class="num neg">×0.66</td></tr>
     </tbody>
   </table>
-  <div class="insight-card">
+  <div class="insight-card" data-en="<strong>Headline</strong>: <strong>Learning for Robotics has mean ×0.70 but median 9</strong> (vs overall median 32). Most papers are too recent for citations to accumulate. Meanwhile <strong>SLAM/Locomotion/Hardware sit at ×1.26</strong>, high impact. <strong>“Popular” and “influential” are not the same thing</strong>.">
     <strong>핵심 사실</strong>: <strong>Learning for Robotics는 평균 ×0.70인데 median은 9</strong> (전체 median 32). 대부분이 너무 최신이라 인용 누적 시간 부족. 반면 <strong>SLAM/Locomotion/Hardware는 ×1.26</strong>의 높은 영향력. <strong>"인기"와 "영향력"은 다르다</strong>.
   </div>
 </section>
@@ -1046,17 +1083,16 @@
 </footer>
 
 <script>
-  // URL ↔ state sync. Two pieces of state live in the hash:
+  // URL ↔ state sync. Three pieces of state live in the hash:
   //   tab=<time|tree|insights>     active tab (default: tree)
   //   node=<Phylum/Class/...>      focused node in the radial viewer
-  // Sharing the URL restores both.
+  //   lang=<en>                    UI language (default: ko)
+  // Sharing the URL restores all three.
   (function() {
     var TAB_TO_HASH = { 'tab-b': 'time', 'tab-c': 'tree', 'tab-i': 'insights' };
     var HASH_TO_TAB = { 'time': 'tab-b', 'tree': 'tab-c', 'insights': 'tab-i' };
 
     function parseHash() {
-      // Returns { tab: 'tree', node: 'Manipulation/Grasping' } from
-      // #tab=tree&node=Manipulation/Grasping (any order, any subset).
       var out = {};
       var raw = (window.location.hash || '').replace(/^#/, '');
       raw.split('&').forEach(function(pair) {
@@ -1071,6 +1107,7 @@
       var pieces = [];
       if (parts.tab)  pieces.push('tab='  + parts.tab);
       if (parts.node) pieces.push('node=' + parts.node);
+      if (parts.lang) pieces.push('lang=' + parts.lang);
       var newHash = pieces.length ? '#' + pieces.join('&') : '';
       if (window.location.hash !== newHash) {
         history.replaceState(null, '',
@@ -1087,6 +1124,46 @@
       }
     }
 
+    // ---- Language ----
+    // Each translatable element has data-en="<English>"; the original
+    // (Korean) markup stays as the default.
+    function applyLang(lang) {
+      var en = lang === 'en';
+      document.documentElement.lang = en ? 'en' : 'ko';
+      // text content
+      document.querySelectorAll('[data-en]').forEach(function(el) {
+        if (el.dataset.ko === undefined) el.dataset.ko = el.innerHTML;
+        el.innerHTML = en ? el.dataset.en : el.dataset.ko;
+      });
+      // attribute swaps (placeholder, title, alt, aria-label)
+      ['placeholder', 'title', 'alt', 'aria-label'].forEach(function(attr) {
+        var dsKey = 'en' + attr.replace(/(^|-)([a-z])/g, function(_, _1, c) { return c.toUpperCase(); });
+        var dsKeyKo = 'ko' + attr.replace(/(^|-)([a-z])/g, function(_, _1, c) { return c.toUpperCase(); });
+        var sel = '[data-' + dsKey.replace(/([A-Z])/g, '-$1').toLowerCase() + ']';
+        document.querySelectorAll(sel).forEach(function(el) {
+          if (el.dataset[dsKeyKo] === undefined) {
+            el.dataset[dsKeyKo] = el.getAttribute(attr) || '';
+          }
+          el.setAttribute(attr, en ? el.dataset[dsKey] : el.dataset[dsKeyKo]);
+        });
+      });
+      // Lang toggle button state
+      document.querySelectorAll('#lang-toggle button').forEach(function(b) {
+        b.classList.toggle('active', b.dataset.lang === (en ? 'en' : 'ko'));
+      });
+      // Forward to embedded iframes (radial + horizontal tree viewers
+      // re-translate their own UI when they receive this message).
+      document.querySelectorAll('iframe').forEach(function(f) {
+        try {
+          f.contentWindow.postMessage(
+            { type: 'phylotree:lang', lang: lang || 'ko' }, '*');
+        } catch (_) { /* cross-origin safe-guard */ }
+      });
+      currentLang = lang === 'en' ? 'en' : 'ko';
+    }
+
+    var currentLang = parseHash().lang === 'en' ? 'en' : 'ko';
+
     // ---- Tab clicks ----
     function getCurrentTabKey() {
       var checked = document.querySelector('.tab-input:checked');
@@ -1094,25 +1171,41 @@
     }
     document.querySelectorAll('.tab-label').forEach(function(label) {
       label.addEventListener('click', function() {
-        // Run after the radio flips
         setTimeout(function() {
           var h = parseHash();
           var key = getCurrentTabKey();
           if (key) h.tab = key;
+          if (currentLang === 'en') h.lang = 'en'; else delete h.lang;
           writeHash(h);
         }, 0);
       });
     });
 
-    // ---- Initial radial-viewer src: forward incoming #node= so the
-    //      iframe boots with the right wedge focused. ----
-    var initialNode = parseHash().node;
-    if (initialNode) {
-      var iframe = document.getElementById('iframe-radial');
-      if (iframe) {
-        iframe.src = iframe.src.split('#')[0] + '#node=' + initialNode;
-      }
-    }
+    // ---- Lang toggle clicks ----
+    document.querySelectorAll('#lang-toggle button').forEach(function(b) {
+      b.addEventListener('click', function() {
+        var lang = b.dataset.lang;
+        applyLang(lang);
+        var h = parseHash();
+        if (lang === 'en') h.lang = 'en'; else delete h.lang;
+        writeHash(h);
+      });
+    });
+
+    // ---- Initial radial-viewer src: forward incoming #node= and
+    //      lang= so the iframe boots already in the right state. ----
+    (function setupIframeBoot() {
+      var p = parseHash();
+      var iframes = document.querySelectorAll('iframe');
+      iframes.forEach(function(iframe) {
+        var hashParts = [];
+        if (iframe.id === 'iframe-radial' && p.node) hashParts.push('node=' + p.node);
+        if (p.lang === 'en') hashParts.push('lang=en');
+        if (hashParts.length) {
+          iframe.src = iframe.src.split('#')[0] + '#' + hashParts.join('&');
+        }
+      });
+    })();
 
     // ---- Bubbled selections from the radial iframe ----
     window.addEventListener('message', function(e) {
@@ -1129,7 +1222,12 @@
 
     // ---- Initial paint + back/forward ----
     applyTabFromHash();
-    window.addEventListener('hashchange', applyTabFromHash);
+    applyLang(currentLang);
+    window.addEventListener('hashchange', function() {
+      applyTabFromHash();
+      var newLang = parseHash().lang === 'en' ? 'en' : 'ko';
+      if (newLang !== currentLang) applyLang(newLang);
+    });
   })();
 </script>
 

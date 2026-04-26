@@ -265,16 +265,16 @@
     <div class="subtitle">Horizontal collapsible tree · 7,477 papers</div>
 
     <div class="help-card">
-      <div class="row"><span>노드 클릭</span><kbd>토글</kbd></div>
-      <div class="row"><span>호버 (정보)</span><kbd>mouse</kbd></div>
-      <div class="row"><span>형제 이동</span><kbd>↑ ↓</kbd></div>
-      <div class="row"><span>한 단계 펼치기</span><kbd>→</kbd></div>
-      <div class="row"><span>한 단계 접기</span><kbd>←</kbd></div>
-      <div class="row"><span>해제</span><kbd>Esc</kbd></div>
+      <div class="row"><span data-en="Click node">노드 클릭</span><kbd data-en="toggle">토글</kbd></div>
+      <div class="row"><span data-en="Hover (info)">호버 (정보)</span><kbd>mouse</kbd></div>
+      <div class="row"><span data-en="Sibling nav">형제 이동</span><kbd>↑ ↓</kbd></div>
+      <div class="row"><span data-en="Expand one step">한 단계 펼치기</span><kbd>→</kbd></div>
+      <div class="row"><span data-en="Collapse one step">한 단계 접기</span><kbd>←</kbd></div>
+      <div class="row"><span data-en="Clear">해제</span><kbd>Esc</kbd></div>
       <div class="btn-row">
-        <button class="btn primary" id="btn-expand-2">L2까지</button>
-        <button class="btn" id="btn-expand-3">L3까지</button>
-        <button class="btn" id="btn-collapse">전부 접기</button>
+        <button class="btn primary" id="btn-expand-2" data-en="To L2">L2까지</button>
+        <button class="btn" id="btn-expand-3" data-en="To L3">L3까지</button>
+        <button class="btn" id="btn-collapse" data-en="Collapse all">전부 접기</button>
       </div>
     </div>
 
@@ -621,8 +621,8 @@ function buildInfoCardHTML(d, sourceLabel, sourceClass) {
   if (!d) {
     return `<div class="info-card"><div class="info-empty">${
       sourceLabel === 'FOCUSED'
-        ? '아무 노드나 클릭하면 여기에 정보가 표시됩니다.'
-        : '노드에 마우스를 올려보세요.'
+        ? t('Click any node to see its info here.', '아무 노드나 클릭하면 여기에 정보가 표시됩니다.')
+        : t('Hover a node.', '노드에 마우스를 올려보세요.')
     }</div></div>`;
   }
   const pct = (d.value / totalPapers * 100).toFixed(2);
@@ -660,6 +660,39 @@ function escapeHTML(s) {
   return String(s).replace(/[&<>"']/g, c =>
     ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 }
+
+
+// ============ i18n ============
+let currentLang = (function() {
+  var m = (window.location.hash || '').match(/[#&]lang=([a-z]+)/);
+  return m && m[1] === 'en' ? 'en' : 'ko';
+})();
+
+function t(en, ko) { return currentLang === 'en' ? en : ko; }
+
+function applyLang(lang) {
+  var en = lang === 'en';
+  document.documentElement.lang = en ? 'en' : 'ko';
+  document.querySelectorAll('[data-en]').forEach(function(el) {
+    if (el.dataset.ko === undefined) el.dataset.ko = el.innerHTML;
+    el.innerHTML = en ? el.dataset.en : el.dataset.ko;
+  });
+  currentLang = en ? 'en' : 'ko';
+  // Re-render dynamic FOCUSED/HOVER cards
+  if (typeof focusedNode !== 'undefined' && focusedNode) {
+    if (typeof renderFocusedPanel === 'function') renderFocusedPanel(focusedNode);
+  } else if (typeof focusedCard !== 'undefined') {
+    if (typeof renderFocusedPanel === 'function') renderFocusedPanel(null);
+  }
+}
+
+applyLang(currentLang);
+
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'phylotree:lang') {
+    applyLang(e.data.lang === 'en' ? 'en' : 'ko');
+  }
+});
 </script>
 </body>
 </html>

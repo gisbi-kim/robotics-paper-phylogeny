@@ -1,4 +1,4 @@
-**언어**: [English](insights.en.md) | 한국어
+**Language**: English | [한국어](insights.md)
 
 # Quantitative Insights
 
@@ -6,7 +6,7 @@ _From 7477 classified papers (1988-2025)._
 
 ---
 
-## 1. Phylum별 출현·피크·성장률
+## 1. Per-Phylum emergence, peak, and growth rate
 
 | Phylum | Total | First | Peak (year, count) | 2016-20 | 2021-25 | Growth |
 |---|---:|---:|---|---:|---:|---:|
@@ -28,7 +28,7 @@ _From 7477 classified papers (1988-2025)._
 
 ## 2. Hot Classes (2020-2025)
 
-**최근 5년 (2021-2025) 최다 논문 Class TOP 10:**
+**Top 10 Classes by paper count over the last 5 years (2021-2025):**
 
 1. **Planning > Path/Motion Planning** — 178 papers
 2. **Multi-Robot Systems > Coordination** — 111 papers
@@ -43,16 +43,16 @@ _From 7477 classified papers (1988-2025)._
 
 
 
-## 3. 사라진 분야
+## 3. Disappeared fields
 
-**Pre-2015에 활발했지만 Post-2020에 거의 사라진 Class (≥20 → ≤10%):**
+**Classes that were active pre-2015 but have nearly vanished post-2020 (≥20 → ≤10%):**
 
 - Control > Visual Servoing: 50 → 4 (retain 8.0%)
 - Application Domains > Computational Biology Robotics: 28 → 0 (retain 0.0%)
 
 
 
-## 4. 신생 카테고리 first paper
+## 4. First paper of emerging categories
 
 | Category | First year | First paper | Total matched | 2021-2025 cum |
 |---|---:|---|---:|---:|
@@ -139,9 +139,9 @@ _From 7477 classified papers (1988-2025)._
 
 
 
-## 6. 저널 (T-RO / IJRR / RSS) 색깔
+## 6. Journal (T-RO / IJRR / RSS) flavor
 
-**저널별 Phylum 비중 (top 3):**
+**Per-journal Phylum share (top 3):**
 
 - **T-RO**: Locomotion (12.7%), Manipulation (11.6%), Robot Design & Hardware (11.4%)
 - **RSS**: Planning (14.1%), Learning for Robotics (13.1%), Manipulation (12.0%)
@@ -149,7 +149,7 @@ _From 7477 classified papers (1988-2025)._
 
 
 
-## 7. 인용수 정규화
+## 7. Citation normalization
 
 | Phylum | n | Mean cite | Median | × overall mean |
 |---|---:|---:|---:|---:|
@@ -168,5 +168,3 @@ _From 7477 classified papers (1988-2025)._
 | Robot Software & Architecture | 30 | 58.3 | 28.5 | ×0.86 |
 
 _Overall mean = 67.7, median = 32._
-
-
