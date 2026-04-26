@@ -351,7 +351,7 @@
 
   <!-- ============ MAIN (SVG) ============ -->
   <main class="main">
-    <svg id="tree" viewBox="-560 -560 1120 1120"></svg>
+    <svg id="tree" viewBox="-460 -460 920 920"></svg>
   </main>
 
 </div>
@@ -497,48 +497,48 @@ d3.json('tree_data.json').then(data => {
     return rot;
   }
 
-  // Decide between inline and leader for one node.
-  // Returns { mode: 'inline'|'leader'|'skip', label: string }
+  // Decide labeling for one node.
+  // Strategy: ALL labels are inline radial outward, with text truncated
+  // to fit within the band's radial width. No leader lines — keeps the
+  // figure tidy. Density is limited per parent so we don't crowd narrow
+  // sectors.
+  // Returns { mode: 'inline'|'skip', label: string }
   function labelDecision(d) {
-    if (d.depth === 0 || d.depth > 3) return { mode: 'skip' };
+    // Show only depth 1-3: Phylum, Class, Order (소분류까지). Skip Genus.
+    if (d.depth < 1 || d.depth > 3) return { mode: 'skip' };
 
-    // Skip very tiny wedges entirely (leader area would be too crowded)
     const span = d.x1 - d.x0;
-    if (span < 0.005) return { mode: 'skip' };  // < ~0.3°
+    if (span < 0.004) return { mode: 'skip' };  // ~0.23° — too thin to label
 
-    // Limit how many we show per band
-    if (d.depth === 1) {
-      // Phylum: always label
-    } else if (d.depth === 2) {
-      // Class: only top 4 per Phylum AND must occupy ≥ 0.6° of arc
+    // Density caps so labels don't pile up
+    if (d.depth === 2) {
+      // Class: top 5 per Phylum, span ≥ 0.4°
       const sib = d.parent.children.slice().sort((a, b) => b.value - a.value);
-      const idx = sib.indexOf(d);
-      if (idx >= 4 || span < 0.011) return { mode: 'skip' };
+      if (sib.indexOf(d) >= 5 || span < 0.007) return { mode: 'skip' };
     } else if (d.depth === 3) {
-      // Order: only top 2 per Class with span ≥ 1.5°
+      // Order: top 2 per Class, span ≥ 1.0°
       const sib = d.parent.children.slice().sort((a, b) => b.value - a.value);
-      const idx = sib.indexOf(d);
-      if (idx >= 2 || span < 0.026) return { mode: 'skip' };
+      if (sib.indexOf(d) >= 2 || span < 0.018) return { mode: 'skip' };
     }
 
+    // Truncate text to fit the band's radial budget
     const fontSize = fontSizeFor(d.depth);
-    const name = d.data.name;
-    const textW = approxTextWidth(name, fontSize);
     const radialBudget = bandRadialWidth(d) * 0.92;
+    const charBudget = Math.floor(radialBudget / (fontSize * FONT_PER_CHAR));
+    if (charBudget < 2) return { mode: 'skip' };
 
-    // If radial text fits inside the band: inline
-    if (textW <= radialBudget) {
-      return { mode: 'inline', label: name };
+    let name = d.data.name;
+    if (name.length > charBudget) {
+      name = (charBudget >= 2)
+        ? name.slice(0, Math.max(1, charBudget - 1)) + '…'
+        : name.slice(0, charBudget);
     }
-
-    // Otherwise: leader line + label at outer margin
-    return { mode: 'leader', label: name };
+    return { mode: 'inline', label: name };
   }
 
-  // Make label decisions once
   const labelDecisions = allNodes.map(d => ({ d, ...labelDecision(d) }));
   const inlineLabels = labelDecisions.filter(x => x.mode === 'inline');
-  const leaderLabels = labelDecisions.filter(x => x.mode === 'leader');
+  const leaderLabels = [];   // unused — keeping for future flexibility
 
   // ----- Inline radial labels -----
   svg.selectAll('text.label-inline')
