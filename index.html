@@ -392,13 +392,13 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 24px;
-    align-items: stretch;
   }
-  .tab-spacer { flex: 1; }
+
+  /* ============== Language toggle (lives in appbar) ============== */
   .lang-toggle {
     display: inline-flex;
     align-items: center;
-    align-self: center;
+    margin-left: 6px;
     background: var(--bg-subtle);
     border-radius: 16px;
     padding: 2px;
@@ -640,6 +640,10 @@
       <a class="icon-btn" href="TAXONOMY.md">
         <span class="icon">📖</span><span>Taxonomy</span>
       </a>
+      <span class="lang-toggle" id="lang-toggle">
+        <button data-lang="ko" class="active">한국어</button>
+        <button data-lang="en">English</button>
+      </span>
     </div>
   </div>
 </div>
@@ -761,11 +765,6 @@
     <label for="tab-b" class="tab-label">📊&nbsp; Time Series</label>
     <label for="tab-c" class="tab-label">🌳&nbsp; Phylogenetic Tree</label>
     <label for="tab-i" class="tab-label">📍&nbsp; Quantitative Insights</label>
-    <span class="tab-spacer"></span>
-    <span class="lang-toggle" id="lang-toggle">
-      <button data-lang="ko" class="active">한국어</button>
-      <button data-lang="en">English</button>
-    </span>
   </div>
 </div>
 
