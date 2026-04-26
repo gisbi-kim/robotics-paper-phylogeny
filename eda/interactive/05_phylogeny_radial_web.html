@@ -276,6 +276,52 @@
     filter: drop-shadow(0 0 4px rgba(255, 112, 67, 0.65));
   }
 
+  /* Suggestion chips */
+  .suggestions {
+    display: flex; flex-wrap: wrap; gap: 5px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .suggestions-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    margin-right: 2px;
+  }
+  .suggestion-chip {
+    background: white;
+    border: 1px solid var(--border-strong);
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .suggestion-chip:hover {
+    background: #fff3b0;
+    border-color: #ff7043;
+    color: #ff7043;
+  }
+  .refresh-btn {
+    background: none;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 12px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    transition: transform 0.3s ease, color 0.15s, border-color 0.15s;
+    margin-left: auto;
+  }
+  .refresh-btn:hover { color: var(--primary); border-color: var(--primary); }
+  .refresh-btn.spin { transform: rotate(360deg); }
+
   /* Search box */
   .search-card {
     background: white;
@@ -430,6 +476,12 @@
 
     <!-- Search box -->
     <div class="search-card">
+      <!-- Random keyword suggestions -->
+      <div class="suggestions" id="search-suggestions">
+        <span class="suggestions-label">추천:</span>
+        <!-- chips populated by JS -->
+        <button class="refresh-btn" id="suggestions-refresh" title="다른 단어">↻</button>
+      </div>
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
         <input class="search-input" type="text" id="search-input"
@@ -694,6 +746,16 @@ d3.json('tree_data.json').then(data => {
     inp.focus();
   });
 
+  // ---- Suggestions ----
+  buildKeywordPool();
+  renderSuggestions();
+  d3.select('#suggestions-refresh').on('click', function() {
+    // Brief spin animation, then refresh
+    this.classList.add('spin');
+    setTimeout(() => this.classList.remove('spin'), 350);
+    renderSuggestions();
+  });
+
   // Keyboard nav
   d3.select(window).on('keydown', (event) => {
     if (!focusedNode) return;
@@ -934,6 +996,80 @@ function highlightMatch(name, query) {
   return escapeHTML(name.slice(0, idx))
     + '<mark>' + escapeHTML(name.slice(idx, idx + query.length)) + '</mark>'
     + escapeHTML(name.slice(idx + query.length));
+}
+
+
+// ============ Random keyword suggestions ============
+let keywordPool = [];
+
+// Common stop-ish words to exclude from the suggestion pool — they
+// produce too-broad or trivial matches. Keep technical terms.
+const SUGGESTION_STOPWORDS = new Set([
+  'the', 'and', 'for', 'with', 'from', 'into', 'using', 'over',
+  'based', 'general', 'system', 'systems', 'method', 'methods',
+  'analysis', 'design', 'model', 'models', 'modeling', 'estimation',
+  'control', 'controller', 'other', 'editorial', 'unclassified',
+  'robot', 'robotic', 'robotics',
+  'application', 'applications', 'domain', 'domains',
+  'foundation', 'foundations', 'theoretical',
+  'meta',
+]);
+
+function buildKeywordPool() {
+  const counts = new Map();   // word → occurrences across node names
+  root.descendants().forEach(d => {
+    if (d.depth < 1 || d.depth > 4) return;
+    // Tokenize on whitespace + a few delimiters; keep word characters
+    d.data.name.split(/[\s/&\-(),.+:|]+/).forEach(raw => {
+      const w = raw.replace(/[^\w]/g, '');
+      if (!w) return;
+      const lc = w.toLowerCase();
+      if (lc.length < 3) return;
+      if (SUGGESTION_STOPWORDS.has(lc)) return;
+      if (/^\d+$/.test(w)) return;   // skip pure numbers
+      counts.set(w, (counts.get(w) || 0) + 1);
+    });
+  });
+  // Use words that appear at least once and aren't in stopwords
+  // De-duplicate case variants by keeping the most-common surface form
+  // (keys are case-sensitive surface forms, that's fine).
+  keywordPool = Array.from(counts.keys());
+}
+
+function pickRandomKeywords(n) {
+  if (keywordPool.length === 0) return [];
+  const out = new Set();
+  // Try up to 5*n picks to handle de-dup across case variants
+  let attempts = 0;
+  while (out.size < n && attempts < n * 6) {
+    const w = keywordPool[Math.floor(Math.random() * keywordPool.length)];
+    out.add(w);
+    attempts++;
+  }
+  return Array.from(out);
+}
+
+function renderSuggestions() {
+  const container = d3.select('#search-suggestions');
+  const refreshBtn = container.select('#suggestions-refresh').node();
+  // Clear existing chips but keep the label and refresh button
+  container.selectAll('.suggestion-chip').remove();
+  const words = pickRandomKeywords(5);
+  // Insert chips between the label and the refresh button
+  const labelEl = container.select('.suggestions-label').node();
+  words.forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = 'suggestion-chip';
+    btn.textContent = w;
+    btn.addEventListener('click', () => {
+      const inp = document.getElementById('search-input');
+      inp.value = w;
+      performSearch(w);
+      // Refresh suggestions so the next 5 are different
+      renderSuggestions();
+    });
+    container.node().insertBefore(btn, refreshBtn);
+  });
 }
 </script>
 </body>

@@ -709,41 +709,42 @@
 <!-- ================== TAB C ================== -->
 <div id="panel-c" class="tab-content">
 
-<!-- 5: Horizontal Collapsible Tree -->
+<!-- Radial Tree (pie chart, search-enabled) -->
 <section class="card">
-  <h2><span class="num">PLOT 5</span> Horizontal Collapsible Tree (D3.js) ⭐</h2>
-  <p class="desc">왼쪽 root에서 오른쪽으로 가지치는 전형적 phylogenetic tree. 노드 클릭으로 가지 펼치고/접기. 기본은 Phylum까지만 펼쳐져 있고 클릭하거나 사이드바 버튼으로 더 깊이 들어갈 수 있음.</p>
-  <div class="links">
-    <a href="eda/interactive/06_phylogeny_tree_web.html" target="_blank">🖱️ Open in new tab (full screen)</a>
-  </div>
-  <iframe src="eda/interactive/06_phylogeny_tree_web.html" style="height:850px;"></iframe>
-  <details open>
-    <summary>📍 사용법</summary>
-    <ul>
-      <li><strong>노드 클릭</strong> → 자식 펼치기/접기 + focus 선택 (해당 lineage 강조, 나머지 dim)</li>
-      <li><strong>호버</strong> → 사이드바 HOVER 카드에 정보 표시 (실시간)</li>
-      <li><strong>↑/↓</strong> = 같은 부모의 형제 노드로 이동, <strong>←</strong> = 접기, <strong>→</strong> = 펼치기, <strong>Esc</strong> = 해제</li>
-      <li>사이드바 버튼: <strong>L2까지</strong> = 모든 Class 펼침, <strong>L3까지</strong> = Order까지, <strong>전부 접기</strong> = Phylum만</li>
-      <li>파란 외곽 동그라미가 있는 노드 = 접힌 자식이 있음을 의미</li>
-    </ul>
-  </details>
-</section>
-
-<!-- 5a: D3 interactive radial -->
-<section class="card">
-  <h2><span class="num">PLOT 5a</span> Interactive Radial Tree (D3.js)</h2>
-  <p class="desc"><strong>호버</strong>하면 wedge 강조 + 툴팁. <strong>클릭</strong>으로 계열 선택 후 <kbd>← →</kbd> <kbd>↑</kbd> <kbd>↓</kbd> 화살표로 이웃 셀 탐색. <kbd>Esc</kbd>로 해제.</p>
+  <h2>🥧 Radial Tree (D3.js)</h2>
+  <p class="desc">생물 계통도 파이 차트. <strong>사이드바 검색</strong>으로 단어가 들어간 wedge들을 한꺼번에 하이라이트. <strong>호버</strong>로 강조, <strong>클릭</strong>으로 계열 선택 후 <kbd>←→↑↓</kbd>로 탐색.</p>
   <div class="links">
     <a href="eda/interactive/05_phylogeny_radial_web.html" target="_blank">🖱️ Open in new tab (full screen)</a>
   </div>
   <iframe src="eda/interactive/05_phylogeny_radial_web.html"></iframe>
   <details open>
-    <summary>📍 사용법 + 추천 탐색 경로</summary>
+    <summary>📍 사용법 + 추천 탐색</summary>
     <ul>
-      <li><strong>호버</strong> → wedge 두꺼워짐 + 우측 상단 툴팁 (breadcrumb / 카운트 / 비중)</li>
-      <li><strong>클릭</strong> → 해당 계열만 강조 (조상 + 후손 모두). 나머지 dim. 노란 테두리 = 현재 focus.</li>
+      <li><strong>🔍 검색</strong> → 단어를 입력하거나 추천 칩(↻로 갱신)을 클릭. 매칭된 wedge에 주황 glow + 사이드바에 결과 리스트.</li>
+      <li><strong>결과 클릭</strong> → 해당 wedge로 점프, 계열(조상+후손) lineage 하이라이트.</li>
+      <li><strong>호버</strong> → wedge 두꺼워짐 + 사이드바 HOVER 카드.</li>
       <li><strong>←/→</strong> = 형제, <strong>↑</strong> = 부모, <strong>↓</strong> = 첫 자식 (가장 큰 child부터)</li>
       <li class="quant"><strong>📊 추천 탐색</strong>: <em>Manipulation → Contact-rich → Deformable Object</em>의 Genus까지 들어가보면 Cloth/Garment vs Rope/Cable vs Liquid 비중 비교 가능</li>
+    </ul>
+  </details>
+</section>
+
+<!-- Horizontal Collapsible Tree -->
+<section class="card">
+  <h2>🌳 Horizontal Collapsible Tree (D3.js)</h2>
+  <p class="desc">왼쪽 root에서 오른쪽으로 가지치는 전형적 phylogenetic tree. 노드 또는 라벨 클릭으로 펼치기/접기. 기본은 Phylum까지만 펼쳐져 있고 더 깊이 들어가려면 클릭하거나 사이드바 버튼 사용.</p>
+  <div class="links">
+    <a href="eda/interactive/06_phylogeny_tree_web.html" target="_blank">🖱️ Open in new tab (full screen)</a>
+  </div>
+  <iframe src="eda/interactive/06_phylogeny_tree_web.html" style="height:850px;"></iframe>
+  <details>
+    <summary>📍 사용법</summary>
+    <ul>
+      <li><strong>노드/라벨 클릭</strong> → 자식 펼치기/접기 + focus 선택 (해당 lineage 강조, 나머지 dim)</li>
+      <li><strong>호버</strong> → 사이드바 HOVER 카드에 정보 표시 (실시간)</li>
+      <li><strong>↑/↓</strong> = 같은 부모의 형제 노드로 이동, <strong>←</strong> = 접기, <strong>→</strong> = 펼치기, <strong>Esc</strong> = 해제</li>
+      <li>사이드바 버튼: <strong>L2까지</strong> = 모든 Class 펼침, <strong>L3까지</strong> = Order까지, <strong>전부 접기</strong> = Phylum만</li>
+      <li>파란 외곽 동그라미가 있는 노드 = 접힌 자식이 있음을 의미</li>
     </ul>
   </details>
 </section>

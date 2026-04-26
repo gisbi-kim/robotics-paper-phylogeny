@@ -410,15 +410,23 @@ function update() {
 
   svg.attr('width', width).attr('height', height);
 
-  // Container group
+  // Container group + two persistent sub-groups so links always sit
+  // BELOW nodes in DOM order (and therefore in z-order). Without this,
+  // links added during a later expand pass would be appended after
+  // existing node groups and draw on top of their text — the white
+  // halo can't help when the link is literally above the text element.
   let g = svg.select('g.root');
   if (g.empty()) {
     g = svg.append('g').attr('class', 'root');
+    g.append('g').attr('class', 'links-layer');
+    g.append('g').attr('class', 'nodes-layer');
   }
   g.attr('transform', `translate(${MARGIN.left},${MARGIN.top - minX})`);
+  const linksLayer = g.select('g.links-layer');
+  const nodesLayer = g.select('g.nodes-layer');
 
   // ---- Links ----
-  const linkSel = g.selectAll('path.link')
+  const linkSel = linksLayer.selectAll('path.link')
     .data(links, d => d.target.id);
   linkSel.exit().remove();
   const linkEnter = linkSel.enter().append('path')
@@ -429,7 +437,7 @@ function update() {
       .y(d => d.x));
 
   // ---- Nodes ----
-  const nodeSel = g.selectAll('g.node')
+  const nodeSel = nodesLayer.selectAll('g.node')
     .data(nodes, d => d.id);
   nodeSel.exit().remove();
 
