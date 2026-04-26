@@ -473,12 +473,31 @@ function update() {
   merged.select('text.node-label').text(d => truncate(d.data.name, 26));
   merged.select('text.count-badge').text(d => d.value.toLocaleString());
 
-  // Position count badges AFTER labels are rendered, using actual measured width
+  // Position count badges to the right of the label.
+  // Strategy:
+  //  1. First pass: use a character-count-based estimate so positioning
+  //     is correct on the very first paint (getComputedTextLength()
+  //     can return 0 before the browser has laid out the text).
+  //  2. requestAnimationFrame refine: measure the actual rendered width
+  //     and snap the count to the exact pixel position.
+  const GAP = 10;
+  const ESTIMATE_PER_CHAR = 7.2;   // Google Sans 12px avg char width
   merged.each(function(d) {
-    const labelEl = d3.select(this).select('text.node-label').node();
-    const labelW = labelEl ? labelEl.getComputedTextLength() : 100;
+    const name = truncate(d.data.name, 26);
+    const estW = name.length * ESTIMATE_PER_CHAR;
     d3.select(this).select('text.count-badge')
-      .attr('x', 10 + labelW + 8);
+      .attr('x', 10 + estW + GAP);
+  });
+  requestAnimationFrame(() => {
+    merged.each(function(d) {
+      const labelEl = d3.select(this).select('text.node-label').node();
+      if (!labelEl) return;
+      const w = labelEl.getComputedTextLength();
+      if (w > 0) {
+        d3.select(this).select('text.count-badge')
+          .attr('x', 10 + w + GAP);
+      }
+    });
   });
 
   // Background click → reset
