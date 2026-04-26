@@ -644,6 +644,88 @@
     font-family: 'Roboto Mono', monospace;
     margin-left: 6px;
   }
+
+  /* Paper-title search results: same scroll container as match-list,
+     but each item shows the (truncated) title instead of a category. */
+  .paper-match {
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 2px 0;
+    border-left: 3px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .paper-match:hover {
+    background: var(--bg-subtle);
+    border-left-color: #ff7043;
+  }
+  .paper-match .pm-title {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .paper-match .pm-title mark {
+    background: #fff3b0;
+    color: #ff7043;
+    font-weight: 700;
+    padding: 0 1px;
+    border-radius: 2px;
+  }
+  .paper-match .pm-meta {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .paper-match .pm-path {
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .paper-match .pm-cites {
+    font-family: 'Roboto Mono', monospace;
+    color: var(--text-muted);
+  }
+
+  /* Pagination footer for paper search */
+  .pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding: 4px 2px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .pager .pager-info { font-variant-numeric: tabular-nums; }
+  .pager button {
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.2;
+  }
+  .pager button:hover:not(:disabled) {
+    background: var(--bg-subtle);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+  .pager button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
   .label-inline {
     pointer-events: none;
     font-family: 'Google Sans', sans-serif;
@@ -692,7 +774,7 @@
     <h1>🌳 Phylogeny Tree</h1>
     <div class="subtitle">7,477 robotics papers · 13 Phylum × 100 Class</div>
 
-    <!-- Search box -->
+    <!-- Category search box (matches taxonomy node names) -->
     <div class="search-card">
       <!-- Random keyword suggestions -->
       <div class="suggestions" id="search-suggestions">
@@ -703,12 +785,30 @@
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
         <input class="search-input" type="text" id="search-input"
-               placeholder="검색 (예: SLAM, Diffusion, Soft …)"
+               placeholder="계통 검색 (예: SLAM, Diffusion, Soft …)"
                autocomplete="off" />
         <button class="search-clear" id="search-clear" title="지우기">×</button>
       </div>
       <div id="search-summary"></div>
       <div class="match-list" id="search-results"></div>
+    </div>
+
+    <!-- Paper-title search (matches individual paper titles) -->
+    <div class="search-card">
+      <div class="search-input-wrapper">
+        <span class="search-icon">📄</span>
+        <input class="search-input" type="text" id="paper-search-input"
+               placeholder="논문 제목 검색 (예: NeRF, BERT, Octree …)"
+               autocomplete="off" />
+        <button class="search-clear" id="paper-search-clear" title="지우기">×</button>
+      </div>
+      <div id="paper-search-summary"></div>
+      <div class="match-list" id="paper-search-results"></div>
+      <div class="pager" id="paper-search-pager" style="display:none">
+        <button id="paper-prev" title="이전 (←)">◀</button>
+        <span class="pager-info" id="paper-pager-info"></span>
+        <button id="paper-next" title="다음 (→)">▶</button>
+      </div>
     </div>
 
     <!-- Focused (sticky) info -->
@@ -786,6 +886,12 @@ d3.json('papers.json')
     // Re-render the focused card if a node is already selected so the
     // "View papers" button switches from "loading…" to ready.
     if (focusedNode) renderFocusedPanel(focusedNode);
+    // If the user typed in the paper search before papers loaded,
+    // run the search now that we have data.
+    const pendingQuery = document.getElementById('paper-search-input');
+    if (pendingQuery && pendingQuery.value) {
+      performPaperSearch(pendingQuery.value);
+    }
   })
   .catch(err => {
     console.warn('papers.json not loaded — paper list disabled', err);
@@ -1476,6 +1582,164 @@ d3.select(window).on('keydown.modal', (event) => {
       d3.select('#papers-modal').classed('open')) {
     closePapersModal();
     event.stopPropagation();
+  }
+});
+
+
+// ============ Paper-title search ============
+//
+// Independent of the category search above. Runs against papers.json
+// (loaded asynchronously). Up to PAPER_PAGE_SIZE results per page;
+// arrows page through the rest. Click a result → resolve the paper's
+// {phylum, class, order, genus} path to the deepest existing tree node
+// and call selectNode() — same lineage highlight as a wedge click.
+
+const PAPER_PAGE_SIZE = 100;
+let paperSearchQuery = '';
+let paperSearchMatches = [];
+let paperSearchPage = 0;
+
+function findNodeByPath(path) {
+  // Walk the tree depth-first by exact name match; stop at the deepest
+  // node that exists. Any of phylum/class/order/genus can be missing
+  // (a 7,477-paper dataset has plenty of '(general)' Genus leaves
+  // that exist as tree nodes too, but defensive).
+  if (!root) return null;
+  let node = root;
+  for (const name of path) {
+    if (!node.children) break;
+    const next = node.children.find(c => c.data.name === name);
+    if (!next) break;
+    node = next;
+  }
+  return node === root ? null : node;
+}
+
+function paperPath(p) {
+  // Drop nullish so we don't try to descend into a missing level.
+  return [p.phylum, p.class, p.order, p.genus].filter(x => x);
+}
+
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlightTitle(title, query) {
+  const safe = escapeHTML(title || '');
+  if (!query) return safe;
+  const re = new RegExp('(' + escapeRegex(query) + ')', 'ig');
+  return safe.replace(re, '<mark>$1</mark>');
+}
+
+function performPaperSearch(rawQuery) {
+  const query = rawQuery.trim().toLowerCase();
+  paperSearchQuery = query;
+  paperSearchPage = 0;
+
+  d3.select('#paper-search-clear').classed('visible', query.length > 0);
+
+  if (!query) {
+    paperSearchMatches = [];
+    d3.select('#paper-search-summary').html('');
+    d3.select('#paper-search-results').html('');
+    d3.select('#paper-search-pager').style('display', 'none');
+    return;
+  }
+
+  if (!papers.length) {
+    d3.select('#paper-search-summary').html(
+      '<div class="search-summary">논문 데이터 로딩 중…</div>');
+    return;
+  }
+
+  paperSearchMatches = papers.filter(p =>
+    (p.title || '').toLowerCase().includes(query)
+  );
+  // Most-cited first within results — feels more useful than insertion order
+  paperSearchMatches.sort((a, b) => (b.citations || 0) - (a.citations || 0));
+  renderPaperResults();
+}
+
+function renderPaperResults() {
+  const total = paperSearchMatches.length;
+  if (!paperSearchQuery) return;
+
+  if (total === 0) {
+    d3.select('#paper-search-summary').html(
+      `<div class="search-summary"><strong>0</strong> papers for "${escapeHTML(paperSearchQuery)}"</div>`);
+    d3.select('#paper-search-results').html('');
+    d3.select('#paper-search-pager').style('display', 'none');
+    return;
+  }
+
+  const totalPages = Math.ceil(total / PAPER_PAGE_SIZE);
+  paperSearchPage = Math.max(0, Math.min(paperSearchPage, totalPages - 1));
+  const start = paperSearchPage * PAPER_PAGE_SIZE;
+  const end = Math.min(start + PAPER_PAGE_SIZE, total);
+  const page = paperSearchMatches.slice(start, end);
+
+  d3.select('#paper-search-summary').html(
+    `<div class="search-summary"><strong>${total.toLocaleString()}</strong> papers for "${escapeHTML(paperSearchQuery)}" — 클릭해서 계통 강조</div>`);
+
+  const list = d3.select('#paper-search-results');
+  list.html('');
+  page.forEach(p => {
+    const item = list.append('div').attr('class', 'paper-match');
+    item.append('div')
+      .attr('class', 'pm-title')
+      .html(highlightTitle(p.title, paperSearchQuery));
+    const meta = item.append('div').attr('class', 'pm-meta');
+    meta.append('span')
+      .attr('class', 'pm-path')
+      .text(paperPath(p).join(' › '));
+    meta.append('span')
+      .attr('class', 'pm-cites')
+      .text(`${p.venue || '?'} ${p.year || '?'} · ${(p.citations || 0).toLocaleString()} cites`);
+    item.on('click', () => {
+      const node = findNodeByPath(paperPath(p));
+      if (node) selectNode(node);
+    });
+  });
+
+  // Pager: only show if more than one page
+  const pager = d3.select('#paper-search-pager');
+  if (totalPages > 1) {
+    pager.style('display', 'flex');
+    d3.select('#paper-pager-info').text(
+      `${(start + 1).toLocaleString()}–${end.toLocaleString()} / ${total.toLocaleString()} (${paperSearchPage + 1}/${totalPages})`
+    );
+    d3.select('#paper-prev').property('disabled', paperSearchPage === 0);
+    d3.select('#paper-next').property('disabled', paperSearchPage === totalPages - 1);
+  } else {
+    pager.style('display', 'none');
+  }
+}
+
+// Wiring (one-time)
+d3.select('#paper-search-input').on('input', function() {
+  performPaperSearch(this.value);
+});
+d3.select('#paper-search-clear').on('click', () => {
+  d3.select('#paper-search-input').property('value', '');
+  performPaperSearch('');
+  document.getElementById('paper-search-input').focus();
+});
+d3.select('#paper-prev').on('click', () => {
+  if (paperSearchPage > 0) { paperSearchPage--; renderPaperResults(); }
+});
+d3.select('#paper-next').on('click', () => {
+  paperSearchPage++; renderPaperResults();
+});
+// Arrow-key paging while the paper input is focused
+d3.select('#paper-search-input').on('keydown', (event) => {
+  if (paperSearchMatches.length <= PAPER_PAGE_SIZE) return;
+  if (event.key === 'ArrowLeft' && paperSearchPage > 0) {
+    paperSearchPage--; renderPaperResults(); event.preventDefault();
+  } else if (event.key === 'ArrowRight') {
+    const totalPages = Math.ceil(paperSearchMatches.length / PAPER_PAGE_SIZE);
+    if (paperSearchPage < totalPages - 1) {
+      paperSearchPage++; renderPaperResults(); event.preventDefault();
+    }
   }
 });
 </script>
