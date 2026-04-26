@@ -158,6 +158,116 @@
   }
   .info-meta .v { color: var(--text); }
 
+  /* ============== Paper-list modal (mirrors radial viewer) ============== */
+  .papers-btn {
+    margin-top: 12px;
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 9px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  .papers-btn:hover { background: #1765cc; }
+  .papers-btn:disabled {
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+  .papers-modal {
+    position: fixed; inset: 0;
+    background: rgba(32, 33, 36, 0.45);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  .papers-modal.open { display: flex; }
+  .papers-modal .panel {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    max-width: 900px;
+    width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .papers-modal .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .papers-modal .panel-header h2 {
+    margin: 0;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 16px; font-weight: 500; color: var(--text);
+    flex: 1;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .papers-modal .panel-header .meta {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .papers-modal .panel-close {
+    background: transparent; border: none; cursor: pointer;
+    font-size: 22px; color: var(--text-muted);
+    padding: 4px 10px; line-height: 1; border-radius: 4px;
+  }
+  .papers-modal .panel-close:hover { background: var(--bg-subtle); color: var(--text); }
+  .papers-modal .panel-toolbar {
+    padding: 8px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 6px; align-items: center;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .papers-modal .sort-btn {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .papers-modal .sort-btn.active {
+    background: var(--primary-bg);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+  .papers-modal .panel-body { overflow-y: auto; padding: 4px 0; }
+  .paper-item { padding: 10px 20px; border-bottom: 1px solid var(--border); }
+  .paper-item:last-child { border-bottom: none; }
+  .paper-item .row1 {
+    display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;
+  }
+  .paper-item .title-link {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 13.5px; color: var(--primary);
+    text-decoration: none; flex: 1; line-height: 1.35;
+  }
+  .paper-item .title-link:hover { text-decoration: underline; }
+  .paper-item .ext-icon { font-size: 10px; opacity: 0.6; margin-left: 4px; }
+  .paper-item .citations {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px; color: var(--text-muted);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .paper-item .row2 { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; }
+  .paper-item .venue-year { color: var(--text-secondary); font-weight: 500; margin-right: 8px; }
+
   /* ============== Main (SVG) ============== */
   .main {
     position: relative;
@@ -287,6 +397,24 @@
     <svg class="tree" id="tree"></svg>
   </main>
 
+</div>
+
+<!-- ============ PAPERS MODAL ============ -->
+<div class="papers-modal" id="papers-modal">
+  <div class="panel">
+    <div class="panel-header">
+      <h2 id="papers-modal-title">Papers</h2>
+      <span class="meta" id="papers-modal-meta"></span>
+      <button class="panel-close" id="papers-modal-close" title="닫기 (Esc)" data-en-title="Close (Esc)">×</button>
+    </div>
+    <div class="panel-toolbar">
+      <span data-en="Sort:">정렬:</span>
+      <button class="sort-btn active" data-sort="citations" data-en="Citations ↓">피인용 ↓</button>
+      <button class="sort-btn" data-sort="year" data-en="Newest ↓">최신순 ↓</button>
+      <button class="sort-btn" data-sort="title" data-en="Title A→Z">제목 A→Z</button>
+    </div>
+    <div class="panel-body" id="papers-modal-body"></div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -631,6 +759,17 @@ function buildInfoCardHTML(d, sourceLabel, sourceClass) {
   const childCount = all.length;
   const expanded = !!d.children;
 
+  // "View papers" button — only on the FOCUSED card. Disabled until
+  // papers.json finishes loading; the load handler re-renders the card.
+  const papersBtnHTML = sourceLabel === 'FOCUSED' ? `
+      <button class="papers-btn" data-action="open-papers"
+              ${papers.length === 0 ? 'disabled' : ''}>
+        📄 ${papers.length === 0
+              ? t('Loading paper data…', '논문 데이터 로딩…')
+              : t(`View all ${d.value.toLocaleString()} papers in this lineage`,
+                  `이 계열의 논문 ${d.value.toLocaleString()}편 보기`)}
+      </button>` : '';
+
   return `
     <div class="info-card">
       <span class="info-source ${sourceClass}">${sourceLabel}</span>
@@ -645,11 +784,17 @@ function buildInfoCardHTML(d, sourceLabel, sourceClass) {
         <span class="k">Depth</span><span class="v">${d.depth} / 4</span>
         <span class="k">Children</span><span class="v">${childCount} (${expanded ? 'expanded' : 'collapsed'})</span>
       </div>
+      ${papersBtnHTML}
     </div>`;
 }
 
 function renderFocusedPanel(d) {
   focusedCard.html(buildInfoCardHTML(d, 'FOCUSED', 'focus'));
+  if (d) {
+    focusedCard.select('button[data-action="open-papers"]').on('click', () => {
+      openPapersModal(d);
+    });
+  }
 }
 
 function renderHoverPanel(d) {
@@ -660,6 +805,135 @@ function escapeHTML(s) {
   return String(s).replace(/[&<>"']/g, c =>
     ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 }
+
+
+// ============ Papers modal (mirrors radial viewer) ============
+//
+// Each paper carries its full {phylum, class, order, genus} address.
+// The focused node's path is rebuilt from its ancestors. A paper
+// "belongs to" the node iff the first N path segments match
+// (N = node.depth).
+
+let papers = [];
+
+d3.json('papers.json')
+  .then(arr => {
+    papers = Array.isArray(arr) ? arr : [];
+    // If the user already has a node focused, swap in the now-enabled
+    // "view papers" button.
+    if (typeof focusedNode !== 'undefined' && focusedNode) {
+      renderFocusedPanel(focusedNode);
+    }
+  })
+  .catch(err => {
+    console.warn('papers.json not loaded — paper list disabled', err);
+  });
+
+const PATH_FIELDS = ['phylum', 'class', 'order', 'genus'];
+
+function nodePath(d) {
+  return d.ancestors().reverse().slice(1).map(n => n.data.name);
+}
+
+function filterPapers(d) {
+  if (!papers.length) return [];
+  if (d.depth === 0) return papers.slice();
+  const path = nodePath(d);
+  return papers.filter(p => {
+    for (let i = 0; i < path.length; i++) {
+      if (p[PATH_FIELDS[i]] !== path[i]) return false;
+    }
+    return true;
+  });
+}
+
+let currentPapersList = [];
+let currentSort = 'citations';
+
+function sortPapers(list, mode) {
+  const c = list.slice();
+  if (mode === 'citations') {
+    c.sort((a, b) => (b.citations || 0) - (a.citations || 0));
+  } else if (mode === 'year') {
+    c.sort((a, b) => (b.year || 0) - (a.year || 0)
+                  || (b.citations || 0) - (a.citations || 0));
+  } else if (mode === 'title') {
+    c.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+  }
+  return c;
+}
+
+function paperLink(p) {
+  if (p.url) return p.url;
+  if (p.doi) return 'https://doi.org/' + p.doi;
+  return 'https://scholar.google.com/scholar?q=' + encodeURIComponent(p.title || '');
+}
+
+function renderPapersList() {
+  const sorted = sortPapers(currentPapersList, currentSort);
+  const body = d3.select('#papers-modal-body');
+  body.html('');
+  sorted.forEach(p => {
+    const item = body.append('div').attr('class', 'paper-item');
+    const row1 = item.append('div').attr('class', 'row1');
+    row1.append('a')
+      .attr('class', 'title-link')
+      .attr('href', paperLink(p))
+      .attr('target', '_blank')
+      .attr('rel', 'noopener noreferrer')
+      .html(escapeHTML(p.title || '(no title)') +
+            (p.url || p.doi
+              ? ' <span class="ext-icon">↗</span>'
+              : ` <span class="ext-icon" title="${t('No DOI — Scholar search', 'DOI 없음 — Scholar 검색')}">🔎</span>`));
+    row1.append('span')
+      .attr('class', 'citations')
+      .text(((p.citations || 0).toLocaleString()) + ' cites');
+    const row2 = item.append('div').attr('class', 'row2');
+    row2.append('span')
+      .attr('class', 'venue-year')
+      .text(`${p.venue || '?'} ${p.year || '?'}`);
+    row2.append('span')
+      .attr('class', 'authors')
+      .text(p.authors || '');
+  });
+}
+
+function openPapersModal(d) {
+  currentPapersList = filterPapers(d);
+  currentSort = 'citations';
+  d3.select('#papers-modal-title').text(d.data.name);
+  d3.select('#papers-modal-meta').text(
+    `${currentPapersList.length.toLocaleString()} papers · ${nodePath(d).join(' › ')}`
+  );
+  d3.selectAll('#papers-modal .sort-btn')
+    .classed('active', function() { return this.dataset.sort === currentSort; });
+  renderPapersList();
+  d3.select('#papers-modal').classed('open', true);
+}
+
+function closePapersModal() {
+  d3.select('#papers-modal').classed('open', false);
+}
+
+// One-time wiring
+d3.select('#papers-modal-close').on('click', closePapersModal);
+d3.select('#papers-modal').on('click', function(event) {
+  // Backdrop click (not panel) closes
+  if (event.target === this) closePapersModal();
+});
+d3.selectAll('#papers-modal .sort-btn').on('click', function() {
+  currentSort = this.dataset.sort;
+  d3.selectAll('#papers-modal .sort-btn')
+    .classed('active', function() { return this.dataset.sort === currentSort; });
+  renderPapersList();
+});
+d3.select(window).on('keydown.modal', (event) => {
+  if (event.key === 'Escape' &&
+      d3.select('#papers-modal').classed('open')) {
+    closePapersModal();
+    event.stopPropagation();
+  }
+});
 
 
 // ============ i18n ============
