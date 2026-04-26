@@ -258,6 +258,161 @@
     opacity: 0.8;
   }
 
+  /* "View papers" button at the bottom of the FOCUSED card */
+  .papers-btn {
+    margin-top: 12px;
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 9px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  .papers-btn:hover { background: #1765cc; }
+  .papers-btn:disabled {
+    background: var(--bg-subtle);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  /* Papers modal (overlay listing all papers in the focused subtree) */
+  .papers-modal {
+    position: fixed; inset: 0;
+    background: rgba(32, 33, 36, 0.45);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  .papers-modal.open { display: flex; }
+  .papers-modal .panel {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    max-width: 900px;
+    width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .papers-modal .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .papers-modal .panel-header h2 {
+    margin: 0;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .papers-modal .panel-header .meta {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .papers-modal .panel-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    color: var(--text-muted);
+    padding: 4px 10px;
+    line-height: 1;
+    border-radius: 4px;
+  }
+  .papers-modal .panel-close:hover {
+    background: var(--bg-subtle);
+    color: var(--text);
+  }
+  .papers-modal .panel-toolbar {
+    padding: 8px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    align-items: center;
+  }
+  .papers-modal .sort-btn {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .papers-modal .sort-btn.active {
+    background: var(--primary-bg);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+  .papers-modal .panel-body {
+    overflow-y: auto;
+    padding: 4px 0;
+  }
+  .paper-item {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .paper-item:last-child { border-bottom: none; }
+  .paper-item .row1 {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .paper-item .title-link {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--primary);
+    text-decoration: none;
+    flex: 1;
+    line-height: 1.35;
+  }
+  .paper-item .title-link:hover { text-decoration: underline; }
+  .paper-item .ext-icon {
+    font-size: 10px;
+    opacity: 0.6;
+    margin-left: 4px;
+  }
+  .paper-item .citations {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .paper-item .row2 {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .paper-item .venue-year {
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-right: 8px;
+  }
+
   /* ============== Main (SVG) ============== */
   .main {
     position: relative;
@@ -1001,16 +1156,26 @@ function performSearch(rawQuery) {
     return;
   }
 
-  // Find matching nodes (case-insensitive substring on node name)
+  // Find matching nodes (case-insensitive substring on node name).
+  // currentMatches = the *named* hits — these populate the sidebar result
+  // list (one row per match, click navigates to that node).
   currentMatches = root.descendants().filter(d =>
     d.depth >= 1 && d.depth <= 4 &&
     d.data.name.toLowerCase().includes(query)
   );
 
-  // Apply visual highlight on the matching arcs.
+  // Visual highlight set = each match + all its descendants down to the
+  // leaves. Without the descendants, matches at depth 2/3 (thin rings)
+  // are nearly invisible in the radial; with them, every hit shows up
+  // as a clear orange spoke from the matching ring outward to the rim.
+  const highlightSet = new Set();
+  currentMatches.forEach(m => {
+    m.descendants().forEach(n => highlightSet.add(n));
+  });
+
   // Search highlight is ORTHOGONAL to lineage selection — a wedge can be
   // both .focused (yellow) and .search-match (orange glow) at once.
-  arcs.classed('search-match', d => currentMatches.includes(d));
+  arcs.classed('search-match', d => highlightSet.has(d));
 
   // Update sidebar summary + result list
   renderSearchResults();
