@@ -253,6 +253,83 @@
     display: inline-flex; align-items: center; gap: 4px;
   }
 
+  /* ============== Taxonomy terminology card ============== */
+  .taxonomy-card { padding: 28px; }
+  .taxonomy-card h2 {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    margin: 0 0 4px;
+  }
+  .taxonomy-card .sub {
+    color: var(--text-secondary);
+    font-size: 13px; margin-bottom: 20px;
+  }
+  .tx-grid {
+    display: grid;
+    grid-template-columns: 90px 100px 80px 1fr;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
+  .tx-grid > div {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    line-height: 1.5;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .tx-grid .tx-h {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--bg-subtle);
+  }
+  .tx-grid .tx-en {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    color: var(--primary);
+  }
+  .tx-grid .tx-ko { color: var(--text-secondary); font-size: 12.5px; }
+  .tx-grid .tx-n  {
+    font-family: 'Roboto Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .tx-grid .tx-desc { color: var(--text-secondary); flex-direction: column; align-items: flex-start; }
+  .tx-grid .tx-desc .tx-eg {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .tx-grid .tx-desc .tx-eg code {
+    background: var(--bg-subtle);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+  }
+  .tx-note {
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: var(--primary-bg);
+    border-left: 3px solid var(--primary);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .tx-note strong { color: var(--primary); }
+  @media (max-width: 720px) {
+    .tx-grid { grid-template-columns: 1fr; }
+    .tx-grid > div { border-bottom: none; padding: 6px 14px; }
+    .tx-grid .tx-h { padding-top: 14px; }
+    .tx-grid .tx-desc { padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  }
+
   /* ============== Phylum bars (Material progress) ============== */
   .phyla-card { padding: 28px; }
   .phyla-card h2 {
@@ -570,6 +647,50 @@
   <div class="stat-card"><div class="stat-value">100</div><div class="stat-label">Class</div></div>
   <div class="stat-card"><div class="stat-value">~330</div><div class="stat-label">Order</div></div>
   <div class="stat-card"><div class="stat-value">2.9%</div><div class="stat-label">Unclassified</div></div>
+</div>
+
+<!-- ============== Taxonomy terminology ============== -->
+<div class="card taxonomy-card">
+  <h2>🧬 4-depth 분류 용어</h2>
+  <div class="sub">생물 계통도(phylogenetic taxonomy)에서 빌려온 4단계. 위에서 아래로 점점 좁아지는 카테고리.</div>
+
+  <div class="tx-grid">
+    <div class="tx-h">L1</div>
+    <div class="tx-en">Phylum</div>
+    <div class="tx-n">13개</div>
+    <div class="tx-desc">
+      대분류 — 로봇공학 안의 큰 분야
+      <span class="tx-eg">예: <code>Manipulation</code>, <code>Locomotion</code>, <code>SLAM &amp; Localization</code></span>
+    </div>
+
+    <div class="tx-h">L2</div>
+    <div class="tx-en">Class</div>
+    <div class="tx-n">~100개</div>
+    <div class="tx-desc">
+      중분류 — Phylum 안의 주요 갈래
+      <span class="tx-eg">예: <code>Manipulation</code> ▸ <code>Grasping</code></span>
+    </div>
+
+    <div class="tx-h">L3</div>
+    <div class="tx-en">Order</div>
+    <div class="tx-n">~330개</div>
+    <div class="tx-desc">
+      소분류 — Class 안의 세부 주제
+      <span class="tx-eg">예: <code>Grasping</code> ▸ <code>Grasp Planning / Synthesis</code></span>
+    </div>
+
+    <div class="tx-h">L4</div>
+    <div class="tx-en">Genus</div>
+    <div class="tx-n">가변</div>
+    <div class="tx-desc">
+      세부 — Order 안의 구체적 접근법 (top 45 Order에만 sub-rule, 나머지는 <code>(general)</code>)
+      <span class="tx-eg">예: <code>Grasp Planning</code> ▸ <code>Learning-based Grasping</code></span>
+    </div>
+  </div>
+
+  <div class="tx-note">
+    <strong>왜 생물 계통도?</strong> 같은 주제도 논문마다 표현이 다르다 (예: "laser place recognition" ≈ "point cloud loop detection"). 단순 키워드/TF-IDF 대신 <strong>시맨틱 동의어 클러스터</strong>로 묶고, 분야 → 갈래 → 주제 → 접근법으로 내려가는 트리에 매핑. 결과적으로 "어떤 분야가 언제 등장/소멸했는지" "한 주제 안에 어떤 패러다임이 공존하는지"를 한눈에 본다.
+  </div>
 </div>
 
 <!-- ============== Phylum distribution ============== -->
