@@ -270,6 +270,116 @@
     stroke: var(--focus) !important;
     stroke-width: 3px !important;
   }
+  .search-match {
+    stroke: #ff7043 !important;
+    stroke-width: 2.5px !important;
+    filter: drop-shadow(0 0 4px rgba(255, 112, 67, 0.65));
+  }
+
+  /* Search box */
+  .search-card {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: var(--elev-1);
+  }
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-input {
+    width: 100%;
+    padding: 8px 30px 8px 30px;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--bg-subtle);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+  }
+  .search-icon {
+    position: absolute;
+    left: 9px;
+    pointer-events: none;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .search-clear {
+    position: absolute;
+    right: 4px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 6px;
+    line-height: 1;
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .search-clear:hover { background: var(--bg-subtle); color: var(--text); }
+  .search-clear.visible { display: flex; }
+
+  .search-summary {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 8px 2px 6px;
+  }
+  .search-summary strong { color: #ff7043; }
+  .match-list {
+    max-height: 260px;
+    overflow-y: auto;
+    margin: 0 -4px;
+  }
+  .match-item {
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 2px 0;
+    border-left: 3px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .match-item:hover {
+    background: var(--bg-subtle);
+    border-left-color: #ff7043;
+  }
+  .match-item .match-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    /* highlight the matched substring */
+  }
+  .match-item .match-name mark {
+    background: #fff3b0;
+    color: #ff7043;
+    font-weight: 700;
+    padding: 0 1px;
+    border-radius: 2px;
+  }
+  .match-item .match-meta {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .match-item .match-meta .kind {
+    color: var(--primary);
+    font-weight: 500;
+  }
+  .match-item .match-meta .count {
+    font-family: 'Roboto Mono', monospace;
+    margin-left: 6px;
+  }
   .label-inline {
     pointer-events: none;
     font-family: 'Google Sans', sans-serif;
@@ -317,6 +427,19 @@
   <aside class="sidebar">
     <h1>🌳 Phylogeny Tree</h1>
     <div class="subtitle">7,477 robotics papers · 13 Phylum × 100 Class</div>
+
+    <!-- Search box -->
+    <div class="search-card">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="search-input"
+               placeholder="검색 (예: SLAM, Diffusion, Soft …)"
+               autocomplete="off" />
+        <button class="search-clear" id="search-clear" title="지우기">×</button>
+      </div>
+      <div id="search-summary"></div>
+      <div class="match-list" id="search-results"></div>
+    </div>
 
     <div class="help-card">
       <div class="row"><span>호버 (강조)</span><kbd>mouse</kbd></div>
@@ -560,6 +683,17 @@ d3.json('tree_data.json').then(data => {
   svg.on('click', resetSelection);
   d3.select('#reset').on('click', resetSelection);
 
+  // ---- Search wiring ----
+  d3.select('#search-input').on('input', function() {
+    performSearch(this.value);
+  });
+  d3.select('#search-clear').on('click', () => {
+    const inp = document.getElementById('search-input');
+    inp.value = '';
+    performSearch('');
+    inp.focus();
+  });
+
   // Keyboard nav
   d3.select(window).on('keydown', (event) => {
     if (!focusedNode) return;
@@ -708,6 +842,99 @@ function escapeHTML(s) {
     ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 }
 function escapeAttr(s) { return escapeHTML(s); }
+
+
+// ============ Search ============
+let currentSearchQuery = '';
+let currentMatches = [];
+
+function performSearch(rawQuery) {
+  const query = rawQuery.trim().toLowerCase();
+  currentSearchQuery = query;
+
+  // Clear button visibility
+  d3.select('#search-clear').classed('visible', query.length > 0);
+
+  // Empty → clear all search highlights and the result list
+  if (!query) {
+    currentMatches = [];
+    if (arcs) arcs.classed('search-match', false);
+    d3.select('#search-summary').html('');
+    d3.select('#search-results').html('');
+    return;
+  }
+
+  // Find matching nodes (case-insensitive substring on node name)
+  currentMatches = root.descendants().filter(d =>
+    d.depth >= 1 && d.depth <= 4 &&
+    d.data.name.toLowerCase().includes(query)
+  );
+
+  // Apply visual highlight on the matching arcs.
+  // Search highlight is ORTHOGONAL to lineage selection — a wedge can be
+  // both .focused (yellow) and .search-match (orange glow) at once.
+  arcs.classed('search-match', d => currentMatches.includes(d));
+
+  // Update sidebar summary + result list
+  renderSearchResults();
+}
+
+function renderSearchResults() {
+  const total = currentMatches.length;
+  if (!currentSearchQuery) return;
+
+  if (total === 0) {
+    d3.select('#search-summary').html(
+      `<div class="search-summary"><strong>0</strong> matches for "${escapeHTML(currentSearchQuery)}"</div>`);
+    d3.select('#search-results').html('');
+    return;
+  }
+
+  d3.select('#search-summary').html(
+    `<div class="search-summary"><strong>${total}</strong> matches for "${escapeHTML(currentSearchQuery)}" — 클릭해서 이동</div>`);
+
+  // Sort by depth then by paper count desc (Phyla first, then larger nodes)
+  const sorted = currentMatches.slice().sort((a, b) =>
+    a.depth - b.depth || b.value - a.value);
+
+  const list = d3.select('#search-results');
+  list.html('');
+  // Cap at 30 results to keep the sidebar scrollable
+  sorted.slice(0, 30).forEach(d => {
+    const path = d.ancestors().reverse().slice(1, -1)
+      .map(n => n.data.name).join(' › ');
+    const kind = DEPTH_KIND[d.depth] || `Depth ${d.depth}`;
+    const item = list.append('div')
+      .attr('class', 'match-item')
+      .on('click', (event) => {
+        event.stopPropagation();
+        selectNode(d);
+      });
+    item.html(`
+      <div class="match-name">${highlightMatch(d.data.name, currentSearchQuery)}</div>
+      <div class="match-meta">
+        <span class="kind">${kind}</span>
+        ${path ? '· ' + escapeHTML(path) : ''}
+        <span class="count">${d.value.toLocaleString()}p</span>
+      </div>
+    `);
+  });
+  if (sorted.length > 30) {
+    list.append('div').attr('class', 'match-meta')
+      .style('text-align', 'center')
+      .style('padding', '6px')
+      .text(`... +${sorted.length - 30} more`);
+  }
+}
+
+function highlightMatch(name, query) {
+  if (!query) return escapeHTML(name);
+  const idx = name.toLowerCase().indexOf(query);
+  if (idx < 0) return escapeHTML(name);
+  return escapeHTML(name.slice(0, idx))
+    + '<mark>' + escapeHTML(name.slice(idx, idx + query.length)) + '</mark>'
+    + escapeHTML(name.slice(idx + query.length));
+}
 </script>
 </body>
 </html>
