@@ -37,6 +37,7 @@ Four raw-data visualizations live in the [`eda/`](eda/) folder — see [eda/READ
 | [`PLAN.en.md`](PLAN.en.md) | Work plan |
 | [`REFRESH.en.md`](REFRESH.en.md) | Procedure for syncing citations/DOIs from a RoboPaper Atlas snapshot |
 | [`refresh_from_atlas.py`](refresh_from_atlas.py) | atlas xlsx → citation/DOI refresh + regeneration of `papers.json` |
+| [`slides/`](slides/) | 33-frame Beamer deck (cohort wall + paradigm shifts) — compile with XeLaTeX |
 | [`classify.py`](classify.py) | Levels 1–3 classifier (Phylum/Class/Order) |
 | [`genus_rules.py`](genus_rules.py) | Level-4 classifier (Genus, sub-rules for the top 45 Orders) |
 | [`make_excel.py`](make_excel.py) | Script that converts classification results into the Excel file |

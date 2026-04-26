@@ -37,6 +37,7 @@
 | [`PLAN.md`](PLAN.md) | 작업 플랜 |
 | [`REFRESH.md`](REFRESH.md) | RoboPaper Atlas snapshot에서 citation/DOI 동기화 절차 |
 | [`refresh_from_atlas.py`](refresh_from_atlas.py) | atlas xlsx → citation/DOI 갱신 + `papers.json` 재생성 |
+| [`slides/`](slides/) | 33-프레임 Beamer 발표자료 (cohort wall + paradigm shift) — XeLaTeX 컴파일 |
 | [`classify.py`](classify.py) | 1~3 단계 분류기 (Phylum/Class/Order) |
 | [`genus_rules.py`](genus_rules.py) | 4단계 분류기 (Genus, top 45 Order에 sub-rule) |
 | [`make_excel.py`](make_excel.py) | 분류 결과 → 엑셀 변환 스크립트 |
