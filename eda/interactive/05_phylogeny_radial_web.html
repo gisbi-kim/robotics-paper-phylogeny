@@ -1669,14 +1669,13 @@ function applyLang(lang) {
   });
   currentLang = en ? 'en' : 'ko';
   // Re-render any dynamic content that uses t() so it picks up new lang.
-  if (focusedNode) renderFocusedPanel(focusedNode);
-  if (currentSearchQuery) renderSearchResults();
-  if (paperSearchQuery) renderPaperResults();
+  // typeof guards: these vars are `let`-declared further down the file;
+  // a same-tick boot would hit the temporal dead zone otherwise.
+  if (typeof focusedNode !== 'undefined' && focusedNode) renderFocusedPanel(focusedNode);
+  if (typeof currentSearchQuery !== 'undefined' && currentSearchQuery) renderSearchResults();
+  if (typeof paperSearchQuery !== 'undefined' && paperSearchQuery) renderPaperResults();
   if (typeof renderSuggestions === 'function') renderSuggestions();
 }
-
-// Boot: apply whatever lang the URL says
-applyLang(currentLang);
 
 // Listen for parent (index.html) telling us to switch
 window.addEventListener('message', function(e) {
@@ -1842,6 +1841,10 @@ d3.select('#paper-search-input').on('keydown', (event) => {
     }
   }
 });
+
+// Boot the language layer LAST — all let-declared state above
+// (paperSearchQuery, etc.) must exist before applyLang touches it.
+applyLang(currentLang);
 </script>
 </body>
 </html>
