@@ -190,18 +190,25 @@
     transition: r 0.2s;
   }
   .node:hover circle { r: 7; }
+  .node {
+    cursor: pointer;
+  }
   .node text {
-    pointer-events: none;
+    /* Whole text box is clickable (including the gaps between letters),
+       not just the painted glyphs. Click bubbles up to the .node group's
+       handler, so clicking the label/count toggles the node too. */
+    pointer-events: all;
     font-family: 'Google Sans', sans-serif;
     font-size: 12px;
     fill: var(--text);
-    /* White halo so the text stays legible over the highlighted blue
-       link curves that pass through node positions. */
+    /* White halo so text stays legible over the highlighted blue link
+       curves that pass through node positions. */
     paint-order: stroke fill;
     stroke: var(--bg);
     stroke-width: 3.5px;
     stroke-linejoin: round;
   }
+  .node:hover text { fill: var(--primary); }
   .node.has-hidden circle {
     stroke: var(--primary);
     stroke-width: 2;
@@ -216,8 +223,7 @@
     fill: var(--text-muted);
     font-size: 10px;
     font-family: 'Roboto Mono', monospace;
-    pointer-events: none;
-    /* same halo */
+    pointer-events: all;
     paint-order: stroke fill;
     stroke: var(--bg);
     stroke-width: 3px;
