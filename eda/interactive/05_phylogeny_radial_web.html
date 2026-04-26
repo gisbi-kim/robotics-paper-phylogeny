@@ -467,16 +467,26 @@ d3.json('tree_data.json').then(data => {
     return [Math.sin(angleRad) * r, -Math.cos(angleRad) * r];
   }
 
-  // For a label centered at angle `mid`, returns text rotation (degrees)
-  // so the text reads radially outward AND is upright when viewed normally.
+  // Text rotation (degrees, CCW from horizontal) so the baseline is aligned
+  // with the RADIAL direction at `angleRad` (= a spoke from the center
+  // outward, like the hands of a clock). NOT along the arc.
+  // D3 sunburst convention: angle 0 = 12 o'clock, increasing clockwise.
+  //
+  //   bearing  position    desired text orientation     rotation
+  //   ─────────────────────────────────────────────────────────
+  //   0°       top          vertical, reading bottom→top  -90
+  //   90°      right        horizontal, left→right         0
+  //   180°     bottom       vertical, top→bottom          90 (or -90 after flip)
+  //   270°     left         horizontal, right→left      180 (→ 0 after flip)
+  //
+  // Auto-flip whenever |rotation| > 90° so the text stays upright when
+  // read from outside the circle.
   function radialUprightRotation(angleRad) {
-    let deg = (angleRad * 180 / Math.PI) - 90;   // tangent angle (CCW from +x)
-    // Rotate by `deg + 90` to align text along the radial direction
-    let rot = deg + 90;
-    // Normalize to (-180, 180]
+    let bearing = (angleRad * 180 / Math.PI) % 360;
+    while (bearing < 0) bearing += 360;
+    let rot = bearing - 90;
     while (rot > 180) rot -= 360;
     while (rot <= -180) rot += 360;
-    // Auto-flip so the text is never upside down
     if (rot > 90) rot -= 180;
     else if (rot < -90) rot += 180;
     return rot;

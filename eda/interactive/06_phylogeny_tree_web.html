@@ -195,6 +195,12 @@
     font-family: 'Google Sans', sans-serif;
     font-size: 12px;
     fill: var(--text);
+    /* White halo so the text stays legible over the highlighted blue
+       link curves that pass through node positions. */
+    paint-order: stroke fill;
+    stroke: var(--bg);
+    stroke-width: 3.5px;
+    stroke-linejoin: round;
   }
   .node.has-hidden circle {
     stroke: var(--primary);
@@ -211,6 +217,11 @@
     font-size: 10px;
     font-family: 'Roboto Mono', monospace;
     pointer-events: none;
+    /* same halo */
+    paint-order: stroke fill;
+    stroke: var(--bg);
+    stroke-width: 3px;
+    stroke-linejoin: round;
   }
 
   /* Vertical depth axis labels at top */
