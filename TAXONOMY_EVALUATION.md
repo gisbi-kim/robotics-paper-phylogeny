@@ -136,3 +136,7 @@ Handbook의 구조가 더 직관적인 측면은 분명 있으나, 그것은 교
 ---
 
 *참고: Springer Handbook of Robotics, 2nd ed. (Siciliano & Khatib, 2016), ISBN 978-3-319-32550-7; 1st ed. (2008), ISBN 978-3-540-23957-4.*
+
+*비교에 사용한 목차 PDF (저작권상 표지/목차 일부만):*
+- [`references/springer_handbook_robotics_2008_toc.pdf`](references/springer_handbook_robotics_2008_toc.pdf) — 2008판 (1st ed.)
+- [`references/springer_handbook_robotics_2016_toc.pdf`](references/springer_handbook_robotics_2016_toc.pdf) — 2016판 (2nd ed.)

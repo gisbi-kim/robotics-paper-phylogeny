@@ -136,3 +136,7 @@ The Handbook is undeniably more intuitive in some respects, but that is a conseq
 ---
 
 *Reference: Springer Handbook of Robotics, 2nd ed. (Siciliano & Khatib, 2016), ISBN 978-3-319-32550-7; 1st ed. (2008), ISBN 978-3-540-23957-4.*
+
+*ToC PDFs used for the comparison (cover + table of contents only, for fair-use review):*
+- [`references/springer_handbook_robotics_2008_toc.pdf`](references/springer_handbook_robotics_2008_toc.pdf) — 1st edition (2008)
+- [`references/springer_handbook_robotics_2016_toc.pdf`](references/springer_handbook_robotics_2016_toc.pdf) — 2nd edition (2016)
