@@ -430,6 +430,63 @@ const focusedCard = d3.select('#focused-card');
 const hoveredCard = d3.select('#hovered-card');
 const depthHeader = d3.select('#depth-header');
 
+// ============ Drag-to-pan on the scroll container ============
+// Click on empty space + drag → pans the tree by scrolling #main.
+// Skips drags that start on a node so click-to-toggle still works,
+// and swallows the synthetic click after a real drag so it doesn't
+// fire resetSelection on the svg.
+(function setupDragPan() {
+  let isDown = false;
+  let dragged = false;
+  let startX = 0, startY = 0, startScrollX = 0, startScrollY = 0;
+  const THRESHOLD = 4;
+
+  main.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    if (e.target.closest('g.node')) return;
+    isDown = true;
+    dragged = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    startScrollX = main.scrollLeft;
+    startScrollY = main.scrollTop;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (!dragged && Math.hypot(dx, dy) > THRESHOLD) {
+      dragged = true;
+      main.style.cursor = 'grabbing';
+      // Suppress text selection and node hovers while dragging
+      document.body.style.userSelect = 'none';
+    }
+    if (dragged) {
+      main.scrollLeft = startScrollX - dx;
+      main.scrollTop  = startScrollY - dy;
+      e.preventDefault();
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDown) return;
+    isDown = false;
+    main.style.cursor = '';
+    document.body.style.userSelect = '';
+    if (dragged) {
+      // Swallow the synthetic click so resetSelection on the svg
+      // background doesn't fire after a real drag.
+      const swallow = (ev) => {
+        ev.stopPropagation();
+        ev.preventDefault();
+        window.removeEventListener('click', swallow, true);
+      };
+      window.addEventListener('click', swallow, true);
+    }
+  });
+})();
+
 let root, focusedNode = null;
 let totalPapers = 0;
 
