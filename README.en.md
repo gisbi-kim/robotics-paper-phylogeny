@@ -34,6 +34,7 @@ Four raw-data visualizations live in the [`eda/`](eda/) folder — see [eda/READ
 | **[`robotics_taxonomy.xlsx`](robotics_taxonomy.xlsx)** | Main result — 3 sheets (Papers / Taxonomy_Tree / Stats), **4-depth (P/C/O/G)** |
 | [`TAXONOMY.md`](TAXONOMY.md) | Full tree of 13 Phylum × ~95 Class × ~330 Order |
 | [`TAXONOMY_CHANGES.md`](TAXONOMY_CHANGES.md) | Diff and update notes between the draft and the post-read-through revision over all 7,477 papers |
+| [`TAXONOMY_EVALUATION.en.md`](TAXONOMY_EVALUATION.en.md) | Self-evaluation: MECE and insightfulness compared against the Springer Handbook of Robotics |
 | [`PLAN.en.md`](PLAN.en.md) | Work plan |
 | [`REFRESH.en.md`](REFRESH.en.md) | Procedure for syncing citations/DOIs from a RoboPaper Atlas snapshot |
 | [`refresh_from_atlas.py`](refresh_from_atlas.py) | atlas xlsx → citation/DOI refresh + regeneration of `papers.json` |
