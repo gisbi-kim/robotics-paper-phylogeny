@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taxonomy — Robotics Paper Phylogeny</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&family=Roboto+Mono&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-subtle: #f8f9fa;
+    --bg-elevated: #ffffff;
+    --text: #202124;
+    --text-secondary: #5f6368;
+    --text-muted: #80868b;
+    --border: #e8eaed;
+    --border-strong: #dadce0;
+    --primary: #1a73e8;
+    --primary-hover: #1557b0;
+    --primary-bg: #e8f0fe;
+    --success: #188038;
+    --success-bg: #e6f4ea;
+    --danger: #c5221f;
+    --danger-bg: #fce8e6;
+    --warning: #b06000;
+    --warning-bg: #fef7e0;
+    --elev-1: 0 1px 2px 0 rgba(60,64,67,0.30), 0 1px 3px 1px rgba(60,64,67,0.15);
+    --elev-2: 0 1px 2px 0 rgba(60,64,67,0.30), 0 2px 6px 2px rgba(60,64,67,0.15);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Google Sans', 'Roboto', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", sans-serif;
+    line-height: 1.5;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+  }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* App bar */
+  .appbar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    backdrop-filter: blur(8px);
+  }
+  .appbar-inner {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .appbar-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    color: var(--text);
+  }
+  .appbar-logo .icon { font-size: 22px; }
+  .appbar-spacer { flex: 1; }
+  .appbar-actions { display: flex; gap: 4px; align-items: center; }
+  .icon-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    color: var(--text-secondary);
+    font-size: 13px; font-weight: 500;
+    transition: background 0.15s;
+    border: none; background: none; cursor: pointer;
+  }
+  .icon-btn:hover {
+    background: var(--bg-subtle);
+    text-decoration: none;
+    color: var(--text);
+  }
+  .icon-btn.active {
+    background: var(--primary-bg);
+    color: var(--primary);
+  }
+
+  .lang-toggle {
+    display: inline-flex; align-items: center;
+    background: var(--bg-subtle);
+    border-radius: 16px;
+    padding: 3px;
+    margin-left: 8px;
+    font-family: 'Google Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+  }
+  .lang-toggle button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 14px;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    transition: all 0.15s;
+  }
+  .lang-toggle button:hover { color: var(--text); }
+  .lang-toggle button.active {
+    background: var(--bg-elevated);
+    color: var(--primary);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+
+  /* Hero */
+  .hero {
+    background: var(--bg);
+    padding: 56px 24px 32px;
+    text-align: center;
+  }
+  .hero-inner { max-width: 820px; margin: 0 auto; }
+  .hero h1 {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 1.1;
+    margin: 0 0 16px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 strong {
+    background: linear-gradient(135deg, #4285f4, #34a853, #fbbc04, #ea4335);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 500;
+  }
+  .hero .lede {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+  .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .chip {
+    display: inline-flex; align-items: center;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  /* Container */
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+  }
+
+  /* Section header */
+  .section-eyebrow {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 56px 0 8px;
+  }
+  .section-title {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    font-size: 28px;
+    margin: 0 0 12px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .section-sub {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin: 0 0 24px;
+    max-width: 760px;
+    line-height: 1.6;
+  }
+
+  /* Card */
+  .card {
+    background: var(--bg-elevated);
+    border-radius: 8px;
+    padding: 28px;
+    margin: 0 0 20px;
+    box-shadow: var(--elev-1);
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: var(--elev-2); }
+
+  /* 4-depth grid */
+  .tx-grid {
+    display: grid;
+    grid-template-columns: 70px 110px 80px 1fr;
+    border-top: 1px solid var(--border);
+  }
+  .tx-grid > div {
+    padding: 14px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    line-height: 1.5;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .tx-grid .tx-h {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--bg-subtle);
+  }
+  .tx-grid .tx-en {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    color: var(--primary);
+  }
+  .tx-grid .tx-n {
+    font-family: 'Roboto Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .tx-grid .tx-desc { color: var(--text-secondary); flex-direction: column; align-items: flex-start; }
+  .tx-grid .tx-desc .tx-eg {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .tx-grid .tx-desc .tx-eg code {
+    background: var(--bg-subtle);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+  }
+  @media (max-width: 720px) {
+    .tx-grid { grid-template-columns: 1fr; }
+    .tx-grid > div { border-bottom: none; padding: 6px 14px; }
+    .tx-grid .tx-h { padding-top: 14px; }
+    .tx-grid .tx-desc { padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  }
+
+  /* Phylum cards (replaces appbar's flat list) */
+  .phyla-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .phylum-tile {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--phy-color, var(--primary));
+    border-radius: 6px;
+    padding: 14px 16px;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .phylum-tile:hover {
+    box-shadow: var(--elev-1);
+    transform: translateY(-1px);
+  }
+  .phylum-tile-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .phylum-tile-name {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .phylum-tile-count {
+    font-family: 'Roboto Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .phylum-tile-desc {
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  /* Evaluation: comparison cards */
+  .eval-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  @media (max-width: 720px) {
+    .eval-grid { grid-template-columns: 1fr; }
+  }
+  .eval-card {
+    background: var(--bg-elevated);
+    border-radius: 8px;
+    padding: 22px 24px;
+    box-shadow: var(--elev-1);
+    border-top: 4px solid var(--eval-accent, var(--primary));
+  }
+  .eval-card.handbook { --eval-accent: #b06000; }
+  .eval-card.ours     { --eval-accent: #188038; }
+  .eval-card h3 {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  .eval-card .meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+  .eval-card .summary {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
+  .eval-card pre {
+    background: var(--bg-subtle);
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--text);
+    overflow-x: auto;
+    margin: 0;
+  }
+
+  /* MECE table */
+  table.mece {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  table.mece th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  table.mece td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  table.mece td.topic { font-weight: 500; }
+  table.mece td .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    background: var(--danger-bg);
+    color: var(--danger);
+    margin: 1px 4px 1px 0;
+  }
+  table.mece td .pill.ok {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+
+  /* Verdict block */
+  .verdict {
+    background: var(--primary-bg);
+    border-left: 4px solid var(--primary);
+    padding: 18px 22px;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.65;
+    margin: 16px 0 8px;
+  }
+  .verdict strong { color: var(--primary); font-weight: 700; }
+  .verdict ol { margin: 8px 0 0; padding-left: 20px; }
+  .verdict li { margin: 6px 0; }
+
+  /* Strengths cards */
+  .strength-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    margin: 14px 0;
+  }
+  .strength-card {
+    background: var(--success-bg);
+    border-radius: 6px;
+    padding: 14px 16px;
+    border-left: 3px solid var(--success);
+  }
+  .strength-card h4 {
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    margin: 0 0 6px;
+    color: var(--success);
+  }
+  .strength-card p {
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* Trends table */
+  table.trends {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 12.5px;
+  }
+  table.trends th, table.trends td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  table.trends th {
+    background: var(--bg-subtle);
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+  }
+  table.trends td.our { color: var(--success); font-family: 'Roboto Mono', monospace; font-size: 11.5px; }
+  table.trends td.their { color: var(--danger); font-style: italic; }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 56px;
+    padding: 28px 24px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-align: center;
+    background: var(--bg-subtle);
+  }
+  footer p { margin: 4px 0; }
+
+  /* Anchor link nav */
+  .anchor-nav {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 24px 0;
+  }
+  .anchor-nav a {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .anchor-nav a:hover {
+    background: var(--bg-elevated);
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 32px; }
+    .hero { padding: 36px 16px 24px; }
+    .container { padding: 0 16px 32px; }
+    .appbar { padding: 0 16px; }
+    .appbar-actions .icon-btn span:not(.icon) { display: none; }
+    .section-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- App bar -->
+<div class="appbar">
+  <div class="appbar-inner">
+    <a class="appbar-logo" href="index.html" style="color: inherit;">
+      <span class="icon">🌳</span>
+      <span>Robotics Phylogeny</span>
+    </a>
+    <div class="appbar-spacer"></div>
+    <div class="appbar-actions">
+      <a class="icon-btn" href="https://github.com/gisbi-kim/robotics-paper-phylogeny" target="_blank">
+        <span class="icon">📚</span><span>GitHub</span>
+      </a>
+      <a class="icon-btn" href="robotics_taxonomy.xlsx">
+        <span class="icon">📊</span><span>Excel</span>
+      </a>
+      <a class="icon-btn active" href="taxonomy.html">
+        <span class="icon">📖</span><span>Taxonomy</span>
+      </a>
+      <span class="lang-toggle" id="lang-toggle">
+        <button data-lang="ko" class="active">한국어</button>
+        <button data-lang="en">English</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1 data-en="The <strong>Taxonomy</strong>">계통도 <strong>Taxonomy</strong></h1>
+    <p class="lede" data-en="A 4-level phylogeny (Phylum → Class → Order → Genus) for 7,477 robotics papers. Below: how the tree is structured, the 13 top-level Phyla, and how it compares to the Springer Handbook of Robotics.">
+      7,477편의 로봇공학 논문을 4단계(Phylum → Class → Order → Genus)로 묶은 계통 분류 체계.
+      구조, 13개 Phylum, 그리고 Springer Handbook of Robotics와의 비교 평가까지.
+    </p>
+    <div class="chips">
+      <span class="chip">📦 7,477 papers</span>
+      <span class="chip">🌳 13 Phylum</span>
+      <span class="chip">🌿 ~100 Class</span>
+      <span class="chip">🍃 ~330 Order</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+
+<!-- Anchor nav -->
+<nav class="anchor-nav">
+  <a href="#concept" data-en="① Concept">① 개념</a>
+  <a href="#phyla" data-en="② 13 Phyla">② 13 Phylum</a>
+  <a href="#full-tree" data-en="③ Full tree">③ 전체 트리</a>
+  <a href="#evaluation" data-en="④ Self-evaluation">④ 자체 평가</a>
+</nav>
+
+<!-- ============== § 1. CONCEPT ============== -->
+<div class="section-eyebrow" id="concept">§ 1</div>
+<h2 class="section-title" data-en="The 4-level structure">4단계 구조</h2>
+<p class="section-sub" data-en="Borrowing from biological phylogenetic taxonomy, papers are placed into four nested levels. Each row narrows the category from the one above.">생물 계통도(phylogenetic taxonomy)에서 빌려온 4단계. 위에서 아래로 점점 좁아지는 카테고리.</p>
+
+<div class="card">
+  <div class="tx-grid">
+    <div class="tx-h">L1</div>
+    <div class="tx-en">Phylum</div>
+    <div class="tx-n" data-en="13">13개</div>
+    <div class="tx-desc" data-en='Top level — broad areas within robotics<span class="tx-eg">e.g. <code>Manipulation</code>, <code>Locomotion</code>, <code>SLAM &amp; Localization</code></span>'>
+      대분류 — 로봇공학 안의 큰 분야
+      <span class="tx-eg">예: <code>Manipulation</code>, <code>Locomotion</code>, <code>SLAM &amp; Localization</code></span>
+    </div>
+
+    <div class="tx-h">L2</div>
+    <div class="tx-en">Class</div>
+    <div class="tx-n" data-en="~100">~100개</div>
+    <div class="tx-desc" data-en='Mid level — major branches inside a Phylum<span class="tx-eg">e.g. <code>Manipulation</code> ▸ <code>Grasping</code></span>'>
+      중분류 — Phylum 안의 주요 갈래
+      <span class="tx-eg">예: <code>Manipulation</code> ▸ <code>Grasping</code></span>
+    </div>
+
+    <div class="tx-h">L3</div>
+    <div class="tx-en">Order</div>
+    <div class="tx-n" data-en="~330">~330개</div>
+    <div class="tx-desc" data-en='Sub level — specific topics inside a Class<span class="tx-eg">e.g. <code>Grasping</code> ▸ <code>Grasp Planning / Synthesis</code></span>'>
+      소분류 — Class 안의 세부 주제
+      <span class="tx-eg">예: <code>Grasping</code> ▸ <code>Grasp Planning / Synthesis</code></span>
+    </div>
+
+    <div class="tx-h">L4</div>
+    <div class="tx-en">Genus</div>
+    <div class="tx-n" data-en="varies">가변</div>
+    <div class="tx-desc" data-en='Leaf level — concrete approaches inside an Order. Top 45 Orders carry sub-rules; the rest are labelled (general).<span class="tx-eg">e.g. <code>Grasp Planning</code> ▸ <code>Learning-based Grasping</code></span>'>
+      세부 — Order 안의 구체적 접근법. top 45 Order에만 sub-rule, 나머지는 모두 <code>(general)</code>
+      <span class="tx-eg">예: <code>Grasp Planning</code> ▸ <code>Learning-based Grasping</code></span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== § 2. 13 PHYLA ============== -->
+<div class="section-eyebrow" id="phyla">§ 2</div>
+<h2 class="section-title" data-en="The 13 Phyla">13개 Phylum</h2>
+<p class="section-sub" data-en="Every paper goes into exactly one Phylum. Numbers are paper counts (% of 7,477).">모든 논문은 정확히 하나의 Phylum에 속합니다. 숫자는 논문 수 (% of 7,477).</p>
+
+<div class="phyla-grid">
+  <div class="phylum-tile" style="--phy-color:#2ca02c;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Manipulation</span>
+      <span class="phylum-tile-count">934 · 12.5%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Grasping, dexterous, deformable, assembly, non-prehensile, mobile manipulation">그래스핑·dexterous·deformable·조립·non-prehensile·이동조작</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#98df8a;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Locomotion</span>
+      <span class="phylum-tile-count">842 · 11.3%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Legged, wheeled, aerial, underwater, bio-inspired locomotion">다리·바퀴·공중·수중·바이오 영감 이동</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#ff7f0e;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Planning</span>
+      <span class="phylum-tile-count">835 · 11.2%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Path / motion / task / navigation / exploration planning">경로·모션·태스크·네비게이션·탐사 계획</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#aec7e8;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">SLAM &amp; Localization</span>
+      <span class="phylum-tile-count">670 · 9.0%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Localization, mapping, calibration, place recognition">위치추정·매핑·캘리브레이션·Place Recognition</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#d62728;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Robot Design &amp; Hardware</span>
+      <span class="phylum-tile-count">623 · 8.3%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Soft, continuum, modular, micro robots, actuator design">소프트·연속체·모듈러·마이크로·액추에이터 설계</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#1f77b4;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Perception &amp; Sensing</span>
+      <span class="phylum-tile-count">554 · 7.4%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Vision, LiDAR, tactile, event-based, multi-modal perception">시각·LiDAR·촉각·이벤트·다중모달 인식</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#c49c94;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Theoretical Foundations</span>
+      <span class="phylum-tile-count">491 · 6.6%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Kinematics, dynamics, optimization, Lie groups, stability, formal methods">기구학·동역학·최적화·Lie 그룹·안정성·형식방법</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#ffbb78;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Control</span>
+      <span class="phylum-tile-count">441 · 5.9%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Classical, predictive, impedance, safety-critical, learning-based control">고전·예측·임피던스·안전·학습 기반 제어</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#9467bd;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Multi-Robot Systems</span>
+      <span class="phylum-tile-count">408 · 5.5%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Swarm, coordination, MAPF, distributed SLAM, aerial swarms">군집·조정·MAPF·분산 SLAM·aerial swarm</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#8c564b;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Application Domains</span>
+      <span class="phylum-tile-count">396 · 5.3%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Medical, field, autonomous driving, space, service, computational biology">의료·필드·자율주행·우주·서비스·계산생물학</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#ff9896;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Human-Robot Interaction</span>
+      <span class="phylum-tile-count">395 · 5.3%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="pHRI, teleoperation, assistive, haptics">pHRI·텔레오퍼레이션·어시스티브·햅틱</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#c5b0d5;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Learning for Robotics</span>
+      <span class="phylum-tile-count">354 · 4.7%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="RL, IL, VLA, diffusion policy, datasets">RL·IL·VLA·Diffusion Policy·데이터셋</div>
+  </div>
+  <div class="phylum-tile" style="--phy-color:#e377c2;">
+    <div class="phylum-tile-head">
+      <span class="phylum-tile-name">Robot Software &amp; Architecture</span>
+      <span class="phylum-tile-count">30 · 0.4%</span>
+    </div>
+    <div class="phylum-tile-desc" data-en="Middleware, behavior trees, codegen, real-time">미들웨어·BT·코드젠·실시간</div>
+  </div>
+</div>
+
+<!-- ============== § 3. FULL TREE LINK ============== -->
+<div class="section-eyebrow" id="full-tree">§ 3</div>
+<h2 class="section-title" data-en="Full tree (~100 Class · ~330 Order)">전체 트리 (~100 Class · ~330 Order)</h2>
+<p class="section-sub" data-en="The complete 13 × ~100 × ~330 tree, with rationale for every Class/Order added or removed during the read-through of all 7,477 papers.">13 × ~100 × ~330의 전체 트리. 7,477편 통독 과정에서 각 Class/Order의 추가·제거 근거 포함.</p>
+
+<div class="card">
+  <p style="margin: 0 0 12px;">
+    <a href="TAXONOMY.md" style="font-weight: 500;">📖 <span data-en="TAXONOMY.md — full tree">TAXONOMY.md — 전체 트리</span></a>
+    &nbsp;·&nbsp;
+    <a href="TAXONOMY_CHANGES.md"><span data-en="TAXONOMY_CHANGES.md — diff &amp; rationale">TAXONOMY_CHANGES.md — 변경 내역</span></a>
+    &nbsp;·&nbsp;
+    <a href="robotics_taxonomy.xlsx"><span data-en="Excel — papers + tree + stats">Excel — 논문 + 트리 + 통계</span></a>
+  </p>
+  <p class="section-sub" style="margin: 0; font-size: 13px;" data-en='Tip: The interactive radial &amp; horizontal tree viewers on the <a href="index.html#tab=c">main page</a> let you click through the tree visually, with a "view papers" button on every node.'>
+    팁: <a href="index.html#tab=c">메인 페이지</a>의 인터랙티브 radial &amp; horizontal tree 뷰어에서 트리를 시각적으로 탐색할 수 있습니다 (각 노드에 "view papers" 버튼).
+  </p>
+</div>
+
+<!-- ============== § 4. EVALUATION ============== -->
+<div class="section-eyebrow" id="evaluation">§ 4</div>
+<h2 class="section-title" data-en="Self-evaluation: vs. Springer Handbook of Robotics">자체 평가: Springer Handbook of Robotics 대비</h2>
+<p class="section-sub" data-en='How does our taxonomy stack up against the de facto standard reference — the <em>Springer Handbook of Robotics</em> (Siciliano &amp; Khatib, 2008 / 2016)? Our claim: <strong>more MECE</strong> and <strong>more current</strong> for paper-classification purposes — though the Handbook is more intuitive as a textbook.'>
+  로보틱스 분야 사실상 표준 레퍼런스인 <em>Springer Handbook of Robotics</em> (Siciliano &amp; Khatib, 2008 / 2016)와 비교해 우리 계통도가 얼마나 MECE하고 insightful한지. 결론: 논문 분류 목적에서는 <strong>더 MECE</strong>하고 <strong>현재 연구 지형을 더 잘 반영</strong>. 단, Handbook은 교과서로서는 더 직관적.
+</p>
+
+<!-- side-by-side -->
+<div class="eval-grid">
+  <div class="eval-card handbook">
+    <h3>Springer Handbook of Robotics</h3>
+    <div class="meta">2008 (64ch) · 2016 (83ch) — Siciliano &amp; Khatib (Eds.)</div>
+    <div class="summary" data-en="7-part structure mixing technology layers, robot types, and application domains.">7-part 구조. 기술 계층 × 로봇 타입 × 응용 도메인이 혼재.</div>
+<pre>Part A  Robotics Foundations
+Part B  Robot Structures
+Part C  Sensing and Perception
+Part D  Manipulation and Interfaces
+Part E  Mobile &amp; Distributed Robotics
+Part F  Field &amp; Service Robotics
+Part G  Human-Centered &amp; Life-like</pre>
+  </div>
+
+  <div class="eval-card ours">
+    <h3 data-en="Our 4-level Phylogeny">우리 4계층 계통도</h3>
+    <div class="meta">2025 · 7,477 papers · 13 Phyla / ~100 Class / ~330 Order / Genus</div>
+    <div class="summary" data-en="One consistent organizing principle: functional capability. Application domains explicitly cross-cutting.">단일 원칙: <strong>functional capability (연구가 무엇을 가능하게 하는가)</strong>. 응용은 cross-cutting Phylum으로 분리.</div>
+<pre>① Perception &amp; Sensing       ⑧ HRI
+② SLAM &amp; Localization        ⑨ Multi-Robot Systems
+③ Planning                   ⑩ Learning for Robotics
+④ Control                    ⑪ Application Domains
+⑤ Manipulation               ⑫ Theoretical Foundations
+⑥ Locomotion                 ⑬ Robot Software &amp; Arch.
+⑦ Robot Design &amp; Hardware</pre>
+  </div>
+</div>
+
+<!-- MECE failures table -->
+<h3 style="margin: 36px 0 6px; font-family: 'Google Sans', sans-serif; font-weight: 500; font-size: 18px;" data-en="MECE failures in the Handbook (Mutual Exclusivity)">Handbook의 MECE 위반 (상호배타성)</h3>
+<p class="section-sub" style="font-size: 13px; margin-bottom: 12px;" data-en="The same topic legitimately belongs to two parts at once — a structural classification flaw.">같은 주제가 두 파트에 동시에 정당하게 속함 — 구조적 분류 결함.</p>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+<table class="mece">
+<thead>
+<tr>
+  <th data-en="Topic">주제</th>
+  <th data-en="Conflicting parts in the Handbook">Handbook 안에서의 충돌</th>
+  <th data-en="In our taxonomy">우리 분류 위치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td class="topic">Aerial Robots</td>
+  <td>
+    <span class="pill">Part B (Structures)</span>
+    <span class="pill">Part E (Mobile)</span>
+    <span data-en="Flying robot is both a structure and a mobile platform" style="display:block; margin-top:6px; color:var(--text-secondary); font-size:12px;">비행 로봇은 구조이면서 동시에 이동 플랫폼</span>
+  </td>
+  <td><span class="pill ok">Locomotion ▸ Aerial</span></td>
+</tr>
+<tr>
+  <td class="topic">SLAM</td>
+  <td>
+    <span class="pill">Part C (Sensing)</span>
+    <span class="pill">Part E (Mobile)</span>
+    <span data-en="Localization spans both perception and mobile robotics" style="display:block; margin-top:6px; color:var(--text-secondary); font-size:12px;">위치추정이 인식과 이동 양쪽에 걸침</span>
+  </td>
+  <td><span class="pill ok">SLAM &amp; Localization (독립)</span></td>
+</tr>
+<tr>
+  <td class="topic">Underwater Robots</td>
+  <td>
+    <span class="pill">Part B (Structures)</span>
+    <span class="pill">Part F (Field)</span>
+    <span data-en="Same robot family appears as structure and as service" style="display:block; margin-top:6px; color:var(--text-secondary); font-size:12px;">같은 로봇이 구조와 서비스 양쪽에 등장</span>
+  </td>
+  <td><span class="pill ok">Locomotion ▸ Underwater</span></td>
+</tr>
+<tr>
+  <td class="topic">Medical Robotics</td>
+  <td>
+    <span class="pill">Part D (Manipulation)</span>
+    <span class="pill">Part F (Service)</span>
+    <span data-en="Surgical robot = manipulation tech + service application" style="display:block; margin-top:6px; color:var(--text-secondary); font-size:12px;">수술 로봇 = 조작 기술 + 서비스 응용</span>
+  </td>
+  <td><span class="pill ok">Application Domains ▸ Medical</span></td>
+</tr>
+<tr>
+  <td class="topic">Swarm Robotics</td>
+  <td>
+    <span class="pill">Part E (Distributed)</span>
+    <span class="pill">Part G (Bio-inspired)</span>
+    <span data-en="Swarm behavior fits both distributed systems and bio-inspiration" style="display:block; margin-top:6px; color:var(--text-secondary); font-size:12px;">군집 행동이 분산 시스템과 생물 영감 양쪽으로 분류 가능</span>
+  </td>
+  <td><span class="pill ok">Multi-Robot Systems ▸ Swarm</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p style="margin: 18px 0 0; padding: 14px 18px; background: var(--warning-bg); border-left: 3px solid var(--warning); border-radius: 4px; font-size: 13px; line-height: 1.6;" data-en="<strong>Root cause:</strong> the Handbook mixes its organizing axes — technology layer (Part A) × robot type (Part B) × functional domain (Parts C–E) × application (Parts F–G). One paper can simultaneously belong to multiple parts."><strong>근본 원인:</strong> Handbook은 분류 축이 혼재 — 기술 계층(Part A) × 로봇 타입(Part B) × 기능 영역(Part C–E) × 응용 도메인(Part F–G). 한 논문이 여러 파트에 동시에 정당하게 속할 수 있는 구조.</p>
+
+<!-- Strengths -->
+<h3 style="margin: 36px 0 6px; font-family: 'Google Sans', sans-serif; font-weight: 500; font-size: 18px;" data-en="Where our taxonomy is more insightful">우리 계통도가 더 insightful한 지점</h3>
+<p class="section-sub" style="font-size: 13px; margin-bottom: 12px;" data-en="Three design choices that better fit the 2020s research landscape.">2020년대 연구 지형에 더 잘 맞는 세 가지 설계 결정.</p>
+
+<div class="strength-grid">
+  <div class="strength-card">
+    <h4 data-en="① SLAM ⊥ Perception">① SLAM ⊥ Perception</h4>
+    <p data-en="The two communities are genuinely distinct (ICRA SLAM sessions ≠ vision sessions), with different methodologies. The Handbook subordinates SLAM to Sensing; we elevate it.">실제 두 커뮤니티가 다르고(ICRA SLAM session ≠ 비전 세션), 방법론도 다르다. Handbook은 SLAM을 Sensing에 종속시키지만 우리는 독립 Phylum으로 승격.</p>
+  </div>
+  <div class="strength-card">
+    <h4 data-en="② Learning as a top-level Phylum">② Learning을 1등급 Phylum</h4>
+    <p data-en="2008 ignored learning; 2016 still gave it no dedicated part. We make Learning for Robotics a first-class Phylum — capturing RL, IL, VLA, Diffusion Policy, World Models.">2008판은 무시, 2016판도 독립 파트 없음. 우리는 RL·IL·VLA·Diffusion Policy·World Models 모두 독립 Phylum으로.</p>
+  </div>
+  <div class="strength-card">
+    <h4 data-en="③ Application as cross-cutting">③ 응용은 cross-cutting</h4>
+    <p data-en="Autonomous Driving, Medical, Space are application contexts, not technologies. Isolating them prevents contamination of the technology classification.">자율주행·의료·우주는 "기술"이 아니라 "응용 맥락". 별도 Phylum으로 격리해 기술 분류와 혼재 방지.</p>
+  </div>
+</div>
+
+<!-- Trends table -->
+<h3 style="margin: 36px 0 6px; font-family: 'Google Sans', sans-serif; font-weight: 500; font-size: 18px;" data-en="2020s trends our taxonomy captures (Handbook can't)">2020년대 트렌드 수용 (Handbook 미반영)</h3>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+<table class="trends">
+<thead>
+<tr>
+  <th data-en="Trend">트렌드</th>
+  <th data-en="In our taxonomy">우리 분류 위치</th>
+  <th data-en="In the Handbook">Handbook</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>VLA / π₀ / RT-2</td><td class="our">Learning ▸ Foundation Models ▸ VLA</td><td class="their" data-en="not present">해당 없음</td></tr>
+<tr><td>Diffusion Policy</td><td class="our">Learning ▸ Foundation Models ▸ Diffusion Policies</td><td class="their" data-en="not present">해당 없음</td></tr>
+<tr><td>Gaussian Splatting SLAM</td><td class="our">SLAM ▸ Neural Implicit / GS SLAM</td><td class="their" data-en="not present">해당 없음</td></tr>
+<tr><td>Event Camera</td><td class="our">Perception ▸ Event-based Vision</td><td class="their" data-en="not present">해당 없음</td></tr>
+<tr><td>Safety-Critical (CBF)</td><td class="our">Control ▸ Safety-Critical Control</td><td class="their" data-en="not present">해당 없음</td></tr>
+<tr><td>Loco-Manipulation</td><td class="our">Manipulation ▸ Mobile Manipulation</td><td class="their" data-en="not present">해당 없음</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- Where the Handbook wins -->
+<h3 style="margin: 36px 0 6px; font-family: 'Google Sans', sans-serif; font-weight: 500; font-size: 18px;" data-en="Where the Handbook wins (honest)">Handbook이 우세한 점 (솔직히)</h3>
+<div class="card" style="padding: 18px 22px;">
+<ul style="margin: 0; padding-left: 22px; color: var(--text); font-size: 13.5px; line-height: 1.7;">
+  <li data-en='<strong>Robot-type intuitiveness</strong> — chapter-per-robot-type ("Humanoid", "Quadruped", "Aerial") is natural for browsing by embodiment.'><strong>로봇 타입 직관성</strong> — "Humanoid" "Quadruped" "Aerial" 챕터별로 embodiment 탐색에 자연스러움.</li>
+  <li data-en="<strong>Application-first search</strong> — non-specialists looking for &quot;Medical Robotics&quot; find it immediately."><strong>응용 중심 탐색</strong> — 비전문가가 "Medical Robotics" 찾을 때 직관적.</li>
+  <li data-en="<strong>Historical narrative</strong> — each chapter can tell the story of a subfield's development. Optimal as a textbook."><strong>역사적 계보 서술</strong> — 챕터마다 기술 발전사를 서술하기 좋음. 교과서로 최적.</li>
+  <li data-en="<strong>Authority</strong> — 164 contributors, peer-reviewed, industry-standard reference."><strong>권위</strong> — 164명 집필, peer-reviewed, 업계 표준 레퍼런스.</li>
+</ul>
+<p style="margin: 14px 0 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6;" data-en="But these strengths follow from the Handbook being designed as a <strong>textbook (pedagogy)</strong>, not a paper classification system. The structural flaws above only matter when you're trying to MECE-classify thousands of papers automatically.">단, 이 장점들은 Handbook이 <strong>교과서(pedagogy)</strong>로 설계됐기 때문. 위의 구조적 결함은 7,000편 자동 분류 시점에야 결정적으로 드러남.</p>
+</div>
+
+<!-- Verdict -->
+<div class="verdict">
+  <strong data-en="Verdict.">결론.</strong>
+  <span data-en=" Our 4-level phylogenetic taxonomy outperforms the Springer Handbook on three dimensions:"> 우리 4계층 계통도는 Springer Handbook 대비 다음 측면에서 우수합니다:</span>
+  <ol>
+    <li data-en="<strong>MECE</strong> — single consistent organizing principle (functional capability) → far fewer mutual-exclusivity violations."><strong>MECE</strong> — 단일 분류 원칙(functional capability)으로 상호배타성 위반이 현저히 적음.</li>
+    <li data-en="<strong>Insightful</strong> — SLAM/Perception split, Learning as an independent Phylum, explicit Theoretical Foundations reflect 2020s research more accurately."><strong>Insightful</strong> — SLAM/Perception 분리, Learning 독립, Theoretical Foundations 명시화가 2020년대 지형을 더 잘 반영.</li>
+    <li data-en="<strong>Currency</strong> — Foundation Models, Gaussian Splatting, Event Cameras, and other post-2023 trends are accommodated."><strong>시대성</strong> — Foundation Models·Gaussian Splatting·Event Camera 등 2023+ 트렌드 수용.</li>
+  </ol>
+  <p style="margin: 12px 0 0;" data-en='The most consequential differentiator is <strong>elevating Learning for Robotics to a first-class Phylum</strong> — both Handbook editions failed to do this, but it correctly captures where the field&rsquo;s center of gravity now sits.'>가장 의미있는 차이는 <strong>Learning for Robotics를 1등급 Phylum으로 승격</strong>한 것 — Handbook 두 판 모두 실패한 결정인데, 현재 연구의 무게중심을 정확히 반영합니다.</p>
+</div>
+
+<p style="margin: 24px 0 0; font-size: 12.5px; color: var(--text-muted); text-align: center;" data-en='Read the full evaluation: <a href="TAXONOMY_EVALUATION.en.md">TAXONOMY_EVALUATION.en.md</a>'>
+  전체 평가 문서: <a href="TAXONOMY_EVALUATION.md">TAXONOMY_EVALUATION.md</a> · <a href="TAXONOMY_EVALUATION.en.md">EN</a>
+</p>
+
+</div>
+<!-- /container -->
+
+<footer>
+  <p data-en="Robotics Paper Phylogeny · 7,477 papers · T-RO / IJRR / RSS · 1988–2025">Robotics Paper Phylogeny · 7,477편 · T-RO / IJRR / RSS · 1988–2025</p>
+  <p>
+    <a href="index.html" data-en="← Back to main">← 메인으로</a> ·
+    <a href="https://github.com/gisbi-kim/robotics-paper-phylogeny" target="_blank">GitHub</a> ·
+    <a href="TAXONOMY.md">TAXONOMY.md</a> ·
+    <a href="TAXONOMY_EVALUATION.md">TAXONOMY_EVALUATION.md</a>
+  </p>
+</footer>
+
+<script>
+(function(){
+  // Lang toggle: same data-en convention as index.html
+  function applyLang(lang) {
+    var en = lang === 'en';
+    document.documentElement.lang = en ? 'en' : 'ko';
+    document.querySelectorAll('[data-en]').forEach(function(el) {
+      if (el.dataset.ko === undefined) el.dataset.ko = el.innerHTML;
+      el.innerHTML = en ? el.dataset.en : el.dataset.ko;
+    });
+    ['title','alt','placeholder','aria-label'].forEach(function(attr) {
+      var dsKey = 'en' + attr.replace(/(^|-)([a-z])/g, function(_, _1, c){ return c.toUpperCase(); });
+      var dsKeyKo = 'ko' + attr.replace(/(^|-)([a-z])/g, function(_, _1, c){ return c.toUpperCase(); });
+      var sel = '[data-' + dsKey.replace(/([A-Z])/g, '-$1').toLowerCase() + ']';
+      document.querySelectorAll(sel).forEach(function(el) {
+        if (el.dataset[dsKeyKo] === undefined) {
+          el.dataset[dsKeyKo] = el.getAttribute(attr) || '';
+        }
+        el.setAttribute(attr, en ? el.dataset[dsKey] : el.dataset[dsKeyKo]);
+      });
+    });
+    document.querySelectorAll('#lang-toggle button').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.lang === (en ? 'en' : 'ko'));
+    });
+    try { localStorage.setItem('phylotree:lang', en ? 'en' : 'ko'); } catch(_) {}
+    // hash sync (so links to index.html?#lang=en still work both ways)
+    var h = location.hash.replace(/^#/, '');
+    var parts = h ? h.split('&').filter(function(p){ return p.indexOf('lang=') !== 0; }) : [];
+    if (en) parts.push('lang=en');
+    location.hash = parts.join('&');
+  }
+
+  function initialLang() {
+    var m = location.hash.match(/lang=(en|ko)/);
+    if (m) return m[1];
+    try { var s = localStorage.getItem('phylotree:lang'); if (s) return s; } catch(_) {}
+    return 'ko';
+  }
+
+  document.querySelectorAll('#lang-toggle button').forEach(function(b) {
+    b.addEventListener('click', function() { applyLang(b.dataset.lang); });
+  });
+
+  applyLang(initialLang());
+})();
+</script>
+
+</body>
+</html>
