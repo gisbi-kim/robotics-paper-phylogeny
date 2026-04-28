@@ -37,6 +37,7 @@ Four raw-data visualizations live in the [`eda/`](eda/) folder — see [eda/READ
 | [`TAXONOMY_EVALUATION.en.md`](TAXONOMY_EVALUATION.en.md) | Self-evaluation: MECE and insightfulness compared against the Springer Handbook of Robotics |
 | [`PLAN.en.md`](PLAN.en.md) | Work plan |
 | [`REFRESH.en.md`](REFRESH.en.md) | Procedure for syncing citations/DOIs from a RoboPaper Atlas snapshot |
+| [`MAINTENANCE.en.md`](MAINTENANCE.en.md) | Data provenance & timestamps, dependency map, scenario checklists for refreshing months/years from now |
 | [`refresh_from_atlas.py`](refresh_from_atlas.py) | atlas xlsx → citation/DOI refresh + regeneration of `papers.json` |
 | [`slides/`](slides/) | 33-frame Beamer deck (cohort wall + paradigm shifts) — compile with XeLaTeX |
 | [`classify.py`](classify.py) | Levels 1–3 classifier (Phylum/Class/Order) |

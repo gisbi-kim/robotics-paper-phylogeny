@@ -37,6 +37,7 @@
 | [`TAXONOMY_EVALUATION.md`](TAXONOMY_EVALUATION.md) | 자체 평가: Springer Handbook of Robotics 대비 MECE·insightfulness 비교 |
 | [`PLAN.md`](PLAN.md) | 작업 플랜 |
 | [`REFRESH.md`](REFRESH.md) | RoboPaper Atlas snapshot에서 citation/DOI 동기화 절차 |
+| [`MAINTENANCE.md`](MAINTENANCE.md) | 데이터 출처·시점, 의존 관계 맵, 몇 개월/몇 년 뒤 갱신 시나리오별 체크리스트 |
 | [`refresh_from_atlas.py`](refresh_from_atlas.py) | atlas xlsx → citation/DOI 갱신 + `papers.json` 재생성 |
 | [`slides/`](slides/) | 33-프레임 Beamer 발표자료 (cohort wall + paradigm shift) — XeLaTeX 컴파일 |
 | [`classify.py`](classify.py) | 1~3 단계 분류기 (Phylum/Class/Order) |
