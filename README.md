@@ -33,7 +33,8 @@
 |---|---|
 | **[`robotics_taxonomy.xlsx`](robotics_taxonomy.xlsx)** | 메인 결과 — 3 시트 (Papers / Taxonomy_Tree / Stats), **4-depth (P/C/O/G)** |
 | [`TAXONOMY.md`](TAXONOMY.md) | 13 Phylum × ~95 Class × ~330 Order 전체 트리 |
-| [`TAXONOMY_CHANGES.md`](TAXONOMY_CHANGES.md) | 초안 vs 7,477편 통독 후 비교/업데이트 설명 |
+| [`TAXONOMY_CHANGES.md`](TAXONOMY_CHANGES.md) | 초안 vs 7,477편 통독 후 비교/업데이트 설명 (적용된 변경 이력) |
+| [`TAXONOMY_PROPOSALS.md`](TAXONOMY_PROPOSALS.md) | 검토 중인 신규 분류 후보 (외부 신호로부터 발견한 것들 — 충분히 누적되면 채택) |
 | [`TAXONOMY_EVALUATION.md`](TAXONOMY_EVALUATION.md) | 자체 평가: Springer Handbook of Robotics 대비 MECE·insightfulness 비교 |
 | [`PLAN.md`](PLAN.md) | 작업 플랜 |
 | [`REFRESH.md`](REFRESH.md) | RoboPaper Atlas snapshot에서 citation/DOI 동기화 절차 |
